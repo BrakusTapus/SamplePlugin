@@ -22,14 +22,8 @@
 
   <ItemGroup>
     <None Remove="Assests\banner.png" />
+    <None Remove="Assets\banner.png" />
     <None Remove="icon.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
   </ItemGroup>
 
   <PropertyGroup>
@@ -41,6 +35,9 @@
   </PropertyGroup>
   
    <ItemGroup>
+     <EmbeddedResource Include="Assets\banner.png">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </EmbeddedResource>
      <EmbeddedResource Include="icon.png">
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      </EmbeddedResource>
