@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <None Remove="Assests\banner.png" />
+    <None Remove="icon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +39,12 @@
    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
     <DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
   </PropertyGroup>
+  
+   <ItemGroup>
+     <EmbeddedResource Include="icon.png">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </EmbeddedResource>
+   </ItemGroup>
   
    <ItemGroup>
      <Resource Include="Assests\banner.png" />
