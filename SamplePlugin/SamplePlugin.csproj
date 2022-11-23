@@ -43,8 +43,6 @@
     
   <ItemGroup>
     <None Remove="Assests\banner.png" />
-    <None Remove="Assets\banner.png" />
-    <None Remove="icon.png" />
   </ItemGroup>
 
     <!-- Set DalamudLibPath based on OS -->
@@ -62,7 +60,7 @@
      <EmbeddedResource Include="Assets\banner.png">
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      </EmbeddedResource>
-     <EmbeddedResource Include="icon.png">
+     <EmbeddedResource Include="Assets\goat.png">
        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
      </EmbeddedResource>
    </ItemGroup>
@@ -113,11 +111,10 @@
 
   <!-- Manifest -->
   <ItemGroup>
-      <None Include="SamplePlugin.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-  </ItemGroup>
-
+    <EmbeddedResource Include="Assets\EmbeddedResource.json" />
+    <EmbeddedResource Include="Assets\SamplePlugin.json" />
+ </ItemGroup>
+    
   <!-- Used to Decode Images -->
   <ItemGroup>
       <PackageReference Include="SixLabors.ImageSharp">
@@ -132,6 +129,11 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>None</IncludeAssets>
       </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Plugin.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>

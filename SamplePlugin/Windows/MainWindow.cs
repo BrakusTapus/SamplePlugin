@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
@@ -8,10 +8,10 @@ namespace SamplePlugin.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private TextureWrap GoatImage;
+    private TextureWrap bannerImage;
     private Plugin Plugin;
 
-    public MainWindow(Plugin plugin, TextureWrap goatImage) : base(
+    public MainWindow(Plugin plugin, TextureWrap bannerImage) : base(
         "My Amazing Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
@@ -20,13 +20,13 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
-        this.GoatImage = goatImage;
+        this.bannerImage = bannerImage;
         this.Plugin = plugin;
     }
 
     public void Dispose()
     {
-        this.GoatImage.Dispose();
+        this.bannerImage.Dispose();
     }
 
     public override void Draw()
@@ -40,9 +40,9 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        ImGui.Text("Have a goat:");
+        ImGui.Text("Have a banner:");
         ImGui.Indent(55);
-        ImGui.Image(this.GoatImage.ImGuiHandle, new Vector2(this.GoatImage.Width, this.GoatImage.Height));
+        ImGui.Image(this.bannerImage.ImGuiHandle, new Vector2(this.bannerImage.Width, this.bannerImage.Height));
         ImGui.Unindent(55);
     }
 }

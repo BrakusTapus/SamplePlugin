@@ -5,18 +5,24 @@ using System.IO;
 using System.Reflection;
 using Dalamud.Interface.Windowing;
 using SamplePlugin.Windows;
+using SamplePlugin.Services;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text;
+using System;
+using System.Linq;
 
 namespace SamplePlugin;
 
 public sealed class Plugin : IDalamudPlugin
 {
     public string Name => "Sample Plugin";
-    private const string CommandName = "/pmycommand";
+    private const string CommandName = "/sample";
 
     private DalamudPluginInterface PluginInterface { get; init; }
     private CommandManager CommandManager { get; init; }
     public Configuration Configuration { get; init; }
     public WindowSystem WindowSystem = new("SamplePlugin");
+
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -28,18 +34,16 @@ public sealed class Plugin : IDalamudPlugin
         this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         this.Configuration.Initialize(this.PluginInterface);
 
-        /*
-         Assembly myAssembly = Assembly.GetExecutingAssembly();
-        Stream myStream = myAssembly.GetManifestResourceStream( "MyNamespace.SubFolder.MyImage.bmp" );
-        Bitmap bmp = new Bitmap( myStream );
-        */
+        var AssemblyLocation = Service.Interface.AssemblyLocation;
+        var manifest = Path.Join(AssemblyLocation.DirectoryName, "SamplePlugin.json");
 
         // you might normally want to embed resources and load them from the manifest stream
-        var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-        var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+        var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "banner.png");
+        var imagepath2 = Path.Combine();
+        var bannerImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
         WindowSystem.AddWindow(new ConfigWindow(this));
-        WindowSystem.AddWindow(new MainWindow(this, goatImage));
+        WindowSystem.AddWindow(new MainWindow(this, bannerImage));
 
         this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -50,25 +54,30 @@ public sealed class Plugin : IDalamudPlugin
         this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
     }
 
+
+
     public void Dispose()
     {
         this.WindowSystem.RemoveAllWindows();
         this.CommandManager.RemoveHandler(CommandName);
     }
 
-    private void OnCommand(string command, string args)
+    private void OnCommand(string command, string arguments)
     {
-        // in response to the slash command, just display our main ui
-        WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
+        string[]? argumentsParts = arguments.Split();
+
+        switch (argumentsParts[0].ToLower())
+        {
+        }
     }
 
     private void DrawUI()
     {
         this.WindowSystem.Draw();
     }
-
     public void DrawConfigUI()
     {
         WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
     }
+
 }
