@@ -6,8 +6,25 @@ using ImGuiScene;
 
 namespace SamplePlugin.Windows;
 
-public class MainWindow : Window, IDisposable
+public class MainWindow
 {
+    
+    private bool visible = Plugin.Config.GuiMainVisible;
+
+    public bool Visible
+    {
+        get => visible;
+        set
+        {
+            if (Plugin.Config.GuiMainVisible != value)
+            {
+                Plugin.Config.GuiMainVisible = value;
+                Plugin.Config.Save();
+            }
+            visible = value;
+        }
+    }
+
     private TextureWrap bannerImage;
     private Plugin Plugin;
 

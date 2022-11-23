@@ -68,8 +68,6 @@
 
   <!-- Load DLLs included with Dalamud -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.4.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
     <PackageReference Include="TextCopy" Version="6.2.0" />
 
     <Reference Include="FFXIVClientStructs">
@@ -99,6 +97,15 @@
     <Reference Include="Lumina.Excel">
       <HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath>
       <Private>false</Private>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\SharpDX.DXGI.dll</HintPath>
     </Reference>
   </ItemGroup>
 

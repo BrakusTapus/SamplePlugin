@@ -1,3 +1,5 @@
+using System.Net.Http;
+using System.Reflection;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -14,26 +16,58 @@ using System.Net.Http;
 
 namespace SamplePlugin;
 
-public sealed class Plugin : IDalamudPlugin
-{
+#pragma warning disable CA1816 // Dispose warining
+#pragma warning disable RCS1170 // Use read-only auto-implemented property.
+
+public class Plugin : IDalamudPlugin
+{     
+    [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
+    [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+    [PluginService] public static Dalamud.Game.ClientState.Keys.KeyState KeyState { get; private set; } = null!;
+
     public string Name => "Sample Plugin";
-    private const string CommandName = "/sample";
 
-    private DalamudPluginInterface PluginInterface { get; init; }
-    private CommandManager CommandManager { get; init; }
-    public Configuration Configuration { get; init; }
+    public static Configuration Config { get; private set; } = null!;
+    public static MainWindow? GuiMain { get; private set; }
+    public static ConfigWindow? GuiConfig { get; private set; }
+    public object Configuration { get; internal set; }
+
     public WindowSystem WindowSystem = new("SamplePlugin");
+    private const string CommandMain = "/sample";
+    private const string CommandConfig = "/samplecfg";
 
 
-    public Plugin(
-        [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-        [RequiredVersion("1.0")] CommandManager commandManager)
+
+    public Plugin()
     {
-        this.PluginInterface = pluginInterface;
-        this.CommandManager = commandManager;
+        // Setup commands
+        CommandManager.AddHandler(CommandConfig, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Configuration window"
+        });
 
-        this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-        this.Configuration.Initialize(this.PluginInterface);
+        CommandManager.AddHandler(CommandMain, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Display the main window, containing the image."
+        });
+
+        Config = Configuration.Load(); // Load Configuration
+     // ImageSource = Config.LoadSources(); // Load ImageSources from config
+
+     // Embedded.LoadAll(); // Load all embedded resources
+
+        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigGui;
+        PluginInterface.UiBuilder.Draw += DrawUI;
+
+        // Open Main Window
+        if (Config.GuiMainVisible)
+            ShowMainGui();
+        
+    public void Dispose()
+    {
+        CommandManager.RemoveHandler(CommandConfig);
+        CommandManager.RemoveHandler(CommandMain);
+    }
 
         var AssemblyLocation = Service.Interface.AssemblyLocation;
         var manifest = Path.Join(AssemblyLocation.DirectoryName, "SamplePlugin.json");
@@ -41,40 +75,70 @@ public sealed class Plugin : IDalamudPlugin
         // you might normally want to embed resources and load them from the manifest stream
         var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "banner.png");
         var imagepath2 = Path.Combine();
-        var bannerImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+        var bannerImage = PluginInterface.UiBuilder.LoadImage(imagePath);
 
         WindowSystem.AddWindow(new ConfigWindow(this));
         WindowSystem.AddWindow(new MainWindow(this, bannerImage));
 
-        this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(CommandMain, new CommandInfo(OnCommand)
         {
             HelpMessage = "A useful message to display in /xlhelp"
         });
 
-        this.PluginInterface.UiBuilder.Draw += DrawUI;
-        this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+        PluginInterface.UiBuilder.Draw += DrawUI;
+        PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
     }
 
 
 
-    public void Dispose()
-    {
-        this.WindowSystem.RemoveAllWindows();
-        this.CommandManager.RemoveHandler(CommandName);
-    }
     private void OnCommand(string command, string args)
     {
-        // in response to the slash command, just display our main ui
-        WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
+        var input = command + args;
+
+        if (input.Contains("cfg", System.StringComparison.CurrentCultureIgnoreCase)
+         || input.Contains("config", System.StringComparison.CurrentCultureIgnoreCase))
+        {
+            ToggleConfigGui();
+        }
+        else
+        {
+            ToggleMainGui();
+        }
     }
 
     private void DrawUI()
     {
-        this.WindowSystem.Draw();
+        // Allow open/close with middle mouse button
+        if (GuiMain?.Visible != true && Config.Hotkeys.ToggleWindow.IsPressed())
+            ToggleMainGui();
+
+        GuiMain?.Draw();
+        GuiConfig?.Draw();
     }
-    public void DrawConfigUI()
+
+    public static void ToggleMainGui()
     {
-        WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
+        GuiMain ??= new();
+        GuiMain.Visible = !GuiMain.Visible;
+        Config.Save();
+    }
+
+    public static void ToggleConfigGui()
+    {
+        GuiConfig ??= new();
+        GuiConfig.Visible = !GuiConfig.Visible;
+        // Config.Save();
+    }
+
+    public static void ShowMainGui()
+    {
+        GuiMain ??= new();
+        GuiMain.Visible = true;
+    }
+    public static void ShowConfigGui()
+    {
+        GuiConfig ??= new();
+        GuiConfig.Visible = true;
     }
 
 }
