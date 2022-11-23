@@ -1,34 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Authors></Authors>
-    <Company></Company>
     <Version>0.0.0.1</Version>
-    <Description>A sample plugin.</Description>
-    <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <Platforms>x64</Platforms>
-    <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputType>Library</OutputType>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <PreserveCompilationContext>false</PreserveCompilationContext>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
   </PropertyGroup>
 
+  <!-- Info for the Dalamud Packer -->
+  <ProjectExtensions>
+    <DalamudPlugin>
+      <ApiLevel>7</ApiLevel>
+      <Author>Naji</Author>
+      <Name>SamplePlugin</Name>
+      <Punchline>Sample Punchline</Punchline>
+      <Description>Sample Description</Description>
+      <IconUrl>https://i.imgur.com/laajbFE.png</IconUrl>
+      <Tags>
+        <Tag>SamplePlugin</Tag>
+        <Tag>sample</Tag>
+        <Tag>plugin</Tag>
+      </Tags>
+      <CategoryTags>
+        <Tag>UI</Tag>
+      </CategoryTags>
+      <Images>
+        <Icon>../icon.png</Icon>
+      </Images>
+      <Hidden>False</Hidden>
+    </DalamudPlugin>
+  </ProjectExtensions>
+    
   <ItemGroup>
     <None Remove="Assests\banner.png" />
     <None Remove="Assets\banner.png" />
     <None Remove="icon.png" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-  </PropertyGroup>
+    <!-- Set DalamudLibPath based on OS -->
+    <PropertyGroup>
+        <DalamudLibPath Condition="'$(OS)' == 'Windows_NT'">$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+        <DalamudLibPath Condition="'$(OS)' == 'Unix'">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
   
    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
     <DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
@@ -47,9 +71,11 @@
      <Resource Include="Assests\banner.png" />
    </ItemGroup>
 
+  <!-- Load DLLs included with Dalamud -->
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.8" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
+
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>
@@ -78,6 +104,34 @@
       <HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath>
       <Private>false</Private>
     </Reference>
+  </ItemGroup>
+
+  <!-- Needed for creating a .zip -->
+  <ItemGroup>
+      <PackageReference Include="DalamudPackager" Version="2.1.8" />
+  </ItemGroup>
+
+  <!-- Manifest -->
+  <ItemGroup>
+      <None Include="SamplePlugin.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+
+  <!-- Used to Decode Images -->
+  <ItemGroup>
+      <PackageReference Include="SixLabors.ImageSharp">
+          <Version>2.1.3</Version>
+          <GeneratePathProperty>true</GeneratePathProperty>
+      </PackageReference>
+  </ItemGroup>
+
+  <!-- Meziantou.Analyzer for better code -->
+  <ItemGroup>
+      <PackageReference Include="Meziantou.Analyzer" Version="1.0.750">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>None</IncludeAssets>
+      </PackageReference>
   </ItemGroup>
 
 </Project>

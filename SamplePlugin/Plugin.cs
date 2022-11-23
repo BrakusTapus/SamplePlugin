@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Command;
+using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
@@ -6,64 +6,69 @@ using System.Reflection;
 using Dalamud.Interface.Windowing;
 using SamplePlugin.Windows;
 
-namespace SamplePlugin
+namespace SamplePlugin;
+
+public sealed class Plugin : IDalamudPlugin
 {
-    public sealed class Plugin : IDalamudPlugin
+    public string Name => "Sample Plugin";
+    private const string CommandName = "/pmycommand";
+
+    private DalamudPluginInterface PluginInterface { get; init; }
+    private CommandManager CommandManager { get; init; }
+    public Configuration Configuration { get; init; }
+    public WindowSystem WindowSystem = new("SamplePlugin");
+
+    public Plugin(
+        [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
+        [RequiredVersion("1.0")] CommandManager commandManager)
     {
-        public string Name => "Sample Plugin";
-        private const string CommandName = "/pmycommand";
+        this.PluginInterface = pluginInterface;
+        this.CommandManager = commandManager;
 
-        private DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
-        public Configuration Configuration { get; init; }
-        public WindowSystem WindowSystem = new("SamplePlugin");
+        this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        this.Configuration.Initialize(this.PluginInterface);
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+        /*
+         Assembly myAssembly = Assembly.GetExecutingAssembly();
+        Stream myStream = myAssembly.GetManifestResourceStream( "MyNamespace.SubFolder.MyImage.bmp" );
+        Bitmap bmp = new Bitmap( myStream );
+        */
+
+        // you might normally want to embed resources and load them from the manifest stream
+        var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
+        var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+
+        WindowSystem.AddWindow(new ConfigWindow(this));
+        WindowSystem.AddWindow(new MainWindow(this, goatImage));
+
+        this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
+            HelpMessage = "A useful message to display in /xlhelp"
+        });
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface);
+        this.PluginInterface.UiBuilder.Draw += DrawUI;
+        this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+    }
 
-            // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+    public void Dispose()
+    {
+        this.WindowSystem.RemoveAllWindows();
+        this.CommandManager.RemoveHandler(CommandName);
+    }
 
-            WindowSystem.AddWindow(new ConfigWindow(this));
-            WindowSystem.AddWindow(new MainWindow(this, goatImage));
+    private void OnCommand(string command, string args)
+    {
+        // in response to the slash command, just display our main ui
+        WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
+    }
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
-            {
-                HelpMessage = "A useful message to display in /xlhelp"
-            });
+    private void DrawUI()
+    {
+        this.WindowSystem.Draw();
+    }
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-        }
-
-        public void Dispose()
-        {
-            this.WindowSystem.RemoveAllWindows();
-            this.CommandManager.RemoveHandler(CommandName);
-        }
-
-        private void OnCommand(string command, string args)
-        {
-            // in response to the slash command, just display our main ui
-            WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
-        }
-
-        private void DrawUI()
-        {
-            this.WindowSystem.Draw();
-        }
-
-        public void DrawConfigUI()
-        {
-            WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
-        }
+    public void DrawConfigUI()
+    {
+        WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
     }
 }
