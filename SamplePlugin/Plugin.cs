@@ -10,6 +10,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace SamplePlugin;
 
@@ -61,14 +62,10 @@ public sealed class Plugin : IDalamudPlugin
         this.WindowSystem.RemoveAllWindows();
         this.CommandManager.RemoveHandler(CommandName);
     }
-
-    private void OnCommand(string command, string arguments)
+    private void OnCommand(string command, string args)
     {
-        string[]? argumentsParts = arguments.Split();
-
-        switch (argumentsParts[0].ToLower())
-        {
-        }
+        // in response to the slash command, just display our main ui
+        WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
     }
 
     private void DrawUI()

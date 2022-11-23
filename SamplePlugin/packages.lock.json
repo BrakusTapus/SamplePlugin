@@ -15,7 +15,7 @@
         "contentHash": "YVEAW6bEaZj/M0Y2KqiA+YY2IN7cAqWvYKnp07WscZ+yfruV1Xl0MQY8LvTXgeapOcfsrk2ps8jA2QvdTawOxQ=="
       },
       "Microsoft.CodeAnalysis.Common": {
-        "type": "Direct",
+        "type": "Transitive",
         "requested": "[4.4.0, )",
         "resolved": "4.4.0",
         "contentHash": "JfHupS/B7Jb5MZoYkFFABn3mux0wQgxi2D8F/rJYZeRBK2ZOyk7TjQ2Kq9rh6W/DCh0KNbbSbn5qoFar+ueHqw==",
@@ -48,10 +48,24 @@
           "System.Text.Encoding.CodePages": "5.0.0"
         }
       },
+      "TextCopy": {
+        "type": "Direct",
+        "requested": "[6.2.0, )",
+        "resolved": "6.2.0",
+        "contentHash": "mpl+ssTDgROzmSkAoivi8HJdrEh5QCpXScP/vW2qIugfbaPI9eDNxbxxWDosVmKJSh4dfsALsSKqD6EJbE9awQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0"
+        }
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
         "resolved": "3.3.3",
         "contentHash": "j/rOZtLMVJjrfLRlAMckJLPW/1rze9MT1yfWqSIbUPGRu1m1P0fuo9PmqapwsmePfGB5PJrudQLvmUOAMF0DqQ=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "7.0.0",
+        "contentHash": "h3j/QfmFN4S0w4C2A6X7arXij/M/OVw3uQHSOFxnND4DyAzO1F9eMX7Eti7lU/OkSthEE0WzRsfT/Dmx86jzCw=="
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
