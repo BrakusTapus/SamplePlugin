@@ -4,7 +4,6 @@ using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
-using System.Reflection;
 using Dalamud.Interface.Windowing;
 using SamplePlugin.Windows;
 using SamplePlugin.Services;
@@ -12,7 +11,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text;
 using System;
 using System.Linq;
-using System.Net.Http;
+using SamplePlugin.Core;
 
 namespace SamplePlugin;
 
@@ -62,14 +61,8 @@ public class Plugin : IDalamudPlugin
         // Open Main Window
         if (Config.GuiMainVisible)
             ShowMainGui();
-        
-    public void Dispose()
-    {
-        CommandManager.RemoveHandler(CommandConfig);
-        CommandManager.RemoveHandler(CommandMain);
-    }
 
-        var AssemblyLocation = Service.Interface.AssemblyLocation;
+        var AssemblyLocation = Services.Dalamud.Interface.AssemblyLocation;
         var manifest = Path.Join(AssemblyLocation.DirectoryName, "SamplePlugin.json");
 
         // you might normally want to embed resources and load them from the manifest stream
@@ -141,4 +134,9 @@ public class Plugin : IDalamudPlugin
         GuiConfig.Visible = true;
     }
 
+    public void Dispose()
+    {
+        CommandManager.RemoveHandler(CommandConfig);
+        CommandManager.RemoveHandler(CommandMain);
+    }
 }

@@ -18,7 +18,7 @@ using SamplePlugin.Core;
 namespace SamplePlugin.Services;
 
 /// <summary> Dalamud and plugin services. </summary>
-internal class Service
+internal class Dalamud
 {
 
     /// <summary> Gets the Dalamud buddy list. </summary>
@@ -45,7 +45,7 @@ internal class Service
     internal static Condition Condition { get; private set; } = null!;
 
     /// <summary> Gets or sets the plugin configuration. </summary>
-    internal static PluginConfiguration Configuration { get; set; } = null!;
+    internal static Configuration Configuration { get; set; } = null!;
 
     /// <summary> Gets the Dalamud data manager. </summary>
     [PluginService]
