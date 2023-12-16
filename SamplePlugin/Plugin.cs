@@ -33,7 +33,7 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     // Constructor for the plugin.
-    // The [RequiredVersion("1.0")] attribute specifies the required version of the injected service.
+    // The attribute specifies the required version of the injected service.
     public Plugin(DalamudPluginInterface pluginInterface, ICommandManager commandManager, IPluginLog pluginLog)
     {
         // Initialize properties with the injected services.
