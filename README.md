@@ -74,3 +74,67 @@ Note that you only need to add it to the Dev Plugin Locations once (Step 1); it 
 Basically, just replace all references to `SamplePlugin` in all of the files and filenames with your desired name, then start building the plugin of your dreams. You'll figure it out 😁
 
 Dalamud will load the JSON file (by default, `SamplePlugin/SamplePlugin.json`) next to your DLL and use it for metadata, including the description for your plugin in the Plugin Installer. Make sure to update this with information relevant to _your_ plugin!
+
+
+
+### Extra info
+
+
+The imported project does the following
+<Import Project="$(DalamudLibPath)/targets/Dalamud.Plugin.targets"/>
+
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <!-- PropertyGroup: Defines a group of properties for the project -->
+    <PropertyGroup>
+        <!-- TargetFramework: Specifies the target framework version for the project. Here, it's .NET 7.0 specifically for Windows -->
+        <TargetFramework>net7.0-windows</TargetFramework>
+
+        <!-- Platforms: Specifies the platform target, here it's x64 -->
+        <Platforms>x64</Platforms>
+
+        <!-- Nullable: Enables nullable reference types (C# 8.0 feature) -->
+        <Nullable>enable</Nullable>
+
+        <!-- LangVersion: Specifies the version of the C# language to use. 'latest' means the latest available version -->
+        <LangVersion>latest</LangVersion>
+
+        <!-- AllowUnsafeBlocks: Allows the use of unsafe code blocks in the project -->
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <!-- ProduceReferenceAssembly: Indicates whether to produce a reference assembly. Set to false here -->
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+        <!-- AppendTargetFrameworkToOutputPath: Determines if the target framework should be added to the output path. Set to false here -->
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+        <!-- RestorePackagesWithLockFile: Enables the use of a packages lock file for consistent restore results -->
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+        <!-- CopyLocalLockFileAssemblies: Copies the NuGet package assemblies locally with the lock file -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+        <!-- AssemblySearchPaths: Defines additional paths to search for referenced assemblies -->
+        <AssemblySearchPaths>$(AssemblySearchPaths);$(DalamudLibPath)</AssemblySearchPaths>
+    </PropertyGroup>
+
+    <!-- ItemGroup: Defines a group of items used in the project -->
+    <ItemGroup>
+        <!-- PackageReference: Specifies NuGet package references for the project -->
+        <PackageReference Include="DalamudPackager" Version="2.1.12" />
+        <!-- Reference: Specifies assembly references. 'Private=false' means they are not copied to the output directory -->
+        <Reference Include="FFXIVClientStructs" Private="false" />
+        <Reference Include="Newtonsoft.Json" Private="false" />
+        <Reference Include="Dalamud" Private="false" />
+        <Reference Include="ImGui.NET" Private="false" />
+        <Reference Include="ImGuiScene" Private="false" />
+        <Reference Include="Lumina" Private="false" />
+        <Reference Include="Lumina.Excel" Private="false" />
+    </ItemGroup>
+
+    <!-- Target: Defines a build target with a specific action -->
+    <Target Name="Message" BeforeTargets="BeforeBuild">
+        <!-- Message: Displays a message during the build process. 'Importance=high' makes it more prominent -->
+        <Message Text="Dalamud.Plugin: root at $(DalamudLibPath)" Importance="high" />
+    </Target>
+</Project>

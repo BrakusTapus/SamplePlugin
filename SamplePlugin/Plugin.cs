@@ -1,10 +1,11 @@
-﻿using Dalamud.Game.Command;
+using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using SamplePlugin.Windows;
+using Dalamud.Logging;
 
 namespace SamplePlugin
 {
@@ -21,10 +22,9 @@ namespace SamplePlugin
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] ICommandManager commandManager)
+        public Plugin([RequiredVersion("1.0")] DalamudPluginInterface pluginInterface, [RequiredVersion("1.0")] ICommandManager commandManager)
         {
+            PluginLog.Debug($"Starting plugin -> [{Name}]");
             this.PluginInterface = pluginInterface;
             this.CommandManager = commandManager;
 
@@ -32,12 +32,15 @@ namespace SamplePlugin
             this.Configuration.Initialize(this.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
+            // Path 1 points to the build output path (ex: C:\Users\AJvdM\AppData\Roaming\XIVPlugins\Projects\SamplePlugin\SamplePlugin\bin\x64\Release)
+            // Path 2 points to Path 1 + "images\goat.png"
+            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "images\\icon.png");
+            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+            
             ConfigWindow = new ConfigWindow(this);
             MainWindow = new MainWindow(this, goatImage);
-            
+
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
 
@@ -53,10 +56,10 @@ namespace SamplePlugin
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            
+
             ConfigWindow.Dispose();
             MainWindow.Dispose();
-            
+
             this.CommandManager.RemoveHandler(CommandName);
         }
 

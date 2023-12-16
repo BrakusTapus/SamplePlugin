@@ -3,7 +3,7 @@
     <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
 
     <PropertyGroup>
-        <Authors></Authors>
+        <Authors>Kirbo</Authors>
         <Company></Company>
         <Version>0.0.0.1</Version>
         <Description>A sample plugin.</Description>
@@ -13,10 +13,15 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+    <!-- Include all image files from the Images directory -->
     <ItemGroup>
-        <Content Include="..\Data\goat.png">
+        <!-- This includes the content in the build -->
+        <Content Include="..\images\*.png">
+            <!-- the next 3 tags work together and display the content from <content include> in the IDE -->
+            <Link>images\%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
     </ItemGroup>
+
 </Project>
