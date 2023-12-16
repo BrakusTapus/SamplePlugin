@@ -42,7 +42,7 @@ public sealed class Plugin : IDalamudPlugin
         this.CommandManager = commandManager;
 
         // Log a debug message indicating the plugin is starting.
-        PluginLog.Debug($"Starting plugin -> [{Name}]");
+        PluginLog.Debug($"Starting plugin -> [{Name}].");
 
         // Load or create the plugin configuration.
         this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
