@@ -4,9 +4,12 @@
 
     <PropertyGroup>
         <Authors>Kirbo</Authors>
-        <Company></Company>
         <Version>0.0.0.1</Version>
-        <Description>A sample plugin.</Description>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Company></Company>
+        <Description>A long description of the NuGet Package for UI display.</Description>
         <Copyright></Copyright>
         <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
