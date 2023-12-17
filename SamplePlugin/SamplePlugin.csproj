@@ -4,14 +4,9 @@
 
     <PropertyGroup>
         <Authors>Kirbo</Authors>
-        <Version>0.0.0.1</Version>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <Company></Company>
+        <Version>0.0.0.2</Version>
         <Description>A long description of the NuGet Package for UI display.</Description>
-        <Copyright></Copyright>
-        <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
@@ -34,6 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="..\images\"/>
+        <Folder Include="images\"/>
     </ItemGroup>
 </Project>

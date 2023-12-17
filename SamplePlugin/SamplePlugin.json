@@ -1,19 +1,17 @@
 {
     "Author": "Kirbo",
     "Name": "Sample Plugin",
-    "AssemblyVersion": "0.0.0.1",
-    "Punchline": "A short one-liner that shows up in /xlplugins.",
-    "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
-    "InternalName": "samplePlugin",
-    "ApplicableVersion": "any",
+    "Punchline": "A one-liner.",
+    "Description": "A description that shows up in /xlplugins.",
+    "InternalName": "SamplePlugin",
     "RepoUrl": "https://github.com/BrakusTapus/samplePlugin",
-    "Tags": [
-        "sample",
-        "plugin",
-        "goats"
-    ],
+    "ApplicableVersion": "any",
+    "Tags": [ "sample", "plugin" ],
+    "DalamudApiLevel": 9,
+    "AcceptsFeedback": false,
     "IconUrl": "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/icon.png",
     "ImageUrls": [
         "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/image1.png"
-    ]
+    ],
+    "Changelog": "Click the new Changelog button to see whats new"
 }
