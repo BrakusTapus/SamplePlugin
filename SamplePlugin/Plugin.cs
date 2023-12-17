@@ -68,7 +68,7 @@ public class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
-        this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommandToggleMainWindow)
         {
             HelpMessage = "Opens Main menu"
         });
@@ -88,10 +88,10 @@ public class Plugin : IDalamudPlugin
         this.CommandManager.RemoveHandler(CommandName);
     }
 
-    private void OnCommand(string command, string args)
+    private void OnCommandToggleMainWindow(string command, string args)
     {
         // in response to the slash command, just display our main ui
-        MainWindow.IsOpen = true;
+        ToggleMainWindow();
     }
 
     private void DrawUI()
