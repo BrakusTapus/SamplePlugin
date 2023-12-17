@@ -58,7 +58,7 @@ public class Plugin : IDalamudPlugin
 
         // Path 1 points to the build output path (ex: C:\Users\AJvdM\AppData\Roaming\XIVPlugins\Projects\SamplePlugin\SamplePlugin\bin\x64\Release)
         // Path 2 points to Path 1 + "images\goat.png"
-        var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "images\\icon.png");
+        var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "icon.png");
         IDalamudTextureWrap? goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
         ConfigWindow = new ConfigWindow(this);

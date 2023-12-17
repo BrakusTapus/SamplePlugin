@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+    <!-- This sets default properties and dalamud references -->
     <Import Project="Dalamud.Plugin.Bootstrap.targets" />
 
+    <!-- General properties -->
     <PropertyGroup>
         <Authors>Kirbo</Authors>
-        <Version>0.0.0.3</Version>
+        <Version>0.0.0.4</Version>
         <Description>A long description of the NuGet Package for UI display.</Description>
         <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+    <!-- Configuration for Debug -->
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <!-- Set the output path for the Debug configuration -->
+        <OutputPath>bin\Debug\SamplePlugin\</OutputPath>
+    </PropertyGroup>
+
+    <!-- Configuration for Release -->
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <!-- Set the output path for the Release configuration -->
+        <OutputPath>bin\Release\SamplePlugin\</OutputPath>
+    </PropertyGroup>
+
+    <!-- Including the manifest file -->
     <ItemGroup>
         <Content Include="SamplePlugin.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 
+    <!-- Including images -->
     <ItemGroup>
-        <Content Include="..\images\**">
+        <Content Include="..\images\*.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Link>images\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <Visible>false</Visible>
         </Content>
     </ItemGroup>
 
