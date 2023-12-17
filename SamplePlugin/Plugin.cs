@@ -37,16 +37,17 @@ public class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     // Constructor for the plugin.
-    // The attribute specifies the required version of the injected service.
     public Plugin(DalamudPluginInterface pluginInterface, ICommandManager commandManager, IPluginLog pluginLog)
     {
         // Initialize properties with the injected services.
-        this.PluginLog = pluginLog;
-        this.PluginInterface = pluginInterface;
-        this.CommandManager = commandManager;
+        this.PluginLog = pluginLog;        
+        PluginLog.Debug($"Starting [{Name}]"); // Log a debug message indicating the plugin is starting.
 
-        // Log a debug message indicating the plugin is starting.
-        PluginLog.Debug($"Starting plugin -> [{Name}]..");
+        this.PluginInterface = pluginInterface;
+        PluginLog.Debug("Initialize: " + PluginInterface);
+
+        this.CommandManager = commandManager;
+        PluginLog.Debug("Initialize: " + CommandManager);
 
         // Load or create the plugin configuration.
         this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
