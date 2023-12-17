@@ -69,11 +69,12 @@ public class Plugin : IDalamudPlugin
 
         this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Opens Main menu"
         });
 
         this.PluginInterface.UiBuilder.Draw += DrawUI;
-        this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+        this.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigWindow;
+        this.PluginInterface.UiBuilder.OpenMainUi += ToggleMainWindow;
     }
 
     public void Dispose()
@@ -97,8 +98,17 @@ public class Plugin : IDalamudPlugin
         this.WindowSystem.Draw();
     }
 
-    public void DrawConfigUI()
+    /// <summary>
+    /// Method: Toggles the visibility of the main window of the plugin.
+    /// <remarks>Changes the open state of the MainWindow, showing or hiding it.</remarks>
+    /// </summary>
+    private void ToggleMainWindow()
     {
-        ConfigWindow.IsOpen = true;
+        MainWindow.IsOpen = !MainWindow.IsOpen;
+    }
+
+    public void ToggleConfigWindow()
+    {
+        ConfigWindow.IsOpen = !ConfigWindow.IsOpen;
     }
 }
