@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="images\"/>
+        <!-- Include all PNG images from the images folder located one level up -->
+        <EmbeddedResource Include="..\images\*.png" />
     </ItemGroup>
 </Project>
