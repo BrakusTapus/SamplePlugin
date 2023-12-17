@@ -77,10 +77,32 @@ Dalamud will load the JSON file (by default, `SamplePlugin/SamplePlugin.json`) n
 
 
 
-### Extra info
+## Extra info
 
+
+### Dalamud.Plugin.Bootstrap.Targets
+
+Sets the ``DalamudLibPath`` to the XIVLauncher/addon/dev/ folder and also uses ``targets/Dalamud.Plugin.targets`` to set some project defaults
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
+        <DalamudLibPath Condition="$(DALAMUD_HOME) != ''">$(DALAMUD_HOME)/</DalamudLibPath>
+    </PropertyGroup>
+    
+    <Import Project="$(DalamudLibPath)/targets/Dalamud.Plugin.targets"/>
+</Project>
+```
+
+
+### Dalamud.Plugin.Targets
 
 The imported project does the following
+```
 <Import Project="$(DalamudLibPath)/targets/Dalamud.Plugin.targets"/>
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -138,3 +160,4 @@ The imported project does the following
         <Message Text="Dalamud.Plugin: root at $(DalamudLibPath)" Importance="high" />
     </Target>
 </Project>
+```

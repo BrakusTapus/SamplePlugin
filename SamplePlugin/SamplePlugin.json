@@ -9,9 +9,9 @@
     "Tags": [ "sample", "plugin" ],
     "DalamudApiLevel": 9,
     "AcceptsFeedback": false,
-    "IconUrl": "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/icon.png",
+    "IconUrl": "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/SamplePlugin/images/icon.png",
     "ImageUrls": [
-        "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/image1.png"
+        "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/SamplePlugin/images/image1.png"
     ],
     "Changelog": "Click the new Changelog button to see whats new"
 }
