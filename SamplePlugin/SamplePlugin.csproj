@@ -17,17 +17,6 @@
         </Content>
     </ItemGroup>
 
-    <!-- Include all image files from the Images directory -->
-    <ItemGroup>
-        <!-- This includes the content in the build -->
-        <Content Include="..\images\*.png">
-            <!-- the next 3 tags work together and display the content from <content include> in the IDE -->
-            <Link>images\%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>true</Visible>
-        </Content>
-    </ItemGroup>
-
     <ItemGroup>
         <Folder Include="images\"/>
     </ItemGroup>
