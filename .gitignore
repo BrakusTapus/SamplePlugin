@@ -2,4 +2,6 @@
 obj/
 bin/
 *.user
-/desktop.ini
+/.gitignore
+.editorconfig
+/.gitignore
