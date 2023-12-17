@@ -9,7 +9,7 @@
     "Tags": [ "sample", "plugin" ],
     "DalamudApiLevel": 9,
     "AcceptsFeedback": false,
-    "IconUrl": "https://raw.githubusercontent.com/InitialDet/AutoHook/main/AutoHook/images/icon.png",
+    "IconUrl": "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/icon.png",
     "ImageUrls": [
         "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/SamplePlugin/images/image1.png"
     ],

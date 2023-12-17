@@ -18,7 +18,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Include all PNG images from the images folder located one level up -->
-        <EmbeddedResource Include="..\images\*.png" />
+        <!-- Include images from a folder one level up and show them in a virtual 'images' folder in Solution Explorer -->
+        <EmbeddedResource Include="..\images\*.png">
+            <Link>images\%(Filename)%(Extension)</Link>
+        </EmbeddedResource>
     </ItemGroup>
+
 </Project>
