@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
+    <Import Project="Dalamud.Plugin.Bootstrap.targets" />
 
     <PropertyGroup>
         <Authors>Kirbo</Authors>
-        <Version>0.0.0.2</Version>
+        <Version>0.0.0.3</Version>
         <Description>A long description of the NuGet Package for UI display.</Description>
         <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -18,10 +18,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Include images from a folder one level up and show them in a virtual 'images' folder in Solution Explorer -->
-        <EmbeddedResource Include="..\images\*.png">
-            <Link>images\%(Filename)%(Extension)</Link>
-        </EmbeddedResource>
+        <Content Include="..\images\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>images\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </Content>
     </ItemGroup>
 
 </Project>
