@@ -6,7 +6,7 @@
     <!-- General properties -->
     <PropertyGroup>
         <Authors>Kirbo</Authors>
-        <Version>0.0.0.7</Version>
+        <Version>0.0.0.8</Version>
         <Description>A long description of the NuGet Package for UI display.</Description>
         <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>

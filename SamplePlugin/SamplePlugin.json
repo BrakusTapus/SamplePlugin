@@ -6,7 +6,11 @@
     "InternalName": "SamplePlugin",
     "RepoUrl": "https://github.com/BrakusTapus/SamplePlugin",
     "ApplicableVersion": "any",
-    "Tags": [ "sample", "plugin", "private" ],
+    "Tags": [
+        "sample",
+        "plugin",
+        "private"
+    ],
     "DalamudApiLevel": 9,
     "AcceptsFeedback": false,
     "IconUrl": "https://raw.githubusercontent.com/BrakusTapus/SamplePlugin/main/images/icon.png",
