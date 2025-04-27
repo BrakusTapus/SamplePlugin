@@ -14,8 +14,4 @@
       <Visible>false</Visible>
     </Content>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DalamudServices\" />
-  </ItemGroup>
 </Project>
