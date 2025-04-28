@@ -4,20 +4,22 @@ using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using SamplePlugin.Windows;
+using SamplePlugin.UI;
 using SamplePlugin.DalamudServices;
+using Dalamud.Game.Gui.NamePlate;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
+using SamplePlugin.NamePlate;
+using Serilog;
+using System.Collections.Generic;
+using SamplePlugin.Configs;
+using SamplePlugin.Updaters;
+using ECommons;
 
 namespace SamplePlugin;
 
 public sealed class Plugin : IDalamudPlugin
 {
-    //[PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
-    //[PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
-    //[PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
-    //[PluginService] internal static IClientState ClientState { get; private set; } = null!;
-    //[PluginService] internal static IDataManager DataManager { get; private set; } = null!;
-    //[PluginService] internal static IPluginLog Log { get; private set; } = null!;
-
     private const string CommandName = "/kirbo";
 
     public Configuration Configuration { get; init; }
@@ -28,6 +30,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        ECommonsMain.Init(pluginInterface, this, ECommons.Module.DalamudReflector, ECommons.Module.ObjectFunctions);
         Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
@@ -59,6 +62,12 @@ public sealed class Plugin : IDalamudPlugin
             MainWindow.IsOpen = true;
         }
 
+        Feature.Enable();
+        MainUpdater.Enable();
+
+        //Service.NamePlateGui.OnNamePlateUpdate += OnNamePlateUpdate;
+        //Service.NamePlateGui.OnNamePlateUpdate += MainWindow.OnNamePlateUpdate2;
+
         // Add a simple message to the log with level set to information
         // Use /xllog to open the log window in-game
         // Example Output: 00:57:54.959 | INF | [SamplePlugin] ===A cool log message from Sample Plugin===
@@ -68,11 +77,14 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
-
         ConfigWindow.Dispose();
         MainWindow.Dispose();
-
+        Feature.Dispose();
         Service.CommandManager.RemoveHandler(CommandName);
+        //Service.NamePlateGui.OnNamePlateUpdate -= OnNamePlateUpdate;
+        //Service.NamePlateGui.OnNamePlateUpdate -= MainWindow.OnNamePlateUpdate2;
+        MainUpdater.Dispose();
+        ECommonsMain.Dispose();
         //Service.Log.Information($"Finished unloading: {Service.PluginInterface.Manifest.Name}."); 
     }
 
@@ -86,4 +98,5 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
+
 }
