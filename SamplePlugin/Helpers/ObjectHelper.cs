@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
+using ECommons.DalamudServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
@@ -37,7 +38,7 @@ internal static class ObjectHelper
     /// <returns></returns>
     public static float DistanceToPlayer(this IGameObject? obj)
     {
-        var localPlayer = Service.ClientState.LocalPlayer;
+        var localPlayer = Svc.ClientState.LocalPlayer;
         if (obj == null) return float.MaxValue;
         if (localPlayer == null) return float.MaxValue;
         if (obj is not IBattleChara b) return float.MaxValue;

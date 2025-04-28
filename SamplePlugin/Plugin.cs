@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using SamplePlugin.Configs;
 using SamplePlugin.Updaters;
 using ECommons;
+using ECommons.DalamudServices;
 
 namespace SamplePlugin;
 
@@ -43,7 +44,7 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
-        Service.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Opens Menu"
         });
@@ -57,7 +58,7 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button that is doing the same but for the main ui of the plugin
         pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
-        if (Service.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
+        if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
         {
             MainWindow.IsOpen = true;
         }
@@ -80,7 +81,7 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Dispose();
         MainWindow.Dispose();
         Feature.Dispose();
-        Service.CommandManager.RemoveHandler(CommandName);
+        Svc.Commands.RemoveHandler(CommandName);
         //Service.NamePlateGui.OnNamePlateUpdate -= OnNamePlateUpdate;
         //Service.NamePlateGui.OnNamePlateUpdate -= MainWindow.OnNamePlateUpdate2;
         MainUpdater.Dispose();

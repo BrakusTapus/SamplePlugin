@@ -54,7 +54,7 @@ public static class Feature
     {
         foreach (INamePlateUpdateHandler handler in handlers)
         {
-            Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter? localPlayer = Service.ClientState.LocalPlayer;
+            Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter? localPlayer = Svc.ClientState.LocalPlayer;
             if (localPlayer == null)
             {
                 continue;
