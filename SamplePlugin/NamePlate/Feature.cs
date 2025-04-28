@@ -63,9 +63,9 @@ public static class Feature
             if (handler.NamePlateKind == NamePlateKind.PlayerCharacter || handler.NamePlateKind == NamePlateKind.BattleNpcEnemy)
             {
                 int nameIconId = handler.NameIconId;
-                var objectId = handler.GameObjectId;
-                var name = handler.Name.ToString();
-                var isBoss = handler.IsBossFromNamePlateIconId();
+                ulong objectId = handler.GameObjectId;
+                string name = handler.Name.ToString();
+                bool isBoss = handler.IsBossFromNamePlateIconId();
 
                 Svc.Log.Info($"Nameplate Update - Name: {name}, ObjectId: {objectId:X8}, NameIconId: {nameIconId}, IsBoss: {isBoss}");
             }

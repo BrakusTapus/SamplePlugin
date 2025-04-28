@@ -164,6 +164,11 @@ public class MainWindow : Window, IDisposable
                 {
                     Plugin.ToggleConfigUI();
                 }
+                if (ImGui.Button("Request Redraw"))
+                {
+                    //Feature.namePlateEntries.Clear();
+                    Service.NamePlateGui.RequestRedraw();
+                }
 
                 ImGui.Spacing();
             }
