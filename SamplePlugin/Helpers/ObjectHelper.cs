@@ -13,6 +13,7 @@ using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using SamplePlugin.DalamudServices;
+using SamplePlugin.Updaters;
 
 namespace SamplePlugin.Helpers;
 internal static class ObjectHelper
@@ -77,5 +78,24 @@ internal static class ObjectHelper
 
         return !FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance()->BGCollisionModule
             ->RaycastMaterialFilter(&hit, &point, &direction, direction.Length(), 1, unknown);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static int NumberOfHostilesInRange
+    {
+        get
+        {
+            int count = 0;
+            foreach (var o in MainUpdater.AllTargets)
+            {
+                if (o.DistanceToPlayer() < 30)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
     }
 }

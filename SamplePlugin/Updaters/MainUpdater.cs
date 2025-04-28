@@ -1,49 +1,85 @@
-using System;
+//using System.Collections.Generic;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
-using SamplePlugin.DalamudServices;
 
 namespace SamplePlugin.Updaters;
+
 internal static class MainUpdater
 {
+    public static IReadOnlyList<IBattleChara> AllTargets => _allTargets;
+    private static readonly List<IBattleChara> _allTargets = new();
+
     public static void Enable()
     {
         Svc.Framework.Update += KirboUpdate;
     }
-
 
     public static void Dispose()
     {
         Svc.Framework.Update -= KirboUpdate;
     }
 
-    private unsafe static void KirboUpdate(IFramework framework)
+    private static void KirboUpdate(IFramework framework)
     {
         UpdateTargets();
     }
 
-
-    public static List<IBattleChara> AllTargets { get; set; } = [];
     internal static void UpdateTargets()
     {
-        AllTargets = GetAllTargets();
-    }
-
-    private static List<IBattleChara> GetAllTargets()
-    {
-        var allTargets = new List<IBattleChara>();
+        _allTargets.Clear();
         foreach (var obj in Svc.Objects)
         {
             if (obj is IBattleChara battleChara)
             {
-                allTargets.Add(battleChara);
+                _allTargets.Add(battleChara);
             }
         }
-        return allTargets;
     }
 }
+
+
+
+//using Dalamud.Game.ClientState.Objects.Types;
+//using Dalamud.Plugin.Services;
+//using ECommons.DalamudServices;
+
+//namespace SamplePlugin.Updaters;
+
+//internal static class MainUpdater
+//{
+//    public static void Enable()
+//    {
+//        Svc.Framework.Update += KirboUpdate;
+//    }
+
+//    public static void Dispose()
+//    {
+//        Svc.Framework.Update -= KirboUpdate;
+//    }
+
+//    private static void KirboUpdate(IFramework framework)
+//    {
+//        UpdateTargets();
+//    }
+
+//    public static List<IBattleChara> AllTargets { get; set; } = [];
+//    internal static void UpdateTargets()
+//    {
+//        AllTargets = GetAllTargets();
+//    }
+
+//    private static List<IBattleChara> GetAllTargets()
+//    {
+//        List<IBattleChara> allTargets = new List<IBattleChara>();
+//        foreach (IGameObject obj in Svc.Objects)
+//        {
+//            if (obj is IBattleChara battleChara)
+//            {
+//                allTargets.Add(battleChara);
+//            }
+//        }
+//        return allTargets;
+//    }
+//}

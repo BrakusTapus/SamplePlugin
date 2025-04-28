@@ -9,7 +9,6 @@ using SamplePlugin.DalamudServices;
 using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
-using SamplePlugin.NamePlate;
 using Serilog;
 using System.Collections.Generic;
 using SamplePlugin.Configs;
@@ -63,16 +62,8 @@ public sealed class Plugin : IDalamudPlugin
             MainWindow.IsOpen = true;
         }
 
-        Feature.Enable();
+        //NamePlateUpdater.Enable();
         MainUpdater.Enable();
-
-        //Service.NamePlateGui.OnNamePlateUpdate += OnNamePlateUpdate;
-        //Service.NamePlateGui.OnNamePlateUpdate += MainWindow.OnNamePlateUpdate2;
-
-        // Add a simple message to the log with level set to information
-        // Use /xllog to open the log window in-game
-        // Example Output: 00:57:54.959 | INF | [SamplePlugin] ===A cool log message from Sample Plugin===
-        //Service.Log.Information($"Finished loading: {pluginInterface.Manifest.Name}.");
     }
 
     public void Dispose()
@@ -80,13 +71,10 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
         ConfigWindow.Dispose();
         MainWindow.Dispose();
-        Feature.Dispose();
         Svc.Commands.RemoveHandler(CommandName);
-        //Service.NamePlateGui.OnNamePlateUpdate -= OnNamePlateUpdate;
-        //Service.NamePlateGui.OnNamePlateUpdate -= MainWindow.OnNamePlateUpdate2;
+        //NamePlateUpdater.Dispose();
         MainUpdater.Dispose();
         ECommonsMain.Dispose();
-        //Service.Log.Information($"Finished unloading: {Service.PluginInterface.Manifest.Name}."); 
     }
 
     private void OnCommand(string command, string args)
