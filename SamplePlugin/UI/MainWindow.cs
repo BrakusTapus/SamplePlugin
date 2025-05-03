@@ -14,7 +14,6 @@ using ImGuiNET;
 using Lumina.Excel.Sheets;
 using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers.UI;
-using SamplePlugin.NamePlate;
 using SamplePlugin.Updaters;
 
 namespace SamplePlugin.UI;

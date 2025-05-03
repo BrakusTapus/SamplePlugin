@@ -31,7 +31,7 @@ internal static class MainUpdater
         _allTargets.Clear();
         foreach (var obj in Svc.Objects)
         {
-            if (obj is IBattleChara battleChara)
+            if (obj is IBattleChara battleChara && obj.Name.ToString() != string.Empty)
             {
                 _allTargets.Add(battleChara);
             }
