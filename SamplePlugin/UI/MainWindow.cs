@@ -183,13 +183,62 @@ public class MainWindow : Window, IDisposable
         }
 
         ImGui.Separator();
-
+        if (ImGui.Button("Remove"))
+        {
+            NamePlateUpdater.ClearList();
+        }
         foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
         {
-            ImGui.TextUnformatted($"Name: {entry.Name}");
-            ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-            ImGui.TextUnformatted($"GameObjectId: {entry.GameObjectId.ToString()}");
+            if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+            {
+                // Define fixed width for both columns
+                ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100f);
+                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
+
+                Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
+                if (icon2 != null)
+                {
+                    ImGui.TableNextRow();
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.TextUnformatted("Name");
+                    ImGui.TableSetColumnIndex(1);
+                    ImGui.TextUnformatted(entry.Name);
+                    ImGui.SameLine();
+                    ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
+
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.BeginTooltip();
+                        ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
+                        ImGui.EndTooltip();
+                    }
+                }
+
+                ImGui.TableNextRow();
+                ImGui.TableSetColumnIndex(0);
+                ImGui.TextUnformatted("GameObjectId");
+                ImGui.TableSetColumnIndex(1);
+                ImGui.TextUnformatted(entry.GameObjectId.ToString());
+
+                ImGui.EndTable();
+            }
+
+            // Add vertical spacing between entries
+            ImGui.Dummy(new Vector2(0, 10));
         }
+
+        //foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
+        //{
+        //    Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
+        //    ImGui.TextUnformatted($"Name: {entry.Name}");
+        //    ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
+        //    if (icon2 != null)
+        //    {
+        //        ImGui.SameLine();
+        //        ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
+        //    }
+        //    ImGui.TextUnformatted($"GameObjectId: {entry.GameObjectId.ToString()}");
+        //}
     }
 
     //public void DrawNamePlates()

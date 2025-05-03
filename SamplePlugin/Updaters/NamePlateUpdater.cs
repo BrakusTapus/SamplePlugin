@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Plugin.Services;
@@ -29,24 +30,42 @@ internal static class NamePlateUpdater
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
-        //_allNamePlates.Clear();
         foreach (INamePlateUpdateHandler handler in handlers)
         {
-            // Only track player characters and enemy battle NPCs
             if (handler.NamePlateKind == NamePlateKind.PlayerCharacter || handler.NamePlateKind == NamePlateKind.BattleNpcEnemy)
             {
-                NamePlateEntry entry = new NamePlateEntry
+                var existing = _allNamePlates.FirstOrDefault(p => p.GameObjectId == handler.GameObjectId);
+                if (existing != null)
                 {
-                    GameObjectId = handler.GameObjectId,
-                    Name = handler.Name.ToString(),
-                    NameIconId = handler.NameIconId,
-                    MarkerIconId = handler.MarkerIconId,
-                    IsBoss = handler.IsBossFromNamePlateIconId(),
-                    Kind = handler.NamePlateKind,
-                };
-                _allNamePlates.Add(entry);
+                    // Update existing entry
+                    existing.Name = handler.Name.ToString();
+                    existing.NameIconId = handler.NameIconId;
+                    existing.MarkerIconId = handler.MarkerIconId;
+                    existing.IsBoss = handler.IsBossFromNamePlateIconId();
+                    existing.Kind = handler.NamePlateKind;
+                    existing.BattleChara = handler.BattleChara;
+                }
+                else
+                {
+                    // Add new entry
+                    _allNamePlates.Add(new NamePlateEntry
+                    {
+                        GameObjectId = handler.GameObjectId,
+                        Name = handler.Name.ToString(),
+                        NameIconId = handler.NameIconId,
+                        MarkerIconId = handler.MarkerIconId,
+                        IsBoss = handler.IsBossFromNamePlateIconId(),
+                        Kind = handler.NamePlateKind,
+                        BattleChara = handler.BattleChara // Assuming you're tracking this for targetability
+                    });
+                }
             }
         }
+    }
+
+    public static void ClearList()
+    {
+        _allNamePlates.Clear();
     }
 }
 
@@ -92,5 +111,7 @@ internal class NamePlateEntry
     /// Gets the <see cref="IBattleChara"/> associated with this nameplate, if possible. Returns null if the nameplate
     /// has an associated <see cref="IGameObject"/>, but that object cannot be assigned to <see cref="IBattleChara"/>.
     /// </summary>
-    public IBattleChara? BattleChara { get; }
+    public IBattleChara? BattleChara { get; set; }
+
+    public bool IsTargetable => BattleChara.IsTargetable;
 }

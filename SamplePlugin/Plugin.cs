@@ -57,12 +57,14 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button that is doing the same but for the main ui of the plugin
         pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
+        Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
+
         if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
         {
             MainWindow.IsOpen = true;
         }
 
-        //NamePlateUpdater.Enable();
+        NamePlateUpdater.Enable();
         MainUpdater.Enable();
     }
 
@@ -72,8 +74,9 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Dispose();
         MainWindow.Dispose();
         Svc.Commands.RemoveHandler(CommandName);
-        //NamePlateUpdater.Dispose();
+        NamePlateUpdater.Dispose();
         MainUpdater.Dispose();
+        Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
         ECommonsMain.Dispose();
     }
 
@@ -88,4 +91,8 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
 
+    private static void ClientState_TerritoryChanged(ushort obj)
+    {
+        NamePlateUpdater.ClearList();
+    }
 }
