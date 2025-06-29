@@ -30,7 +30,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
-        ECommonsMain.Init(pluginInterface, this, ECommons.Module.DalamudReflector, ECommons.Module.ObjectFunctions);
+        ECommonsMain.Init(pluginInterface, this, Module.All);
         Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
