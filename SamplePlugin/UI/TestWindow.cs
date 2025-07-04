@@ -50,39 +50,38 @@ public class TestWindow : Window, IDisposable
 
     private void DrawHeader()
     {
-        // Use Belias.png as the logo from the Assets folder in output directory
+        // Use kirbo.png as the logo from the Assets folder in output directory
         try
         {
-            var assemblyDir = Svc.PluginInterface.AssemblyLocation.Directory?.FullName!;
-            var logoPath = System.IO.Path.Combine(assemblyDir, "Assets", "kirbo.png");
-
-            if (!System.IO.File.Exists(logoPath))
+            // Get available width in the current ImGui window
+            float availableWidth = ImGui.GetContentRegionAvail().X;
+            using (var child = ImRaii.Child("SomeChildWithAScrollbar4", new Vector2(availableWidth, 300), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                // Try looking in another location
-                logoPath = System.IO.Path.Combine(assemblyDir, "kirbo.png");
-            }
+                if (child.Success)
+                {
+                    var assemblyDir = Svc.PluginInterface.AssemblyLocation.Directory?.FullName!;
+                    var logoPath = System.IO.Path.Combine(assemblyDir, "Assets", "kirbo.png");
 
-            //var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
-            //if (logoImage != null)
-            //{
-            //    float scale = 0.8f; // Scale down the logo if needed
-            //    ImGui.Image(logoImage.ImGuiHandle, new Vector2(logoImage.Width * scale, logoImage.Height * scale));
-            //}
-            var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
-            if (logoImage != null)
-            {
-                // Get available width in the current ImGui window
-                float availableWidth = ImGui.GetContentRegionAvail().X;
+                    if (!System.IO.File.Exists(logoPath))
+                    {
+                        // Try looking in another location
+                        logoPath = System.IO.Path.Combine(assemblyDir, "kirbo.png");
+                    }
 
-                // Maintain aspect ratio
-                float imageAspectRatio = (float)logoImage.Width / logoImage.Height;
+                    var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
+                    if (logoImage != null)
+                    {
+                        // Maintain aspect ratio
+                        float imageAspectRatio = (float)logoImage.Width / logoImage.Height;
 
-                // Set max width or scale image based on available space
-                float desiredWidth = Math.Min(availableWidth, logoImage.Width);
-                float desiredHeight = desiredWidth / imageAspectRatio;
-                ImGuiHelpers.CenterCursorFor(desiredWidth);
-                // Render the image at scaled size
-                ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
+                        // Set max width or scale image based on available space
+                        float desiredWidth = Math.Min(availableWidth, logoImage.Width);
+                        float desiredHeight = desiredWidth / imageAspectRatio;
+                        ImGuiHelpers.CenterCursorFor(desiredWidth);
+                        // Render the image at scaled size
+                        ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
+                    }
+                }
             }
         }
         catch (Exception ex)
