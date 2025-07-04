@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dalamud.Interface.Components;
 using Dalamud.Interface.Textures;
 using ECommons.DalamudServices;
 using SamplePlugin.DalamudServices;
@@ -19,5 +20,17 @@ internal static class ImGuiExt
     {
         var path = Svc.Texture.GetIconPath(new GameIconLookup(iconId));
         return Svc.Texture.GetFromGame(path);
+    }
+
+    /// <summary>
+    /// Round (i) Image with a tooltip
+    /// </summary>
+    /// <param name="desc">What gets shown on hover</param>
+    public static void HelpMarker(string desc)
+    {
+        if (desc.Length == 0)
+            return;
+
+        ImGuiComponents.HelpMarker(desc);
     }
 }

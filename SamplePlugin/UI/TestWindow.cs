@@ -16,7 +16,7 @@ public class TestWindow : Window, IDisposable
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(375, 300),
+            MinimumSize = new Vector2(150, 100),
             MaximumSize = new Vector2(3440, 1440)
         };
         Plugin = plugin;
@@ -62,11 +62,27 @@ public class TestWindow : Window, IDisposable
                 logoPath = System.IO.Path.Combine(assemblyDir, "kirbo.png");
             }
 
+            //var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
+            //if (logoImage != null)
+            //{
+            //    float scale = 0.8f; // Scale down the logo if needed
+            //    ImGui.Image(logoImage.ImGuiHandle, new Vector2(logoImage.Width * scale, logoImage.Height * scale));
+            //}
             var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
             if (logoImage != null)
             {
-                float scale = 0.8f; // Scale down the logo if needed
-                ImGui.Image(logoImage.ImGuiHandle, new Vector2(logoImage.Width * scale, logoImage.Height * scale));
+                // Get available width in the current ImGui window
+                float availableWidth = ImGui.GetContentRegionAvail().X;
+
+                // Maintain aspect ratio
+                float imageAspectRatio = (float)logoImage.Width / logoImage.Height;
+
+                // Set max width or scale image based on available space
+                float desiredWidth = Math.Min(availableWidth, logoImage.Width);
+                float desiredHeight = desiredWidth / imageAspectRatio;
+                ImGuiHelpers.CenterCursorFor(desiredWidth);
+                // Render the image at scaled size
+                ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
             }
         }
         catch (Exception ex)
@@ -77,7 +93,7 @@ public class TestWindow : Window, IDisposable
 
         ImGui.TextUnformatted("Kirbo - Test Window");
         ImGui.Separator();
-        ImGui.TextUnformatted("Create and manage rotations for Rotation Solver Reborn with ease.");
+        ImGui.TextUnformatted("placeholder.");
         ImGui.Spacing();
 
         // Reference class member to ensure non-static
