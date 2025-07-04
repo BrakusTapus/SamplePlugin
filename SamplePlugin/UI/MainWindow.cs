@@ -163,6 +163,10 @@ public class MainWindow : Window, IDisposable
                 {
                     Plugin.ToggleConfigUI();
                 }
+                if (ImGui.Button("Show Test window"))
+                {
+                    Plugin.ToggleTestUI();
+                }
                 if (ImGui.Button("Request Redraw"))
                 {
                     //Feature.namePlateEntries.Clear();

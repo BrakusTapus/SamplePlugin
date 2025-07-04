@@ -21,4 +21,7 @@
     <ItemGroup>
         <PackageReference Include="ECommons" Version="3.0.0.2" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Assets\" />
+    </ItemGroup>
 </Project>
