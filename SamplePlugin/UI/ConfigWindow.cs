@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using SamplePlugin.Configs;
 
-namespace SamplePlugin.Windows;
+namespace SamplePlugin.UI;
 
 public class ConfigWindow : Window, IDisposable
 {
