@@ -167,6 +167,10 @@ public class MainWindow : Window, IDisposable
                 {
                     Plugin.ToggleTestUI();
                 }
+                if (ImGui.Button("Show HighLight window"))
+                {
+                    Plugin.ToggleHighlightUI();
+                }
                 if (ImGui.Button("Request Redraw"))
                 {
                     //Feature.namePlateEntries.Clear();

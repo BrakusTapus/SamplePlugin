@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
@@ -13,7 +14,7 @@ using ImGuiNET;
 using SamplePlugin.DalamudServices;
 
 namespace SamplePlugin.Helpers.UI;
-internal static class ImGuiExt
+internal unsafe static class ImGuiExt
 {
     /// <summary>
     /// Obtain an icon texture in the game using its ID.
@@ -64,4 +65,65 @@ internal static class ImGuiExt
         || ThreadLoadImageHandler.TryGetIconTextureWrap(@default, true, out texture)
         || ThreadLoadImageHandler.TryGetIconTextureWrap(0, true, out texture);
 
+    /// <summary>
+    /// Converts RGB color to <see cref="Vector4"/> for ImGui
+    /// </summary>
+    /// <param name="col">Color in format 0xRRGGBB</param>
+    /// <param name="alpha">Optional transparency value between 0 and 1</param>
+    /// <returns>Color in <see cref="Vector4"/> format ready to be used with <see cref="ImGui"/> functions</returns>
+    public static Vector4 Vector4FromRGB(uint col, float alpha = 1.0f)
+    {
+        byte* bytes = (byte*)&col;
+        return new Vector4((float)bytes[2] / 255f, (float)bytes[1] / 255f, (float)bytes[0] / 255f, alpha);
+    }
+
+    /// <summary>
+    /// Converts RGBA color to <see cref="Vector4"/> for ImGui
+    /// </summary>
+    /// <param name="col">Color in format 0xRRGGBBAA</param>
+    /// <returns>Color in <see cref="Vector4"/> format ready to be used with <see cref="ImGui"/> functions</returns>
+    public static Vector4 Vector4FromRGBA(uint col)
+    {
+        byte* bytes = (byte*)&col;
+        return new Vector4((float)bytes[3] / 255f, (float)bytes[2] / 255f, (float)bytes[1] / 255f, (float)bytes[0] / 255f);
+    }
+
+    /// <summary>
+    /// Returns a color based on the provided percentage value.
+    /// </summary>
+    public static Vector4 GetParsedColor(int percent)
+    {
+        if (percent < 25)
+        {
+            return ImGuiColors.ParsedGrey;
+        }
+        else if (percent < 50)
+        {
+            return ImGuiColors.ParsedGreen;
+        }
+        else if (percent < 75)
+        {
+            return ImGuiColors.ParsedBlue;
+        }
+        else if (percent < 95)
+        {
+            return ImGuiColors.ParsedPurple;
+        }
+        else if (percent < 99)
+        {
+            return ImGuiColors.ParsedOrange;
+        }
+        else if (percent == 99)
+        {
+            return ImGuiColors.ParsedPink;
+        }
+        else if (percent == 100)
+        {
+            return ImGuiColors.ParsedGold;
+        }
+        else
+        {
+            return ImGuiColors.DalamudRed;
+        }
+    }
 }

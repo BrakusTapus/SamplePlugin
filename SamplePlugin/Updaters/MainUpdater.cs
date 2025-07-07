@@ -10,6 +10,8 @@ internal static class MainUpdater
 {
     public static IReadOnlyList<IBattleChara> AllTargets => _allTargets;
     private static readonly List<IBattleChara> _allTargets = new();
+    public static IReadOnlyList<IGameObject> AllGameObjects => _allGameObjects;
+    private static readonly List<IGameObject> _allGameObjects = new();
 
     public static void Enable()
     {
@@ -24,16 +26,29 @@ internal static class MainUpdater
     private static void KirboUpdate(IFramework framework)
     {
         UpdateTargets();
+        UpdateGameObjects();
     }
 
     internal static void UpdateTargets()
     {
         _allTargets.Clear();
-        foreach (var obj in Svc.Objects)
+        foreach (IGameObject obj in Svc.Objects)
         {
             if (obj is IBattleChara battleChara && obj.Name.ToString() != string.Empty)
             {
                 _allTargets.Add(battleChara);
+            }
+        }
+    }
+
+    internal static void UpdateGameObjects()
+    {
+        _allGameObjects.Clear();
+        foreach (IGameObject gameObject in Svc.Objects)
+        {
+            if (gameObject is IGameObject obj && gameObject.Name.ToString() != string.Empty)
+            {
+                _allGameObjects.Add(gameObject);
             }
         }
     }
