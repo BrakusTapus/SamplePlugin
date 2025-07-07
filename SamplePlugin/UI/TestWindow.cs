@@ -6,6 +6,7 @@ using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using SamplePlugin.Helpers.UI;
 
 namespace SamplePlugin.UI;
 public class TestWindow : Window, IDisposable
@@ -45,14 +46,15 @@ public class TestWindow : Window, IDisposable
 
     public override void Draw()
     {
+        DrawBackground();
         DrawHeader();
     }
 
     private void DrawHeader()
     {
-        // Use kirbo.png as the logo from the Assets folder in output directory
+        // Use logo.png as the logo from the Assets folder in output directory
         try
-        {
+        { 
             // Get available width in the current ImGui window
             float availableWidth = ImGui.GetContentRegionAvail().X;
             using (var child = ImRaii.Child("SomeChildWithAScrollbar4", new Vector2(availableWidth, 300), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
@@ -60,12 +62,12 @@ public class TestWindow : Window, IDisposable
                 if (child.Success)
                 {
                     var assemblyDir = Svc.PluginInterface.AssemblyLocation.Directory?.FullName!;
-                    var logoPath = System.IO.Path.Combine(assemblyDir, "Assets", "kirbo.png");
+                    var logoPath = System.IO.Path.Combine(assemblyDir, "Assets", "logo.png");
 
                     if (!System.IO.File.Exists(logoPath))
                     {
                         // Try looking in another location
-                        logoPath = System.IO.Path.Combine(assemblyDir, "kirbo.png");
+                        logoPath = System.IO.Path.Combine(assemblyDir, "logo.png");
                     }
 
                     var logoImage = Svc.Texture.GetFromFile(logoPath).GetWrapOrDefault();
@@ -81,6 +83,10 @@ public class TestWindow : Window, IDisposable
                         // Render the image at scaled size
                         ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
                     }
+                    ImGui.TextUnformatted("Kirbo - Test Window");
+                    ImGui.Separator();
+                    ImGui.TextUnformatted("placeholder.");
+                    ImGui.Spacing();
                 }
             }
         }
@@ -89,13 +95,21 @@ public class TestWindow : Window, IDisposable
             // If we can't load the image, just don't display it
             Svc.Log.Error($"Failed to load logo: {ex.Message}");
         }
-
-        ImGui.TextUnformatted("Kirbo - Test Window");
-        ImGui.Separator();
-        ImGui.TextUnformatted("placeholder.");
-        ImGui.Spacing();
-
         // Reference class member to ensure non-static
         _ = Plugin;
+    }
+
+    public static void DrawBackground()
+    {
+        var windowHeight = ImGui.GetWindowHeight();
+        var windowWidth = ImGui.GetWindowWidth();
+        ImGui.SetCursorPos(new Vector2(0, 0));
+        using (var background = ImRaii.Child("background", new Vector2(windowWidth, windowHeight), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground))
+        {
+            if (background)
+            {
+                ImGuiExt.DrawBackgroundFill(193902);
+            }
+        }
     }
 }
