@@ -1,3 +1,5 @@
+//TODO add mimic emote feature
+//TODO organize main window with proper tabs/settings
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;

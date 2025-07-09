@@ -24,6 +24,12 @@ internal class TargetHighlight : Window
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight), ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar)
     {
+        float displaySizeWidth = ImGui.GetIO().DisplaySize.X - 10;
+        float displaySizeHeight = ImGui.GetIO().DisplaySize.Y - 10;
+        Size = new Vector2(displaySizeWidth, displaySizeHeight); //Define's size of window
+        SizeCondition = ImGuiCond.Always; //Locks window size
+        Position = new Vector2(0, 0);
+        PositionCondition = ImGuiCond.Always;
         RespectCloseHotkey = false;
         Plugin = plugin;
     }
@@ -45,9 +51,6 @@ internal class TargetHighlight : Window
         ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
         if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
         {
-            ImGui.SetWindowSize(new Vector2((ImGui.GetIO().DisplaySize.X - 10), (ImGui.GetIO().DisplaySize.Y - 10)));
-            ImGui.SetCursorPos(new Vector2(0, 0));
-            //ImGui.SetWindowSize(new Vector2(500,500));
             // Filter AllTargets to include only BattleChara objects.
             IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
 
