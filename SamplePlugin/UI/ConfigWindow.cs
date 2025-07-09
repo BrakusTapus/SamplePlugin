@@ -42,18 +42,11 @@ public class ConfigWindow : Window, IDisposable
     public override void Draw()
     {
         // can't ref a property, so use a local copy
-        var configValue = Configuration.DisplayPlayerInfo;
-        if (ImGui.Checkbox("Random Config Bool", ref configValue))
-        {
-            Configuration.DisplayPlayerInfo = configValue;
-            // can save immediately on change, if you don't want to provide a "Save and Close" button
-            Configuration.Save();
-        }
-
         var movable = Configuration.IsConfigWindowMovable;
         if (ImGui.Checkbox("Movable Config Window", ref movable))
         {
             Configuration.IsConfigWindowMovable = movable;
+            // can save immediately on change, if you don't want to provide a "Save and Close" button
             Configuration.Save();
         }
     }
