@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Gui.NamePlate;
+using Dalamud.Interface;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
@@ -12,6 +13,7 @@ using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using SamplePlugin.Configs;
 using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
@@ -22,6 +24,7 @@ public class MainWindow : Window, IDisposable
 {
     private string GoatImagePath;
     private Plugin Plugin;
+    private Configuration Configuration;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -35,8 +38,25 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
+        TitleBarButtons.Add(new()
+        {
+            Click = (m) =>
+            {
+                if (m != ImGuiMouseButton.Left)
+                {
+                    return;
+                }
+
+                plugin.ToggleConfigUI();
+            },
+            Icon = FontAwesomeIcon.Cog,
+            IconOffset = new(2, 2),
+            ShowTooltip = () => ImGui.SetTooltip(("Toggle settings window.")),
+        });
+
         GoatImagePath = goatImagePath;
         Plugin = plugin;
+        Configuration = plugin.Configuration;
     }
 
     public void Dispose() { }
@@ -52,29 +72,42 @@ public class MainWindow : Window, IDisposable
                     if (tab1.Success)
                     {
                         DrawImage();
-                    }
-                }
-                using (var tab2 = ImRaii.TabItem("Player Info"))
-                {
-                    if (tab2.Success)
-                    {
-                        DrawPlayerInfo();
-                    }
-                }
-
-                using (var tab3 = ImRaii.TabItem("Plugin Info"))
-                {
-                    if (tab3.Success)
-                    {
                         DrawPluginInfo();
                     }
                 }
-
-                using (var tab4 = ImRaii.TabItem("Target Info"))
+                var playerInfoValue = Configuration.DisplayPlayerInfo;
+                if (playerInfoValue)
                 {
-                    if (tab4.Success)
+                    using (var tab2 = ImRaii.TabItem("Player Info"))
                     {
-                        DrawTargetInfo();
+                        if (tab2.Success)
+                        {
+                            DrawPlayerInfo();
+                        }
+                    }
+                }
+
+                var targetInfoValue = Configuration.DisplayTargetInfo;
+                if (targetInfoValue)
+                {
+                    using (var tab3 = ImRaii.TabItem("Target Info"))
+                    {
+                        if (tab3.Success)
+                        {
+                            DrawTargetInfo();
+                        }
+                    }
+                }
+
+                var highlightValue = Configuration.DisplayHighLight;
+                if (highlightValue)
+                {
+                    using (var tab4 = ImRaii.TabItem("Highlight Info"))
+                    {
+                        if (tab4.Success)
+                        {
+                            DrawHighlightTab();
+                        }
                     }
                 }
             }
@@ -83,13 +116,13 @@ public class MainWindow : Window, IDisposable
 
     public void DrawImage()
     {
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", Vector2.Zero, true))
+        float availableWidth = ImGui.GetContentRegionAvail().X;
+        var goatImage = Svc.Texture.GetFromFile(GoatImagePath).GetWrapOrDefault();
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, goatImage.Height + 15), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)
             {
-                //ImGui.TextUnformatted("Have a goat:");
-                var goatImage = Svc.Texture.GetFromFile(GoatImagePath).GetWrapOrDefault();
                 if (goatImage != null)
                 {
                     ImGuiHelpers.CenterCursorFor(goatImage.Width);
@@ -153,28 +186,35 @@ public class MainWindow : Window, IDisposable
         {
             if (child.Success)
             {
+                var playerInfoValue = Configuration.DisplayPlayerInfo;
+                if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
+                {
+                    Configuration.DisplayPlayerInfo = playerInfoValue;
+                    // can save immediately on change, if you don't want to provide a "Save and Close" button
+                    Configuration.Save();
+                }
+                var targetInfoValue = Configuration.DisplayTargetInfo;
+                if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
+                {
+                    Configuration.DisplayTargetInfo = targetInfoValue;
+                    Configuration.Save();
+                }
+                var highlightValue = Configuration.DisplayHighLight;
+                if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
+                {
+                    Configuration.DisplayHighLight = highlightValue;
+                    Configuration.Save();
+                }
+
                 // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
                 // These expect formatting parameter if any part of the text contains a "%", which we can't
                 // provide through our bindings, leading to a Crash to Desktop.
                 // Replacements can be found in the ImGuiHelpers Class
-                ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
+                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfo}");
 
-                if (ImGui.Button("Show Settings"))
-                {
-                    Plugin.ToggleConfigUI();
-                }
                 if (ImGui.Button("Show Test window"))
                 {
                     Plugin.ToggleTestUI();
-                }
-                if (ImGui.Button("Show HighLight window"))
-                {
-                    Plugin.ToggleHighlightUI();
-                }
-                if (ImGui.Button("Request Redraw"))
-                {
-                    //Feature.namePlateEntries.Clear();
-                    Service.NamePlateGui.RequestRedraw();
                 }
 
                 ImGui.Spacing();
@@ -184,17 +224,23 @@ public class MainWindow : Window, IDisposable
 
     public static void DrawTargetInfo()
     {
+        if (ImGui.Button("Request Redraw"))
+        {
+            Service.NamePlateGui.RequestRedraw();
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Clear List"))
+        {
+            NamePlateUpdater.ClearList();
+        }
+        ImGui.Separator();
+
         foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllTargets)
         {
             ImGui.TextUnformatted(item.Name.ToString());
             ImGui.TextUnformatted(item.GameObjectId.ToString());
         }
-
         ImGui.Separator();
-        if (ImGui.Button("Remove"))
-        {
-            NamePlateUpdater.ClearList();
-        }
         foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
         {
             if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
@@ -247,6 +293,17 @@ public class MainWindow : Window, IDisposable
         //    }
         //    ImGui.TextUnformatted($"GameObjectId: {entry.GameObjectId.ToString()}");
         //}
+    }
+
+    public void DrawHighlightTab()
+    {
+        var highlightOverlayValue = Configuration.EnableHighLightOverlay;
+        if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
+        {
+            Configuration.EnableHighLightOverlay = highlightOverlayValue;
+            Plugin.ToggleHighlightUI();
+            Configuration.Save();
+        }
     }
 
     //public void DrawNamePlates()
