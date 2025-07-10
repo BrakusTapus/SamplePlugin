@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Style;
@@ -60,6 +61,10 @@ internal class TargetHighlight : Window
             // Iterate through your BattleChara targets and call TargetHighlight method for each one.
             foreach (IGameObject target in battleCharas)
             {
+                if (target == player)
+                {
+                    HighlightPlayer(player);
+                }
                 // Check if the target is not the player character.
                 if (target != player)
                 {
@@ -69,6 +74,55 @@ internal class TargetHighlight : Window
         }
 
         ImGui.End();
+    }
+
+    private unsafe static void HighlightPlayer(IPlayerCharacter player)
+    {
+        var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)player.Address;
+
+        // World positions
+        var basePosition = player.Position;
+        var topPosition = basePosition with { Y = basePosition.Y + gameObject->Height + 0.85f };
+
+        // Project both to screen
+        if (!Svc.GameGui.WorldToScreen(basePosition, out var screenBase))
+            return;
+
+        if (!Svc.GameGui.WorldToScreen(topPosition, out var screenTop))
+            return;
+
+        // Calculate rectangle width based on distance
+        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
+        var distance = Utils.DistanceBetweenObjects(camera.Position, player.Position, 0);
+        var scale = 100 * (25 / distance);
+        var width = (float)(scale * player.HitboxRadius);
+
+        // Draw rectangle from top to bottom
+        var drawList = ImGui.GetWindowDrawList();
+        drawList.AddRect(
+            new Vector2(screenBase.X - width / 2f, screenTop.Y),
+            new Vector2(screenBase.X + width / 2f, screenBase.Y),
+            ImGui.GetColorU32(ImGuiColors.DalamudWhite),
+            5f,
+            ImDrawFlags.RoundCornersAll,
+            3f
+        );
+        // Get icon texture
+        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(55).GetWrapOrDefault(); // TODO make it so the icon is job based
+        if (icon is null)
+            return;
+
+        // Icon dimensions
+        const float iconSize = 22f;
+        Vector2 iconTopLeft = new Vector2(screenTop.X - iconSize / 2f, screenTop.Y - iconSize - 4f); // 4px padding above rectangle
+        Vector2 iconBottomRight = iconTopLeft + new Vector2(iconSize, iconSize);
+
+        // Draw icon image
+        drawList.AddImage(
+            icon.ImGuiHandle,
+            iconTopLeft,
+            iconBottomRight
+        );
     }
 
     private unsafe static void HighlightAllGameObjects(IGameObject target)
@@ -154,7 +208,7 @@ internal class TargetHighlight : Window
                     new Vector2(screenPos.X - size / 2, screenPos.Y - size), // Top-left corner coordinates
                     new Vector2(screenPos.X + size / 2, screenPos.Y), // Bottom-right corner coordinates
                     ImGui.GetColorU32(color), // Use the specified color
-                    0f,
+                    5f,
                     ImDrawFlags.RoundCornersAll,
                     3f);
     }
