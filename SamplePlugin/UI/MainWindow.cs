@@ -138,7 +138,7 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public static void DrawPlayerInfo()
+    public unsafe static void DrawPlayerInfo()
     {
         using (var child = ImRaii.Child("SomeChildWithAScrollbar3", Vector2.Zero, true))
         {
@@ -164,6 +164,8 @@ public class MainWindow : Window, IDisposable
                 // ExtractText() should be the preferred method to read Lumina SeStrings,
                 // as ToString does not provide the actual text values, instead gives an encoded macro string.
                 ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
+                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
+                ImGui.SliderFloat($"Hitbox Radius###{localPlayer.Name}{localPlayer.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
 
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Svc.ClientState.TerritoryType;
@@ -222,7 +224,7 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public static void DrawTargetInfo()
+    public unsafe static void DrawTargetInfo()
     {
         if (ImGui.Button("Request Redraw"))
         {
@@ -239,6 +241,7 @@ public class MainWindow : Window, IDisposable
         {
             ImGui.TextUnformatted(item.Name.ToString());
             ImGui.TextUnformatted(item.GameObjectId.ToString());
+            ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
         }
         ImGui.Separator();
         foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
@@ -303,6 +306,16 @@ public class MainWindow : Window, IDisposable
             Configuration.EnableHighLightOverlay = highlightOverlayValue;
             Plugin.ToggleHighlightUI();
             Configuration.Save();
+        }
+        var highlightPlayer = Configuration.HighlightPlayer;
+        if (highlightOverlayValue)
+        {
+            ImGui.Indent();
+            if (ImGui.Checkbox("Highlight Player?", ref highlightPlayer))
+            {
+                Configuration.HighlightPlayer = highlightPlayer;
+                Configuration.Save();
+            }
         }
     }
 

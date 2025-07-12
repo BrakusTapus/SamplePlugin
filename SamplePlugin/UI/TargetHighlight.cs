@@ -13,6 +13,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using ImGuiNET;
+using SamplePlugin.Configs;
 using SamplePlugin.Data;
 using SamplePlugin.Helpers;
 using SamplePlugin.Helpers.UI;
@@ -22,6 +23,7 @@ namespace SamplePlugin.UI;
 internal class TargetHighlight : Window
 {
     private Plugin Plugin;
+    private Configuration Configuration;
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight), ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar)
     {
@@ -33,6 +35,7 @@ internal class TargetHighlight : Window
         PositionCondition = ImGuiCond.Always;
         RespectCloseHotkey = false;
         Plugin = plugin;
+        Configuration = plugin.Configuration;
     }
 
     public override void Draw()
@@ -61,9 +64,13 @@ internal class TargetHighlight : Window
             // Iterate through your BattleChara targets and call TargetHighlight method for each one.
             foreach (IGameObject target in battleCharas)
             {
-                if (target == player)
+                var highlightPlayer = Configuration.HighlightPlayer;
+                if (highlightPlayer)
                 {
-                    HighlightPlayer(player);
+                    if (target == player)
+                    {
+                        HighlightPlayer(player);
+                    }
                 }
                 // Check if the target is not the player character.
                 if (target != player)

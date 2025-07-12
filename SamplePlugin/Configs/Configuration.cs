@@ -16,6 +16,7 @@ public class Configuration : IPluginConfiguration
     public bool DisplayTargetInfo { get; set; } = true;
     public bool DisplayHighLight { get; set; } = true;
     public bool EnableHighLightOverlay { get; set; } = true;
+    public bool HighlightPlayer {  get; set; } = false;
 
     // the below exist just to make saving less cumbersome
     public void Save()
