@@ -308,6 +308,7 @@ public class MainWindow : Window, IDisposable
             Configuration.Save();
         }
         var highlightPlayer = Configuration.HighlightPlayer;
+        var highlightGameObjects = Configuration.HighlightAllGameObjects;
         if (highlightOverlayValue)
         {
             ImGui.Indent();
@@ -316,7 +317,13 @@ public class MainWindow : Window, IDisposable
                 Configuration.HighlightPlayer = highlightPlayer;
                 Configuration.Save();
             }
+            if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
+            {
+                Configuration.HighlightAllGameObjects = highlightGameObjects;
+                Configuration.Save();
+            }
         }
+
     }
 
     //public void DrawNamePlates()

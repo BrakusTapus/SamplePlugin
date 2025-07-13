@@ -52,84 +52,43 @@ internal class TargetHighlight : Window
             return;
         }
 
-        ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
-        if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
+        var highlightOverlayValue = Configuration.EnableHighLightOverlay;
+        if (highlightOverlayValue)
         {
-            // Filter AllTargets to include only BattleChara objects.
-            IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
-
-            // Get the player character.
-            Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter player = Svc.ClientState.LocalPlayer;
-
-            // Iterate through your BattleChara targets and call TargetHighlight method for each one.
-            foreach (IGameObject target in battleCharas)
+            ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
+            if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
             {
-                var highlightPlayer = Configuration.HighlightPlayer;
-                if (highlightPlayer)
+                // Filter AllTargets to include only BattleChara objects.
+                IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
+
+                // Get the player character.
+                Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter player = Svc.ClientState.LocalPlayer;
+
+                // Iterate through your BattleChara targets and call TargetHighlight method for each one.
+                foreach (IGameObject target in battleCharas)
                 {
-                    if (target == player)
+                    var highlightPlayer = Configuration.HighlightPlayer;
+                    if (highlightPlayer)
                     {
-                        HighlightPlayer(player);
+                        if (target == player)
+                        {
+                            DrawWorldSpaceRectangleAroundGameObject(player, ImGuiColors.DalamudViolet);
+                        }
                     }
-                }
-                // Check if the target is not the player character.
-                if (target != player)
-                {
-                    HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
+                    var highlightGameObjects = Configuration.HighlightAllGameObjects;
+                    if (highlightGameObjects)
+                    {
+                        // Check if the target is not the player character.
+                        if (target != player)
+                        {
+                            HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
+                        }
+                    }
                 }
             }
         }
 
         ImGui.End();
-    }
-
-    private unsafe static void HighlightPlayer(IPlayerCharacter player)
-    {
-        var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)player.Address;
-
-        // World positions
-        var basePosition = player.Position;
-        var topPosition = basePosition with { Y = basePosition.Y + gameObject->Height + 0.85f };
-
-        // Project both to screen
-        if (!Svc.GameGui.WorldToScreen(basePosition, out var screenBase))
-            return;
-
-        if (!Svc.GameGui.WorldToScreen(topPosition, out var screenTop))
-            return;
-
-        // Calculate rectangle width based on distance
-        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
-        var distance = Utils.DistanceBetweenObjects(camera.Position, player.Position, 0);
-        var scale = 100 * (25 / distance);
-        var width = (float)(scale * player.HitboxRadius);
-
-        // Draw rectangle from top to bottom
-        var drawList = ImGui.GetWindowDrawList();
-        drawList.AddRect(
-            new Vector2(screenBase.X - width / 2f, screenTop.Y),
-            new Vector2(screenBase.X + width / 2f, screenBase.Y),
-            ImGui.GetColorU32(ImGuiColors.DalamudWhite),
-            5f,
-            ImDrawFlags.RoundCornersAll,
-            3f
-        );
-        // Get icon texture
-        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(55).GetWrapOrDefault(); // TODO make it so the icon is job based
-        if (icon is null)
-            return;
-
-        // Icon dimensions
-        const float iconSize = 22f;
-        Vector2 iconTopLeft = new Vector2(screenTop.X - iconSize / 2f, screenTop.Y - iconSize - 4f); // 4px padding above rectangle
-        Vector2 iconBottomRight = iconTopLeft + new Vector2(iconSize, iconSize);
-
-        // Draw icon image
-        drawList.AddImage(
-            icon.ImGuiHandle,
-            iconTopLeft,
-            iconBottomRight
-        );
     }
 
     private unsafe static void HighlightAllGameObjects(IGameObject target)
@@ -178,6 +137,80 @@ internal class TargetHighlight : Window
             icon.ImGuiHandle,
             iconTopLeft,
             iconBottomRight
+        );
+    }
+
+    private unsafe static void DrawWorldSpaceRectangleAroundGameObject(IGameObject gameObject, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    {
+        if (gameObject == null || gameObject.Address == IntPtr.Zero)
+            return;
+
+        var objStruct = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)gameObject.Address;
+
+        // World-space positions: from base to top of object
+        var baseWorldPos = gameObject.Position;
+        var topWorldPos = baseWorldPos with { Y = baseWorldPos.Y + objStruct->Height + 0.85f };
+
+        // Project world to screen space
+        if (!Svc.GameGui.WorldToScreen(baseWorldPos, out var screenBase) ||
+            !Svc.GameGui.WorldToScreen(topWorldPos, out var screenTop))
+            return;
+
+        // Perspective scaling based on camera distance
+        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
+        var distance = Utils.DistanceBetweenObjects(camera.Position, gameObject.Position, 0);
+        var scale = 100 * (25 / distance);
+        var width = (float)(scale * gameObject.HitboxRadius);
+
+        // Convert Vector4 color to uint
+        uint packedColor = ImGui.GetColorU32(color);
+
+        // Draw rectangle
+        var drawList = ImGui.GetWindowDrawList();
+        drawList.AddRect(
+            new Vector2(screenBase.X - width / 2f, screenTop.Y),
+            new Vector2(screenBase.X + width / 2f, screenBase.Y),
+            packedColor,
+            rounding,
+            drawFlags,
+            thickness
+        );
+    }
+
+    private unsafe static void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    {
+        if (battleChara == null || battleChara.Address == IntPtr.Zero)
+            return;
+
+        var objStruct = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)battleChara.Address;
+
+        // World-space positions: from base to top of object
+        var baseWorldPos = battleChara.Position;
+        var topWorldPos = baseWorldPos with { Y = baseWorldPos.Y + objStruct->Height + 0.85f };
+
+        // Project world to screen space
+        if (!Svc.GameGui.WorldToScreen(baseWorldPos, out var screenBase) ||
+            !Svc.GameGui.WorldToScreen(topWorldPos, out var screenTop))
+            return;
+
+        // Perspective scaling based on camera distance
+        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
+        var distance = Utils.DistanceBetweenObjects(camera.Position, battleChara.Position, 0);
+        var scale = 100 * (25 / distance);
+        var width = (float)(scale * battleChara.HitboxRadius);
+
+        // Convert Vector4 color to uint
+        uint packedColor = ImGui.GetColorU32(color);
+
+        // Draw rectangle
+        var drawList = ImGui.GetWindowDrawList();
+        drawList.AddRect(
+            new Vector2(screenBase.X - width / 2f, screenTop.Y),
+            new Vector2(screenBase.X + width / 2f, screenBase.Y),
+            packedColor,
+            rounding,
+            drawFlags,
+            thickness
         );
     }
 
