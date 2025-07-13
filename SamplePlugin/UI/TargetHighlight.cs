@@ -1,3 +1,4 @@
+//TODO Make an easy to use method that can check for a objects role/job
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using Dalamud.Interface.Style;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.ExcelServices;
 using ImGuiNET;
 using SamplePlugin.Configs;
 using SamplePlugin.Data;
