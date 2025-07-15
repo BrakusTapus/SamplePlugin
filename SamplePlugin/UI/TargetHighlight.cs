@@ -1,4 +1,5 @@
 //TODO Make an easy to use method that can check for a objects role/job
+//TODO seperate highlightable objects/targets based on players/npc/gameobjects/friendly/enemy/aliance/jobs
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,11 +61,11 @@ internal class TargetHighlight : Window
             ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
             if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
             {
-                // Filter AllTargets to include only BattleChara objects.
+                // Filter AllGameObjects to include only targetable objects.
                 IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
 
                 // Get the player character.
-                Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter player = Svc.ClientState.LocalPlayer;
+                IPlayerCharacter player = Svc.ClientState.LocalPlayer;
 
                 // Iterate through your BattleChara targets and call TargetHighlight method for each one.
                 foreach (IGameObject target in battleCharas)
