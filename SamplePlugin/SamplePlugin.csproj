@@ -9,17 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\Data\goat.png">
+        <Content Include="..\SamplePlugin\Assets\goat.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
-        <Content Include="..\Data\kirbo.png">
+        <Content Include="..\SamplePlugin\Assets\kirbo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
         <Content Include="..\SamplePlugin\Assets\logo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
     </ItemGroup>
     <ItemGroup>
