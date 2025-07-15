@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/12.0.2">
     <PropertyGroup>
-        <Version>0.0.0.5</Version>
+        <Version>0.0.0.6</Version>
         <Description>A sample plugin.</Description>
         <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -9,21 +9,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\Data\goat.png">
+        <Content Include="..\SamplePlugin\Assets\goat.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
-        <Content Include="..\Data\kirbo.png">
+        <Content Include="..\SamplePlugin\Assets\kirbo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
         <Content Include="..\SamplePlugin\Assets\logo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>false</Visible>
+            <Visible>true</Visible>
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="ECommons" Version="3.0.0.4" />
+        <!--<PackageReference Include="ECommons" Version="3.0.0.4" />-->
+        <PackageReference Include="ECommons" Version="*" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Assets\" />

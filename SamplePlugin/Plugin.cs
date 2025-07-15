@@ -1,3 +1,5 @@
+//TODO add mimic emote feature
+//TODO organize main window with proper tabs/settings
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -39,8 +41,9 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         // you might normally want to embed resources and load them from the manifest stream
-        var goatImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-        var kirboImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "kirbo.png");
+        var goatImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\goat.png");
+        var kirboImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\kirbo.png");
+        var logoImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\logo.png");
 
         TargetHighlightWindow = new TargetHighlight(this);
         TestWindow = new TestWindow(this);

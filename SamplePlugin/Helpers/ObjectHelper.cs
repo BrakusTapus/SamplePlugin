@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using ECommons.DalamudServices;
+using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
@@ -97,5 +98,32 @@ internal static class ObjectHelper
             }
             return count;
         }
+    }
+
+    /// <summary>
+    /// Is the target in the jobs.
+    /// </summary>
+    /// <param name="battleChara">The game object.</param>
+    /// <param name="validJobs">The valid jobs.</param>
+    /// <returns>True if the object is in the valid jobs, otherwise false.</returns>
+    public static bool IsJobs(this IBattleChara battleChara, params Job[] validJobs)
+    {
+        if (battleChara == null || validJobs == null || validJobs.Length == 0)
+        {
+            return false;
+        }
+
+        HashSet<byte> validJobSet = [];
+        foreach (Job job in validJobs)
+        {
+            _ = validJobSet.Add((byte)(uint)job);
+        }
+
+        return battleChara.IsJobs(validJobSet);
+    }
+
+    private static bool IsJobs(this IGameObject battleChara, HashSet<byte> validJobs)
+    {
+        return battleChara is IBattleChara b && validJobs != null && validJobs.Contains((byte)b.ClassJob.Value.RowId);
     }
 }
