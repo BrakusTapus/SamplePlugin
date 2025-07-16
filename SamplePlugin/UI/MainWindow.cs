@@ -10,6 +10,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
@@ -155,6 +156,48 @@ public class MainWindow : Window, IDisposable
         }
     }
 
+    public void DrawPluginInfo()
+    {
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar4", Vector2.Zero, true))
+        {
+            if (child.Success)
+            {
+                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
+                if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
+                {
+                    Configuration.DisplayPlayerInfoTab = playerInfoValue;
+                    // can save immediately on change, if you don't want to provide a "Save and Close" button
+                    Configuration.Save();
+                }
+                var targetInfoValue = Configuration.DisplayTargetInfoTab;
+                if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
+                {
+                    Configuration.DisplayTargetInfoTab = targetInfoValue;
+                    Configuration.Save();
+                }
+                var highlightValue = Configuration.DisplayHighLightInfoTab;
+                if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
+                {
+                    Configuration.DisplayHighLightInfoTab = highlightValue;
+                    Configuration.Save();
+                }
+
+                // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
+                // These expect formatting parameter if any part of the text contains a "%", which we can't
+                // provide through our bindings, leading to a Crash to Desktop.
+                // Replacements can be found in the ImGuiHelpers Class
+                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfoTab}");
+
+                if (ImGui.Button("Show Test window"))
+                {
+                    Plugin.ToggleTestUI();
+                }
+
+                ImGui.Spacing();
+            }
+        }
+    }
+
     public unsafe static void DrawPlayerInfo()
     {
         using (var child = ImRaii.Child("SomeChildWithAScrollbar3", Vector2.Zero, true))
@@ -199,59 +242,19 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public void DrawPluginInfo()
-    {
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar4", Vector2.Zero, true))
-        {
-            if (child.Success)
-            {
-                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
-                if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
-                {
-                    Configuration.DisplayPlayerInfoTab = playerInfoValue;
-                    // can save immediately on change, if you don't want to provide a "Save and Close" button
-                    Configuration.Save();
-                }
-                var targetInfoValue = Configuration.DisplayTargetInfoTab;
-                if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
-                {
-                    Configuration.DisplayTargetInfoTab = targetInfoValue;
-                    Configuration.Save();
-                }
-                var highlightValue = Configuration.DisplayHighLightInfoTab;
-                if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
-                {
-                    Configuration.DisplayHighLightInfoTab = highlightValue;
-                    Configuration.Save();
-                }
-
-                // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
-                // These expect formatting parameter if any part of the text contains a "%", which we can't
-                // provide through our bindings, leading to a Crash to Desktop.
-                // Replacements can be found in the ImGuiHelpers Class
-                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfoTab}");
-
-                if (ImGui.Button("Show Test window"))
-                {
-                    Plugin.ToggleTestUI();
-                }
-
-                ImGui.Spacing();
-            }
-        }
-    }
-
     public unsafe static void DrawTargetInfo()
     {
-        if (ImGui.Button("Request Redraw"))
+        if (ImGui.Button("Redraw Nameplate"))
         {
             Service.NamePlateGui.RequestRedraw();
         }
+        ImGuiEx.Tooltip("Send a redraw request for nameplates");
         ImGui.SameLine();
         if (ImGui.Button("Clear List"))
         {
             NamePlateUpdater.ClearList();
         }
+        ImGuiEx.Tooltip("Clears the listed nameplates");
         ImGui.Separator();
 
         foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllTargets)
