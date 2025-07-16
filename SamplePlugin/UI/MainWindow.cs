@@ -257,7 +257,7 @@ public class MainWindow : Window, IDisposable
         ImGuiEx.Tooltip("Clears the listed nameplates");
         ImGui.Separator();
 
-        foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllTargets)
+        foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
         {
             ImGui.TextUnformatted(item.Name.ToString());
             ImGui.TextUnformatted(item.GameObjectId.ToString());

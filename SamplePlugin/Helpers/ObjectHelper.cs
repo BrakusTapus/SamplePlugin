@@ -89,7 +89,7 @@ internal static class ObjectHelper
         get
         {
             int count = 0;
-            foreach (IBattleChara o in MainUpdater.AllTargets)
+            foreach (IBattleChara o in MainUpdater.AllBattleCharas)
             {
                 if (o.DistanceToPlayer() < 30)
                 {
