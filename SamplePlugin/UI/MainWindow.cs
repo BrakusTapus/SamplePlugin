@@ -257,51 +257,72 @@ public class MainWindow : Window, IDisposable
         ImGuiEx.Tooltip("Clears the listed nameplates");
         ImGui.Separator();
 
-        foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
+        float availableHeight = ImGui.GetContentRegionAvail().Y;
+        float availableWidth = ImGui.GetContentRegionAvail().X;
+        using (var child1 = ImRaii.Child("targetinfochild1", new Vector2(availableWidth / 2, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
         {
-            ImGui.TextUnformatted(item.Name.ToString());
-            ImGui.TextUnformatted(item.GameObjectId.ToString());
-            ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
-        }
-        ImGui.Separator();
-        foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
-        {
-            if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+            if (child1.Success)
             {
-                // Define fixed width for both columns
-                ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100f);
-                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
-
-                Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
-                if (icon2 != null)
+                foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
                 {
-                    ImGui.TableNextRow();
-                    ImGui.TableSetColumnIndex(0);
-                    ImGui.TextUnformatted("Name");
-                    ImGui.TableSetColumnIndex(1);
-                    ImGui.TextUnformatted(entry.Name);
-                    ImGui.SameLine();
-                    ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
-
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.BeginTooltip();
-                        ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-                        ImGui.EndTooltip();
-                    }
+                    ImGui.TextUnformatted(item.Name.ToString());
+                    ImGui.TextUnformatted(item.GameObjectId.ToString());
+                    ImGui.SetNextItemWidth(100);
+                    ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
                 }
-
-                ImGui.TableNextRow();
-                ImGui.TableSetColumnIndex(0);
-                ImGui.TextUnformatted("GameObjectId");
-                ImGui.TableSetColumnIndex(1);
-                ImGui.TextUnformatted(entry.GameObjectId.ToString());
-
-                ImGui.EndTable();
             }
+        }
+        ImGui.SameLine();
+        using (var child2 = ImRaii.Child("targetinfochild2", new Vector2((availableWidth / 2) - 10, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
+        {
+            if (child2.Success)
+            {
+                foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
+                {
+                    if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+                    {
+                        // Define fixed width for both columns
+                        ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 150f);
+                        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
 
-            // Add vertical spacing between entries
-            ImGui.Dummy(new Vector2(0, 10));
+                        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
+                        if (icon2 != null)
+                        {
+                            ImGui.TableNextRow();
+                            ImGui.TableSetColumnIndex(0);
+                            ImGui.TextUnformatted("Name");
+                            ImGui.TableSetColumnIndex(1);
+                            ImGui.TextUnformatted(entry.Name);
+                            ImGui.SameLine();
+                            ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
+
+                            if (ImGui.IsItemHovered())
+                            {
+                                ImGui.BeginTooltip();
+                                ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
+                                ImGui.EndTooltip();
+                            }
+                        }
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("GameObjectId:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.GameObjectId.ToString());
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Boss from icon:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.IsBoss.ToString());
+
+                        ImGui.EndTable();
+                    }
+
+                    // Add vertical spacing between entries
+                    ImGui.Dummy(new Vector2(0, 10));
+                }
+            }
         }
 
         //foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
