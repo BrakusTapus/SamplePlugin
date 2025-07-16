@@ -67,47 +67,64 @@ public class MainWindow : Window, IDisposable
         {
             if (tabheader.Success)
             {
-                using (var tab1 = ImRaii.TabItem("Main Menu"))
+                using (var mainMenuTab = ImRaii.TabItem("Main Menu"))
                 {
-                    if (tab1.Success)
+                    if (mainMenuTab.Success)
                     {
                         DrawImage();
                         DrawPluginInfo();
                     }
                 }
-                var playerInfoValue = Configuration.DisplayPlayerInfo;
+                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
                 if (playerInfoValue)
                 {
-                    using (var tab2 = ImRaii.TabItem("Player Info"))
+                    using (var playerInfoTab = ImRaii.TabItem("Player Info"))
                     {
-                        if (tab2.Success)
+                        if (playerInfoTab.Success)
                         {
                             DrawPlayerInfo();
                         }
                     }
                 }
 
-                var targetInfoValue = Configuration.DisplayTargetInfo;
+                var targetInfoValue = Configuration.DisplayTargetInfoTab;
                 if (targetInfoValue)
                 {
-                    using (var tab3 = ImRaii.TabItem("Target Info"))
+                    using (var targetInfoTab = ImRaii.TabItem("Target Info"))
                     {
-                        if (tab3.Success)
+                        if (targetInfoTab.Success)
                         {
                             DrawTargetInfo();
                         }
                     }
                 }
 
-                var highlightValue = Configuration.DisplayHighLight;
+                var highlightValue = Configuration.DisplayHighLightInfoTab;
                 if (highlightValue)
                 {
-                    using (var tab4 = ImRaii.TabItem("Highlight Info"))
+                    using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
                     {
-                        if (tab4.Success)
+                        if (highlightInfoTab.Success)
                         {
                             DrawHighlightTab();
                         }
+                    }
+                }
+                if (!Configuration.DisplayHighLightInfoTab)
+                {
+                    if (Configuration.EnableHighLightOverlay)
+                    {
+                        Configuration.EnableHighLightOverlay = false;
+                    }
+
+                    if (Configuration.HighlightPlayer)
+                    {
+                        Configuration.HighlightPlayer = false;
+                    }
+
+                    if (Configuration.HighlightAllGameObjects)
+                    {
+                        Configuration.HighlightAllGameObjects = false;
                     }
                 }
             }
@@ -188,23 +205,23 @@ public class MainWindow : Window, IDisposable
         {
             if (child.Success)
             {
-                var playerInfoValue = Configuration.DisplayPlayerInfo;
+                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
                 if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
                 {
-                    Configuration.DisplayPlayerInfo = playerInfoValue;
+                    Configuration.DisplayPlayerInfoTab = playerInfoValue;
                     // can save immediately on change, if you don't want to provide a "Save and Close" button
                     Configuration.Save();
                 }
-                var targetInfoValue = Configuration.DisplayTargetInfo;
+                var targetInfoValue = Configuration.DisplayTargetInfoTab;
                 if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
                 {
-                    Configuration.DisplayTargetInfo = targetInfoValue;
+                    Configuration.DisplayTargetInfoTab = targetInfoValue;
                     Configuration.Save();
                 }
-                var highlightValue = Configuration.DisplayHighLight;
+                var highlightValue = Configuration.DisplayHighLightInfoTab;
                 if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
                 {
-                    Configuration.DisplayHighLight = highlightValue;
+                    Configuration.DisplayHighLightInfoTab = highlightValue;
                     Configuration.Save();
                 }
 
@@ -212,7 +229,7 @@ public class MainWindow : Window, IDisposable
                 // These expect formatting parameter if any part of the text contains a "%", which we can't
                 // provide through our bindings, leading to a Crash to Desktop.
                 // Replacements can be found in the ImGuiHelpers Class
-                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfo}");
+                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfoTab}");
 
                 if (ImGui.Button("Show Test window"))
                 {
@@ -304,7 +321,7 @@ public class MainWindow : Window, IDisposable
         if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
         {
             Configuration.EnableHighLightOverlay = highlightOverlayValue;
-            Plugin.ToggleHighlightUI();
+            Plugin.TargetHighlightWindow.IsOpen = true;
             Configuration.Save();
         }
         var highlightPlayer = Configuration.HighlightPlayer;

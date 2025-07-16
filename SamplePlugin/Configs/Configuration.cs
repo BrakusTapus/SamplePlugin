@@ -12,10 +12,10 @@ public class Configuration : IPluginConfiguration
     public int Version { get; set; } = 0;
 
     public bool IsConfigWindowMovable { get; set; } = true;
-    public bool DisplayPlayerInfo { get; set; } = true;
-    public bool DisplayTargetInfo { get; set; } = true;
-    public bool DisplayHighLight { get; set; } = true;
-    public bool EnableHighLightOverlay { get; set; } = true;
+    public bool DisplayPlayerInfoTab { get; set; } = true;
+    public bool DisplayTargetInfoTab { get; set; } = true;
+    public bool DisplayHighLightInfoTab { get; set; } = true;
+    public bool EnableHighLightOverlay { get; set; } = false;
     public bool HighlightPlayer { get; set; } = false;
     public bool HighlightAllGameObjects { get; set; } = false;
 
@@ -23,5 +23,6 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         Svc.PluginInterface.SavePluginConfig(this);
+        Svc.Log.Debug($"Saved plugin config.");
     }
 }

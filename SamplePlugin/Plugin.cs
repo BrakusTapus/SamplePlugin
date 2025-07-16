@@ -32,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
     private TestWindow TestWindow { get; init; }
-    private TargetHighlight TargetHighlightWindow { get; init; }
+    internal TargetHighlight TargetHighlightWindow { get; init; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
