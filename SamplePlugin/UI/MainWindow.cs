@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures;
@@ -10,6 +11,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.GameHelpers;
 using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
@@ -265,17 +267,36 @@ public class MainWindow : Window, IDisposable
         {
             if (child1.Success)
             {
-                foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
+                var nameplate = Svc.Targets.Target as IBattleChara;
+
+                var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
+                var nameplate2 = NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+                var icon = NamePlateEntry.CurrentTargetNameplate?.NameIconId ?? -1;
+                var current = NamePlateEntry.CurrentTargetNameplate;
+                if (nameplate2 != null)
                 {
-                    if (!item.IsTargetable || item == null)
-                    {
-                        continue;
-                    }
-                    ImGui.TextUnformatted(item.Name.ToString());
-                    ImGui.TextUnformatted(item.GameObjectId.ToString());
-                    ImGui.SetNextItemWidth(100);
-                    ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
+                    ImGui.TextUnformatted($"Direct: IconID = {nameplate2.NameIconId}");
+                    ImGui.TextUnformatted($"Direct: IconID = {icon}");
+                    ImGui.TextUnformatted($"1 = {current.Name}");
+                    ImGui.TextUnformatted($"2 = {current.IsBoss}");
+                    ImGui.TextUnformatted($"3 = {current.GameObjectId}");
                 }
+                else
+                {
+                    ImGui.TextUnformatted("Direct: NOT FOUND");
+                }
+
+                //foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
+                //{
+                //    if (!item.IsTargetable || item == null)
+                //    {
+                //        continue;
+                //    }
+                //    ImGui.TextUnformatted(item.Name.ToString());
+                //    ImGui.TextUnformatted(item.GameObjectId.ToString());
+                //    ImGui.SetNextItemWidth(100);
+                //    ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
+                //}
             }
         }
         ImGui.SameLine();

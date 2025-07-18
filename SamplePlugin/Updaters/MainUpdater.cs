@@ -1,6 +1,7 @@
 //using System.Collections.Generic;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
 using SamplePlugin.Helpers;

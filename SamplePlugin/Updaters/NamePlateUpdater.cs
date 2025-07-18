@@ -30,6 +30,7 @@ internal static class NamePlateUpdater
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
+        NamePlateUpdater.Update(handlers);
         // Build a set of valid GameObjectIds from current handlers
         HashSet<ulong> currentGameObjectIds = new();
         foreach (INamePlateUpdateHandler handler in handlers)
@@ -76,6 +77,22 @@ internal static class NamePlateUpdater
     {
         _allNamePlates.Clear();
     }
+
+    public static IReadOnlyList<INamePlateUpdateHandler> CurrentNameplates { get; private set; } = new List<INamePlateUpdateHandler>();
+
+    public static void Update(IReadOnlyList<INamePlateUpdateHandler> updated)
+    {
+        CurrentNameplates = updated;
+    }
+    public static INamePlateUpdateHandler? GetCurrentNameplate(this IBattleChara battleChara)
+    {
+        if (battleChara == null)
+            return null;
+
+        return NamePlateUpdater.CurrentNameplates
+            .FirstOrDefault(n => n.GameObjectId == battleChara.GameObjectId);
+    }
+
 }
 
 /// <summary>
@@ -123,4 +140,13 @@ internal class NamePlateEntry
     public IBattleChara? BattleChara { get; set; }
 
     public bool IsTargetable => BattleChara.IsTargetable;
+
+    public static NamePlateEntry? CurrentTargetNameplate
+    {
+        get
+        {
+            var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
+            return NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+        }
+    }
 }
