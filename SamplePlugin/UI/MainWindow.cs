@@ -255,6 +255,8 @@ public class MainWindow : Window, IDisposable
             NamePlateUpdater.ClearList();
         }
         ImGuiEx.Tooltip("Clears the listed nameplates");
+        ImGui.SameLine();
+        ImGui.TextUnformatted("AllNamePlates: " + NamePlateUpdater.AllNamePlates.Count());
         ImGui.Separator();
 
         float availableHeight = ImGui.GetContentRegionAvail().Y;
@@ -315,6 +317,12 @@ public class MainWindow : Window, IDisposable
                         ImGui.TextUnformatted("Boss from icon:");
                         ImGui.TableSetColumnIndex(1);
                         ImGui.TextUnformatted(entry.IsBoss.ToString());
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Targetable:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.IsTargetable.ToString());
 
                         ImGui.EndTable();
                     }
