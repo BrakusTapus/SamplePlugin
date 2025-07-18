@@ -42,6 +42,7 @@ internal static class NamePlateUpdater
                 if (existing != null)
                 {
                     // Update existing entry
+                    existing.GameObjectId = handler.GameObjectId;
                     existing.Name = handler.Name.ToString();
                     existing.NameIconId = handler.NameIconId;
                     existing.MarkerIconId = handler.MarkerIconId;
@@ -67,44 +68,9 @@ internal static class NamePlateUpdater
         }
 
         // Remove entries that are no longer valid
-        _allNamePlates.RemoveAll(entry => entry.BattleChara == null || !entry.BattleChara.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 45);
+        _allNamePlates.RemoveAll(entry => entry.BattleChara == null || !entry.BattleChara.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
 
     }
-
-    //internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
-    //{
-    //    foreach (INamePlateUpdateHandler handler in handlers)
-    //    {
-    //        if (handler.NamePlateKind == NamePlateKind.PlayerCharacter || handler.NamePlateKind == NamePlateKind.BattleNpcEnemy)
-    //        {
-    //            var existing = _allNamePlates.FirstOrDefault(p => p.GameObjectId == handler.GameObjectId);
-    //            if (existing != null)
-    //            {
-    //                // Update existing entry
-    //                existing.Name = handler.Name.ToString();
-    //                existing.NameIconId = handler.NameIconId;
-    //                existing.MarkerIconId = handler.MarkerIconId;
-    //                existing.IsBoss = handler.IsBossFromNamePlateIconId();
-    //                existing.Kind = handler.NamePlateKind;
-    //                existing.BattleChara = handler.BattleChara;
-    //            }
-    //            else
-    //            {
-    //                // Add new entry
-    //                _allNamePlates.Add(new NamePlateEntry
-    //                {
-    //                    GameObjectId = handler.GameObjectId,
-    //                    Name = handler.Name.ToString(),
-    //                    NameIconId = handler.NameIconId,
-    //                    MarkerIconId = handler.MarkerIconId,
-    //                    IsBoss = handler.IsBossFromNamePlateIconId(),
-    //                    Kind = handler.NamePlateKind,
-    //                    BattleChara = handler.BattleChara // Assuming you're tracking this for targetability
-    //                });
-    //            }
-    //        }
-    //    }
-    //}
 
     public static void ClearList()
     {

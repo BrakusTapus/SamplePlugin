@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
+using SamplePlugin.Helpers;
 
 namespace SamplePlugin.Updaters;
 
@@ -32,6 +33,7 @@ internal static class MainUpdater
     internal static void UpdateTargets()
     {
         _allBattleCharas.Clear();
+
         foreach (IGameObject obj in Svc.Objects)
         {
             if (obj is IBattleChara battleChara && obj.Name.ToString() != string.Empty)
@@ -39,6 +41,15 @@ internal static class MainUpdater
                 _allBattleCharas.Add(battleChara);
             }
         }
+
+        // Remove entries from _allBattleCharas if:
+        // - BattleChara is null
+        // - BattleChara is not targetable
+        // - Distance to player is >= 45
+        _allBattleCharas.RemoveAll(battleChara =>
+            battleChara == null ||
+            !battleChara.IsTargetable ||
+            ObjectHelper.DistanceToPlayer(battleChara) >= 55);
     }
 
     internal static void UpdateGameObjects()
@@ -46,11 +57,16 @@ internal static class MainUpdater
         _allGameObjects.Clear();
         foreach (IGameObject gameObject in Svc.Objects)
         {
-            if (gameObject is IGameObject obj && gameObject.Name.ToString() != string.Empty)
+            if (gameObject is IGameObject obj && (gameObject.Name.ToString() != string.Empty && gameObject != null))
             {
                 _allGameObjects.Add(obj);
             }
         }
+
+        _allGameObjects.RemoveAll(gameObject =>
+            gameObject == null ||
+            //!gameObject.IsTargetable ||
+            ObjectHelper.DistanceToPlayer(gameObject) >= 55);
     }
 }
 
