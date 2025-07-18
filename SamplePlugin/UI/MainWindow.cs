@@ -285,10 +285,10 @@ public class MainWindow : Window, IDisposable
             {
                 foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
                 {
-                    //if (!entry.IsTargetable)
-                    //{
-                    //    continue;
-                    //}
+                    if (!entry.IsTargetable)
+                    {
+                        continue;
+                    }
                     if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
                     {
                         // Define fixed width for both columns
