@@ -267,7 +267,7 @@ public class MainWindow : Window, IDisposable
             {
                 foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
                 {
-                    if (!item.IsTargetable)
+                    if (!item.IsTargetable || item == null)
                     {
                         continue;
                     }
