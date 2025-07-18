@@ -267,6 +267,10 @@ public class MainWindow : Window, IDisposable
             {
                 foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
                 {
+                    if (!item.IsTargetable)
+                    {
+                        continue;
+                    }
                     ImGui.TextUnformatted(item.Name.ToString());
                     ImGui.TextUnformatted(item.GameObjectId.ToString());
                     ImGui.SetNextItemWidth(100);
