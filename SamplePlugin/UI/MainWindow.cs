@@ -285,6 +285,10 @@ public class MainWindow : Window, IDisposable
             {
                 foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
                 {
+                    //if (!entry.IsTargetable)
+                    //{
+                    //    continue;
+                    //}
                     if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
                     {
                         // Define fixed width for both columns
@@ -330,14 +334,23 @@ public class MainWindow : Window, IDisposable
 
                         ImGui.TableNextRow();
                         ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("Hitbox Radius");
+                        ImGui.TextUnformatted("Hitbox Radius:");
                         ImGui.TableSetColumnIndex(1);
-                        ImGui.SetNextItemWidth(100);
-                        ImGui.SliderFloat(
-                            $"##HitboxRadiusSlider{entry.BattleChara.Name}{entry.BattleChara.EntityId}",
-                            ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entry.BattleChara.Address)->HitboxRadius,
-                            0f, 100f
-                        );
+
+                        if (entry.BattleChara != null && entry.BattleChara.Address != IntPtr.Zero)
+                        {
+                            ImGui.SetNextItemWidth(100);
+                            var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entry.BattleChara.Address;
+                            ImGui.SliderFloat(
+                                $"##HitboxRadiusSlider{entry.BattleChara.Name}{entry.BattleChara.EntityId}",
+                                ref gameObject->HitboxRadius,
+                                0f, 100f
+                            );
+                        }
+                        else
+                        {
+                            ImGui.TextUnformatted("N/A (No BattleChara)");
+                        }
 
                         ImGui.EndTable();
                     }
