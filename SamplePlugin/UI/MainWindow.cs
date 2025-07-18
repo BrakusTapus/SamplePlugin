@@ -328,6 +328,17 @@ public class MainWindow : Window, IDisposable
                         ImGui.TableSetColumnIndex(1);
                         ImGui.TextUnformatted(entry.IsTargetable.ToString());
 
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Hitbox Radius");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.SetNextItemWidth(100);
+                        ImGui.SliderFloat(
+                            $"##HitboxRadiusSlider{entry.BattleChara.Name}{entry.BattleChara.EntityId}",
+                            ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entry.BattleChara.Address)->HitboxRadius,
+                            0f, 100f
+                        );
+
                         ImGui.EndTable();
                     }
 
