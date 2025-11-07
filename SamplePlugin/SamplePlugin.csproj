@@ -29,4 +29,7 @@
     <ItemGroup>
       <Folder Include="Assets\" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Update="DalamudPackager" Version="13.0.0" />
+    </ItemGroup>
 </Project>
