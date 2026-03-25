@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
@@ -25,7 +26,7 @@ namespace SamplePlugin.UI;
 
 public class MainWindow : Window, IDisposable
 {
-    private string GoatImagePath;
+    private readonly string goatImagePath;
     private Plugin Plugin;
     private Configuration Configuration;
 
@@ -57,7 +58,7 @@ public class MainWindow : Window, IDisposable
             ShowTooltip = () => ImGui.SetTooltip(("Toggle settings window.")),
         });
 
-        GoatImagePath = goatImagePath;
+        this.goatImagePath = goatImagePath;
         Plugin = plugin;
         Configuration = plugin.Configuration;
     }
@@ -137,8 +138,10 @@ public class MainWindow : Window, IDisposable
     public void DrawImage()
     {
         float availableWidth = ImGui.GetContentRegionAvail().X;
-        var goatImage = Svc.Texture.GetFromFile(GoatImagePath).GetWrapOrDefault();
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, goatImage.Height + 15), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+        IDalamudTextureWrap? goatImage = Svc.Texture.GetFromFile(goatImagePath).GetWrapOrDefault();
+        // Use a fallback height if the image isn't available
+        float childHeight = goatImage != null ? goatImage.Height + 15 : 50;
+        using (ImRaii.IEndObject child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)
