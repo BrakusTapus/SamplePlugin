@@ -137,7 +137,7 @@ internal class TargetHighlight : Window
 
         // Draw icon image
         drawList.AddImage(
-            icon.ImGuiHandle,
+            icon.Handle,
             iconTopLeft,
             iconBottomRight
         );

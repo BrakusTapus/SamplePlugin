@@ -81,7 +81,7 @@ public class TestWindow : Window, IDisposable
                         float desiredHeight = desiredWidth / imageAspectRatio;
                         ImGuiHelpers.CenterCursorFor(desiredWidth);
                         // Render the image at scaled size
-                        ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
+                        ImGui.Image(logoImage.Handle, new Vector2(desiredWidth, desiredHeight));
                     }
                     ImGui.TextUnformatted("Kirbo - Test Window");
                     ImGui.Separator();

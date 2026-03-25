@@ -146,7 +146,7 @@ public class MainWindow : Window, IDisposable
                 if (goatImage != null)
                 {
                     ImGuiHelpers.CenterCursorFor(goatImage.Width);
-                    ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+                    ImGui.Image(goatImage.Handle, new Vector2(goatImage.Width, goatImage.Height));
                 }
                 else
                 {
@@ -325,7 +325,7 @@ public class MainWindow : Window, IDisposable
                             ImGui.TableSetColumnIndex(1);
                             ImGui.TextUnformatted(entry.Name);
                             ImGui.SameLine();
-                            ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
+                            ImGui.Image(icon2.Handle, new Vector2(22, 22));
 
                             if (ImGui.IsItemHovered())
                             {

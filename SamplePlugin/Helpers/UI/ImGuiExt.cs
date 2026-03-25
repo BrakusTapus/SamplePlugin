@@ -4,13 +4,13 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using ECommons.DalamudServices;
 using ECommons.ImGuiMethods;
-using ImGuiNET;
 using SamplePlugin.DalamudServices;
 
 namespace SamplePlugin.Helpers.UI;
@@ -50,7 +50,7 @@ internal unsafe static class ImGuiExt
 
         // Draw the background image, stretching it to fill the window size
         ImGui.SetCursorPos(Vector2.Zero);
-        ImGui.Image(texture.ImGuiHandle, windowSize);
+        ImGui.Image(texture.Handle, windowSize);
     }
 
     /// <summary>
