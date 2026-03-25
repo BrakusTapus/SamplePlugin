@@ -11,13 +11,19 @@ public class Configuration : IPluginConfiguration
 {
     public int Version { get; set; } = 0;
 
+    // Config window
     public bool IsConfigWindowMovable { get; set; } = true;
+
+    // Main window tab bar
     public bool DisplayPlayerInfoTab { get; set; } = true;
     public bool DisplayTargetInfoTab { get; set; } = true;
     public bool DisplayHighLightInfoTab { get; set; } = true;
+
+    // Highlight related settings
     public bool EnableHighLightOverlay { get; set; } = false;
     public bool HighlightPlayer { get; set; } = false;
     public bool HighlightAllGameObjects { get; set; } = false;
+
 
     // the below exist just to make saving less cumbersome
     public void Save()

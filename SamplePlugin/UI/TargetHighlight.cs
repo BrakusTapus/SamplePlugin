@@ -21,7 +21,7 @@ using SamplePlugin.Updaters;
 namespace SamplePlugin.UI;
 internal class TargetHighlight : Window
 {
-    private Plugin Plugin;
+    private Plugin plugin;
     private Configuration Configuration;
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight), ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar)
@@ -33,7 +33,7 @@ internal class TargetHighlight : Window
         Position = new Vector2(0, 0);
         PositionCondition = ImGuiCond.Always;
         RespectCloseHotkey = false;
-        Plugin = plugin;
+        this.plugin = plugin;
         Configuration = plugin.Configuration;
     }
 
