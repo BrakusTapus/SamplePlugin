@@ -410,6 +410,7 @@ public class MainWindow : Window, IDisposable
         }
         var highlightPlayer = Configuration.HighlightPlayer;
         var highlightGameObjects = Configuration.HighlightAllGameObjects;
+        var highlightBattleCharas = Configuration.HighlightAllBattleCharas;
         if (highlightOverlayValue)
         {
             ImGui.Indent();
@@ -423,7 +424,12 @@ public class MainWindow : Window, IDisposable
                 Configuration.HighlightAllGameObjects = highlightGameObjects;
                 Configuration.Save();
             }
-
+            // HighlightAllBattleCharas
+            if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
+            {
+                Configuration.HighlightAllBattleCharas = highlightBattleCharas;
+                Configuration.Save();
+            }
             ImGui.Separator();
 
             var useGradientColor = Configuration.UseGradientColor;

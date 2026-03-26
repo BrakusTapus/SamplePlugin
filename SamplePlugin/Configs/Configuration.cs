@@ -27,6 +27,7 @@ public class Configuration : IPluginConfiguration
     public float GlowSize { get; set; } = 8f;
     public int GlowSteps { get; set; } = 8;
     public bool HighlightAllGameObjects { get; set; } = false;
+    public bool HighlightAllBattleCharas { get; set; } = false;
 
 
     // the below exist just to make saving less cumbersome

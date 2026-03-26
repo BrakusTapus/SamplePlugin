@@ -12,7 +12,9 @@ using Dalamud.Interface.Colors;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.Data;
 using SamplePlugin.Helpers;
@@ -61,6 +63,7 @@ internal class TargetHighlight : Window
             {
                 // Filter AllGameObjects to include only targetable objects.
                 IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
+                IEnumerable<IBattleChara> battleCharas2 = MainUpdater.AllGameObjects.OfType<IBattleChara>() .Where(b => b.IsTargetable);
 
                 // Get the player character.
                 IPlayerCharacter player = Svc.Objects.LocalPlayer;
@@ -87,6 +90,19 @@ internal class TargetHighlight : Window
                         {
                             HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
                         }
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharas)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(ECommons.ExcelServices.Job.MCH)) continue;
+
+                        var color = Configuration.UseGradientColor
+                        ? GetGradientColor()
+                        : ImGuiColors.DalamudYellow;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
                     }
                 }
             }
@@ -215,7 +231,7 @@ internal class TargetHighlight : Window
             ImDrawFlags.RoundCornersAll,
             3f
         );
-        // Get icon texture
+        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??
         Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(55).GetWrapOrDefault(); // TODO make it so the icon is job based
         if (icon is null)
         {
