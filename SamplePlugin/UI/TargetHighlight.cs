@@ -9,6 +9,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -19,6 +20,7 @@ using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
 namespace SamplePlugin.UI;
+
 internal class TargetHighlight : Window
 {
     private Plugin plugin;
@@ -71,7 +73,10 @@ internal class TargetHighlight : Window
                     {
                         if (target == player)
                         {
-                            DrawWorldSpaceRectangleAroundGameObject(player, ImGuiColors.DalamudViolet);
+                            var playerColor = Configuration.UseGradientColor
+                                ? GetGradientColor()
+                                : ImGuiColors.DalamudViolet;
+                            DrawWorldSpaceRectangleAroundGameObject(player, playerColor);
                         }
                     }
                     bool highlightGameObjects = Configuration.HighlightAllGameObjects;
@@ -90,7 +95,92 @@ internal class TargetHighlight : Window
         ImGui.End();
     }
 
-    private unsafe static void HighlightAllGameObjects(IGameObject target)
+
+    /// <summary>
+    /// Returns a smoothly animated rainbow color that cycles over a 1-second period.
+    /// Useful for making highlights visually distinct without needing a static colour choice.
+    /// </summary>
+    private static Vector4 GetGradientColor()
+    {
+        const float PERIOD = 1f;
+        var t     = (float)ImGui.GetTime() % PERIOD               / PERIOD;
+        var red   = (MathF.Sin(2 * MathF.PI * t)             + 1) / 2;
+        var green = (MathF.Sin(2 * MathF.PI * (t + 1f / 3f)) + 1) / 2;
+        var blue  = (MathF.Sin(2 * MathF.PI * (t + 2f / 3f)) + 1) / 2;
+        return new Vector4(red, green, blue, 1f);
+    }
+
+    /// <summary>
+    /// Draws a layered glow bloom around a rectangle by rendering multiple expanding
+    /// filled rects with decreasing alpha. Call this *before* AddRect so the crisp
+    /// border sits on top of the glow.
+    /// </summary>
+    /// <param name="drawList">The ImGui draw list to render into.</param>
+    /// <param name="min">Top-left corner of the base rectangle.</param>
+    /// <param name="max">Bottom-right corner of the base rectangle.</param>
+    /// <param name="colU32">Packed RGBA colour (use ImGui.GetColorU32).</param>
+    /// <param name="rounding">Corner rounding radius, should match your AddRect call.</param>
+    /// <param name="glowSize">How far (in pixels) the glow spreads outward.</param>
+    /// <param name="steps">Number of glow layers — more = smoother but more draw calls.</param>
+    /// <param name="innerBoost">Extra brightness boost near the rectangle edge (0 = none).</param>
+    private static void AddGlowRect(
+        ImDrawListPtr drawList,
+        Vector2 min,
+        Vector2 max,
+        uint colU32,
+        float rounding,
+        float glowSize = 8f,
+        int steps = 8,
+        float innerBoost = 0.25f)
+    {
+        for (var i = 0; i < steps; i++)
+        {
+            var t      = (i + 1f) / steps;
+            var expand = t        * glowSize;
+
+            // Quadratic falloff so the glow is bright near the rect and fades outward.
+            var a = 1f - t;
+            a *= a;
+            a *= 1f / steps * 2.2f;
+            a *= 1f + (1f - t) * innerBoost;
+
+            // Unpack the base colour, override alpha with the computed falloff value.
+            var c = ColorU32ToVector4(colU32);
+            c.W *= a;
+            var cU32 = ColorVector4ToU32(c);
+
+            var r = rounding + expand * 0.6f;
+            drawList.AddRectFilled(
+                min - new Vector2(expand),
+                max + new Vector2(expand),
+                cU32,
+                r
+            );
+        }
+    }
+
+    // Inline colour conversion helpers
+    private static Vector4 ColorU32ToVector4(uint col)
+    {
+        return new Vector4(
+            (col & 0xFF) / 255f,
+            ((col >> 8) & 0xFF) / 255f,
+            ((col >> 16) & 0xFF) / 255f,
+            ((col >> 24) & 0xFF) / 255f
+        );
+    }
+
+    private static uint ColorVector4ToU32(Vector4 col)
+    {
+        var r = (uint)Math.Clamp((int)(col.X * 255f), 0, 255);
+        var g = (uint)Math.Clamp((int)(col.Y * 255f), 0, 255);
+        var b = (uint)Math.Clamp((int)(col.Z * 255f), 0, 255);
+        var a = (uint)Math.Clamp((int)(col.W * 255f), 0, 255);
+        return r | (g << 8) | (b << 16) | (a << 24);
+    }
+
+
+    private static unsafe void HighlightAllGameObjects(IGameObject target)
     {
         GameObject* gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Address;
 
@@ -145,7 +235,7 @@ internal class TargetHighlight : Window
         );
     }
 
-    private unsafe static void DrawWorldSpaceRectangleAroundGameObject(IGameObject gameObject, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    private static unsafe void DrawWorldSpaceRectangleAroundGameObject(IGameObject gameObject, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
     {
         if (gameObject == null || gameObject.Address == IntPtr.Zero)
         {
@@ -186,7 +276,7 @@ internal class TargetHighlight : Window
         );
     }
 
-    private unsafe static void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    private static unsafe void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
     {
         if (battleChara == null || battleChara.Address == IntPtr.Zero)
             return;
@@ -223,7 +313,7 @@ internal class TargetHighlight : Window
         );
     }
 
-    private unsafe static void HighlightAllHostiles(IGameObject target)
+    private static unsafe void HighlightAllHostiles(IGameObject target)
     {
         Svc.GameGui.WorldToScreen(target.Position, out var screenPos);
         var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
@@ -238,7 +328,7 @@ internal class TargetHighlight : Window
             3f);
     }
 
-    private unsafe static void HighlightWithColor(IGameObject target, Vector4 color)
+    private static unsafe void HighlightWithColor(IGameObject target, Vector4 color)
     {
 
         Svc.GameGui.WorldToScreen(target.Position, out var screenPos);

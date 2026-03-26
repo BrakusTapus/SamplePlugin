@@ -22,6 +22,10 @@ public class Configuration : IPluginConfiguration
     // Highlight related settings
     public bool EnableHighLightOverlay { get; set; } = false;
     public bool HighlightPlayer { get; set; } = false;
+    public bool UseGradientColor { get; set; } = false;
+    public bool UseGlowEffect { get; set; } = false;
+    public float GlowSize { get; set; } = 8f;
+    public int GlowSteps { get; set; } = 8;
     public bool HighlightAllGameObjects { get; set; } = false;
 
 

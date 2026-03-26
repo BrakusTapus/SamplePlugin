@@ -40,7 +40,7 @@ internal static class ObjectHelper
     /// <returns></returns>
     public static float DistanceToPlayer(this IGameObject? obj)
     {
-        var localPlayer = Svc.ClientState.LocalPlayer;
+        var localPlayer = Svc.Objects.LocalPlayer;
         if (obj == null) return float.MaxValue;
         if (localPlayer == null) return float.MaxValue;
         if (obj is not IBattleChara b) return float.MaxValue;
