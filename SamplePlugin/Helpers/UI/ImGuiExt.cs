@@ -7,13 +7,16 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
+using Dalamud.Interface.Utility;
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
@@ -59,6 +62,17 @@ internal static unsafe class ImGuiExt
         // Draw the background image, stretching it to fill the window size
         ImGui.SetCursorPos(Vector2.Zero);
         ImGui.Image(texture.Handle, windowSize);
+    }
+
+    public static void DrawJobIcon(IBattleChara bnpc)
+    {
+        ImGui.SameLine();
+
+        if (GetTexture(bnpc.ClassJob.RowId + 62000, out Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? texture))
+        {
+            ImGui.Image(texture.Handle, Vector2.One * 24 * ImGuiHelpers.GlobalScale);
+            //ImguiTooltips.HoveredTooltip(UiString.JobConfigTip.GetDescription());
+        }
     }
 
     /// <summary>

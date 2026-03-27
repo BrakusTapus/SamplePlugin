@@ -228,6 +228,7 @@ public class MainWindow : Window, IDisposable
 
                 // ExtractText() should be the preferred method to read Lumina SeStrings,
                 // as ToString does not provide the actual text values, instead gives an encoded macro string.
+                ImGuiExt.DrawJobIcon(localPlayer);
                 ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
                 ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
                 ImGui.SliderFloat($"Hitbox Radius###{localPlayer.Name}{localPlayer.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);

@@ -231,7 +231,7 @@ internal class TargetHighlight : Window
             ImDrawFlags.RoundCornersAll,
             3f
         );
-        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??
+        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??        
         Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(55).GetWrapOrDefault(); // TODO make it so the icon is job based
         if (icon is null)
         {
@@ -326,6 +326,25 @@ internal class TargetHighlight : Window
             rounding,
             drawFlags,
             thickness
+        );
+
+        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??        
+        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(battleChara.ClassJob.RowId + 62000).GetWrapOrDefault(); // TODO make it so the icon is job based
+        if (icon is null)
+        {
+            return;
+        }
+
+        // Icon dimensions
+        const float iconSize = 22f;
+        Vector2 iconTopLeft = new Vector2(screenTop.X - iconSize / 2f, screenTop.Y - iconSize - 4f); // 4px padding above rectangle
+        Vector2 iconBottomRight = iconTopLeft + new Vector2(iconSize, iconSize);
+
+        // Draw icon image
+        drawList.AddImage(
+            icon.Handle,
+            iconTopLeft,
+            iconBottomRight
         );
     }
 
