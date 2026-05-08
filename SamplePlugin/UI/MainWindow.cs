@@ -141,7 +141,7 @@ public class MainWindow : Window, IDisposable
         IDalamudTextureWrap? goatImage = Svc.Texture.GetFromFile(goatImagePath).GetWrapOrDefault();
         // Use a fallback height if the image isn't available
         float childHeight = goatImage != null ? goatImage.Height + 15 : 50;
-        using (ImRaii.IEndObject child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)

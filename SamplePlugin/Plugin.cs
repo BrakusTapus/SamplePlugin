@@ -19,6 +19,7 @@ using ECommons;
 using ECommons.DalamudServices;
 using System;
 using ECommons.ImGuiMethods;
+using ECommons.Logging;
 
 namespace SamplePlugin;
 
