@@ -25,7 +25,7 @@
     </ItemGroup>
     <ItemGroup>
         <!--<PackageReference Include="ECommons" Version="3.0.0.4" />-->
-        <PackageReference Include="ECommons" Version="*" />
+        <PackageReference Include="ECommons" Version="3.2.1.6" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Assets\" />

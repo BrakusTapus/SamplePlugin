@@ -20,6 +20,7 @@ using ECommons.DalamudServices;
 using System;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
+using Dalamud.Game.DutyState;
 
 namespace SamplePlugin;
 
@@ -138,31 +139,31 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
 
-    private static void DutyState_DutyCompleted(object? sender, ushort e)
+    private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
         Notify.Success("Duty Completed!");
     }
 
-    private static void DutyState_DutyRecommenced(object? sender, ushort e)
+    private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
         Notify.Success("Duty Recommenced!");
     }
 
-    private static void DutyState_DutyWiped(object? sender, ushort e)
+    private static void DutyState_DutyWiped(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
         Notify.Success("Duty Wiped!");
     }
 
-    private static void DutyState_DutyStarted(object? sender, ushort e)
+    private static void DutyState_DutyStarted(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
         Notify.Success("Duty Started!");
     }
 
-    private static void ClientState_TerritoryChanged(ushort obj)
+    private static void ClientState_TerritoryChanged(uint id)
     {
         NamePlateUpdater.ClearList();
         Notify.Success("Territory Changed!");
