@@ -13,6 +13,7 @@ using Dalamud.Interface.Components;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
@@ -66,12 +67,20 @@ internal static unsafe class ImGuiExt
 
     public static void DrawJobIcon(IBattleChara bnpc)
     {
-        ImGui.SameLine();
+        //ImGui.SameLine();
 
-        if (GetTexture(bnpc.ClassJob.RowId + 62000, out Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? texture))
+        if (GetTexture(bnpc.ClassJob.RowId + 62100, out Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? texture))
         {
             ImGui.Image(texture.Handle, Vector2.One * 24 * ImGuiHelpers.GlobalScale);
             //ImguiTooltips.HoveredTooltip(UiString.JobConfigTip.GetDescription());
+        }
+    }
+
+    public static void DrawJobIcon(IPlayerState lpc)
+    {
+        if (GetTexture(62100 + lpc.ClassJob.RowId, out IDalamudTextureWrap? texture))
+        {
+            ImGui.Image(texture.Handle, Vector2.One * 24 * ImGuiHelpers.GlobalScale);
         }
     }
 

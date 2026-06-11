@@ -213,26 +213,45 @@ public class MainWindow : Window, IDisposable
                 // Example for other services that Dalamud provides.
                 // ClientState provides a wrapper filled with information about the local player object and client.
 
+                var playerState = Svc.PlayerState;
+                if (!playerState.IsLoaded)
+                {
+                    ImGui.Text("Our local player is currently not logged in.");
+                    return;
+                }
+
+                if (!playerState.ClassJob.IsValid)
+                {
+                    ImGui.Text("Our current job is currently not valid.");
+                    return;
+                }
+
                 var localPlayer = Svc.Objects.LocalPlayer;
                 if (localPlayer == null)
                 {
-                    ImGui.TextUnformatted("Our local player is currently not loaded.");
+                    ImGui.Text("Local player is unavailable.");
                     return;
                 }
 
-                if (!localPlayer.ClassJob.IsValid)
-                {
-                    ImGui.TextUnformatted("Our current job is currently not valid.");
-                    return;
-                }
-
+                ImGui.AlignTextToFramePadding();
+                ImGui.Text($"Current job:");
+                ImGui.SameLine(120 * ImGuiHelpers.GlobalScale);
                 // ExtractText() should be the preferred method to read Lumina SeStrings,
                 // as ToString does not provide the actual text values, instead gives an encoded macro string.
-                ImGuiExt.DrawJobIcon(localPlayer);
-                ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
-                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
-                ImGui.SliderFloat($"Hitbox Radius###{localPlayer.Name}{localPlayer.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
+                ImGuiExt.DrawJobIcon(playerState);
+                ImGui.SameLine();
+                ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
+                //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
 
+                ImGui.NewLine();
+                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
+                ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
+                ImGui.SameLine();
+                if (ImGui.Button("Reset##HitboxRadius"))
+                {
+                    ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius = 0.5f;
+                }
+                ImGui.NewLine();
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Svc.ClientState.TerritoryType;
                 if (Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
