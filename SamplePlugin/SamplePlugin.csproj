@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
-        <Version>0.0.0.7</Version>
+        <Version>0.0.0.8</Version>
         <Description>A sample plugin.</Description>
         <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -25,7 +25,7 @@
     </ItemGroup>
     <ItemGroup>
         <!--<PackageReference Include="ECommons" Version="3.0.0.4" />-->
-        <PackageReference Include="ECommons" Version="3.2.1.9" />
+        <PackageReference Include="ECommons" Version="3.2.1.12" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Assets\" />
