@@ -431,6 +431,12 @@ public class MainWindow : Window, IDisposable
         var highlightPlayer = Configuration.HighlightPlayer;
         var highlightGameObjects = Configuration.HighlightAllGameObjects;
         var highlightBattleCharas = Configuration.HighlightAllBattleCharas;
+        var highlightBattleCharasTanks = Configuration.HighlightAllBattleCharasTanks;
+        var highlightBattleCharasHealers = Configuration.HighlightAllBattleCharasHealers;
+        var highlightBattleCharasDPSMelee = Configuration.HighlightAllBattleCharasDPSMelee;
+        var highlightBattleCharasDPSRanged = Configuration.HighlightAllBattleCharasDPSRanged;
+        var highlightBattleCharasDPSCaster = Configuration.HighlightAllBattleCharasDPSCaster;
+
         if (highlightOverlayValue)
         {
             ImGui.Indent();
@@ -444,12 +450,43 @@ public class MainWindow : Window, IDisposable
                 Configuration.HighlightAllGameObjects = highlightGameObjects;
                 Configuration.Save();
             }
+
             // HighlightAllBattleCharas
             if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
             {
                 Configuration.HighlightAllBattleCharas = highlightBattleCharas;
                 Configuration.Save();
             }
+
+            // Per-role BattleChara checkboxes
+            ImGui.Indent();
+            if (ImGui.Checkbox("Tanks", ref highlightBattleCharasTanks))
+            {
+                Configuration.HighlightAllBattleCharasTanks = highlightBattleCharasTanks;
+                Configuration.Save();
+            }
+            if (ImGui.Checkbox("Healers", ref highlightBattleCharasHealers))
+            {
+                Configuration.HighlightAllBattleCharasHealers = highlightBattleCharasHealers;
+                Configuration.Save();
+            }
+            if (ImGui.Checkbox("DPS Melee", ref highlightBattleCharasDPSMelee))
+            {
+                Configuration.HighlightAllBattleCharasDPSMelee = highlightBattleCharasDPSMelee;
+                Configuration.Save();
+            }
+            if (ImGui.Checkbox("DPS Ranged", ref highlightBattleCharasDPSRanged))
+            {
+                Configuration.HighlightAllBattleCharasDPSRanged = highlightBattleCharasDPSRanged;
+                Configuration.Save();
+            }
+            if (ImGui.Checkbox("DPS Caster", ref highlightBattleCharasDPSCaster))
+            {
+                Configuration.HighlightAllBattleCharasDPSCaster = highlightBattleCharasDPSCaster;
+                Configuration.Save();
+            }
+            ImGui.Unindent();
+
             ImGui.Separator();
 
             var useGradientColor = Configuration.UseGradientColor;
@@ -489,7 +526,6 @@ public class MainWindow : Window, IDisposable
 
             ImGui.Unindent();
         }
-
     }
 
     //public void DrawNamePlates()

@@ -28,6 +28,11 @@ public class Configuration : IPluginConfiguration
     public int GlowSteps { get; set; } = 8;
     public bool HighlightAllGameObjects { get; set; } = false;
     public bool HighlightAllBattleCharas { get; set; } = false;
+    public bool HighlightAllBattleCharasTanks { get; set; } = false;
+    public bool HighlightAllBattleCharasHealers { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSMelee { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSRanged { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSCaster { get; set; } = false;
 
 
     // the below exist just to make saving less cumbersome

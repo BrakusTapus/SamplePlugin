@@ -13,6 +13,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
@@ -41,7 +42,7 @@ internal class TargetHighlight : Window
         Configuration = plugin.Configuration;
     }
 
-    public override void Draw()
+    public override unsafe void Draw()
     {
         // Create a dictionary to store the filtered results for each job role.
         Dictionary<JobRole, IEnumerable<IBattleChara>> filteredResults = new Dictionary<JobRole, IEnumerable<IBattleChara>>();
@@ -97,11 +98,68 @@ internal class TargetHighlight : Window
                 {
                     foreach (IBattleChara target in battleCharas)
                     {
-                        if (!target.IsJobs(ECommons.ExcelServices.Job.MCH)) continue;
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD,
+                                           Job.WHM, Job.SCH, Job.AST, Job.SGE,
+                                           Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR,
+                                           Job.BRD, Job.MCH, Job.DNC,
+                                           Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
 
-                        var color = Configuration.UseGradientColor
-                        ? GetGradientColor()
-                        : ImGuiColors.DalamudYellow;
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.DalamudWhite;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasTanks)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Blue, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedBlue;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasHealers)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.WHM, Job.SCH, Job.AST, Job.SGE)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Green, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedGreen;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSMelee)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Red, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.DPSRed;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSRanged)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BRD, Job.MCH, Job.DNC)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Orange, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedOrange;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSCaster)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+                        
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedPurple;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
                     }
                 }
@@ -290,6 +348,7 @@ internal class TargetHighlight : Window
             drawFlags,
             thickness
         );
+        ((GameObject*)gameObject.Address)->Highlight(ObjectHighlightColor.Orange, true);
     }
 
     private static unsafe void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
@@ -329,7 +388,7 @@ internal class TargetHighlight : Window
         );
 
         // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??        
-        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(battleChara.ClassJob.RowId + 62000).GetWrapOrDefault(); // TODO make it so the icon is job based
+        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(battleChara.ClassJob.RowId + 62100).GetWrapOrDefault(); // TODO make it so the icon is job based
         if (icon is null)
         {
             return;
