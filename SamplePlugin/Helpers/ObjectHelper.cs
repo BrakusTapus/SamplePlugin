@@ -140,7 +140,7 @@ internal static class ObjectHelper
 			return false;
 		}
 
-		if (ActionManager.CanUseActionOnTarget(/*(uint)ActionID.BlizzardPvE*/142, obj.Struct()))
+		if (ActionManager.CanUseActionOnTarget(142, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142
 		{
 			return true;
 		}
