@@ -419,7 +419,7 @@ public class MainWindow : Window, IDisposable
         //}
     }
 
-    public void DrawHighlightTab()
+    public void DrawHighlightTab() // TODO highlighting bnpc's based on jobs should depend on master highlight. refine job highlighting from role to job and add a is enemy toggle.
     {
         var highlightOverlayValue = Configuration.EnableHighLightOverlay;
         if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))

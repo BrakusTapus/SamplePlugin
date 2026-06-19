@@ -42,7 +42,7 @@ internal class TargetHighlight : Window
         Configuration = plugin.Configuration;
     }
 
-    public override unsafe void Draw()
+    public override unsafe void Draw() // TODO needs to be cleaner and add isenemy config
     {
         // Create a dictionary to store the filtered results for each job role.
         Dictionary<JobRole, IEnumerable<IBattleChara>> filteredResults = new Dictionary<JobRole, IEnumerable<IBattleChara>>();
