@@ -425,7 +425,8 @@ public class MainWindow : Window, IDisposable
         if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
         {
             Configuration.EnableHighLightOverlay = highlightOverlayValue;
-            Plugin.TargetHighlightWindow.IsOpen = true;
+            //Plugin.TargetHighlightWindow.IsOpen = true;
+            Plugin.TargetHighlightWindow.IsOpen = highlightOverlayValue;
             Configuration.Save();
         }
         var highlightPlayer = Configuration.HighlightPlayer;
