@@ -119,6 +119,14 @@ internal class TargetHighlight : Window
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
                     }
                 }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
 
                 if (Configuration.HighlightAllBattleCharasHealers)
                 {
@@ -128,6 +136,14 @@ internal class TargetHighlight : Window
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Green, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedGreen;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.WHM, Job.SCH, Job.AST, Job.SGE)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
                     }
                 }
 
@@ -141,6 +157,14 @@ internal class TargetHighlight : Window
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
                     }
                 }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
 
                 if (Configuration.HighlightAllBattleCharasDPSRanged)
                 {
@@ -152,15 +176,31 @@ internal class TargetHighlight : Window
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
                     }
                 }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BRD, Job.MCH, Job.DNC)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
 
                 if (Configuration.HighlightAllBattleCharasDPSCaster)
                 {
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
-                        
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Magenta, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedPurple;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
                     }
                 }
             }

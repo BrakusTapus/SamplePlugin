@@ -11,6 +11,7 @@ using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using SamplePlugin.DalamudServices;
@@ -126,4 +127,24 @@ internal static class ObjectHelper
     {
         return battleChara is IBattleChara b && validJobs != null && validJobs.Contains((byte)b.ClassJob.Value.RowId);
     }
+
+	internal static unsafe bool IsEnemy(this IGameObject obj)
+	{
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (!obj.IsTargetable)
+		{
+			return false;
+		}
+
+		if (ActionManager.CanUseActionOnTarget(/*(uint)ActionID.BlizzardPvE*/142, obj.Struct()))
+		{
+			return true;
+		}
+
+		return false;
+	}
 }
