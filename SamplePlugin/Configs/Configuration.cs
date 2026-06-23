@@ -34,6 +34,11 @@ public class Configuration : IPluginConfiguration
     public bool HighlightAllBattleCharasDPSRanged { get; set; } = false;
     public bool HighlightAllBattleCharasDPSCaster { get; set; } = false;
     public bool EnemyOnly { get; set; } = false;
+    public bool HighlightEnemyTanksOnly { get; set; } = false;
+    public bool HighlightEnemyHealersOnly { get; set; } = false;
+    public bool HighlightEnemyDPSMeleeOnly { get; set; } = false;
+    public bool HighlightEnemyDPSRangedOnly { get; set; } = false;
+    public bool HighlightEnemyDPSCasterOnly { get; set; } = false;
 
 
     // the below exist just to make saving less cumbersome

@@ -19,6 +19,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.DalamudServices;
+using SamplePlugin.Helpers;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
@@ -466,25 +467,84 @@ public class MainWindow : Window, IDisposable
                 Configuration.HighlightAllBattleCharasTanks = highlightBattleCharasTanks;
                 Configuration.Save();
             }
+            if (highlightBattleCharasTanks)
+            {
+                ImGui.Indent();
+                var enemyTanksOnly = Configuration.HighlightEnemyTanksOnly;
+                if (ImGui.Checkbox("Enemy tanks only", ref enemyTanksOnly))
+                {
+                    Configuration.HighlightEnemyTanksOnly = enemyTanksOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
             if (ImGui.Checkbox("Healers", ref highlightBattleCharasHealers))
             {
                 Configuration.HighlightAllBattleCharasHealers = highlightBattleCharasHealers;
                 Configuration.Save();
             }
+            if (highlightBattleCharasHealers)
+            {
+                ImGui.Indent();
+                var enemyHealersOnly = Configuration.HighlightEnemyHealersOnly;
+                if (ImGui.Checkbox("Enemy healers only", ref enemyHealersOnly))
+                {
+                    Configuration.HighlightEnemyHealersOnly = enemyHealersOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
             if (ImGui.Checkbox("DPS Melee", ref highlightBattleCharasDPSMelee))
             {
                 Configuration.HighlightAllBattleCharasDPSMelee = highlightBattleCharasDPSMelee;
                 Configuration.Save();
             }
+            if (highlightBattleCharasDPSMelee)
+            {
+                ImGui.Indent();
+                var enemyDPSMeleeOnly = Configuration.HighlightEnemyDPSMeleeOnly;
+                if (ImGui.Checkbox("Enemy melee only", ref enemyDPSMeleeOnly))
+                {
+                    Configuration.HighlightEnemyDPSMeleeOnly = enemyDPSMeleeOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
             if (ImGui.Checkbox("DPS Ranged", ref highlightBattleCharasDPSRanged))
             {
                 Configuration.HighlightAllBattleCharasDPSRanged = highlightBattleCharasDPSRanged;
                 Configuration.Save();
             }
+            if (highlightBattleCharasDPSRanged)
+            {
+                ImGui.Indent();
+                var enemyDPSRangedOnly = Configuration.HighlightEnemyDPSRangedOnly;
+                if (ImGui.Checkbox("Enemy ranged only", ref enemyDPSRangedOnly))
+                {
+                    Configuration.HighlightEnemyDPSRangedOnly = enemyDPSRangedOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
             if (ImGui.Checkbox("DPS Caster", ref highlightBattleCharasDPSCaster))
             {
                 Configuration.HighlightAllBattleCharasDPSCaster = highlightBattleCharasDPSCaster;
                 Configuration.Save();
+            }
+            if (highlightBattleCharasDPSCaster)
+            {
+                ImGui.Indent();
+                var enemyDPSCasterOnly = Configuration.HighlightEnemyDPSCasterOnly;
+                if (ImGui.Checkbox("Enemy caster only", ref enemyDPSCasterOnly))
+                {
+                    Configuration.HighlightEnemyDPSCasterOnly = enemyDPSCasterOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
             }
             ImGui.Unindent();
 

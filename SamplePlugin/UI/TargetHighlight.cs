@@ -114,6 +114,7 @@ internal class TargetHighlight : Window
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD)) continue;
+                        if (Configuration.HighlightEnemyTanksOnly && !target.IsEnemy()) continue;
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Blue, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedBlue;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
@@ -133,6 +134,7 @@ internal class TargetHighlight : Window
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.WHM, Job.SCH, Job.AST, Job.SGE)) continue;
+                        if (Configuration.HighlightEnemyHealersOnly && !target.IsEnemy()) continue;
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Green, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedGreen;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
@@ -152,6 +154,7 @@ internal class TargetHighlight : Window
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR)) continue;
+                        if (Configuration.HighlightEnemyDPSMeleeOnly && !target.IsEnemy()) continue;
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Red, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.DPSRed;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
@@ -171,6 +174,7 @@ internal class TargetHighlight : Window
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.BRD, Job.MCH, Job.DNC)) continue;
+                        if (Configuration.HighlightEnemyDPSRangedOnly && !target.IsEnemy()) continue;
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Orange, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedOrange;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
@@ -190,6 +194,7 @@ internal class TargetHighlight : Window
                     foreach (IBattleChara target in battleCharas)
                     {
                         if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+                        if (Configuration.HighlightEnemyDPSCasterOnly && !target.IsEnemy()) continue;
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Magenta, true);
                         var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedPurple;
                         DrawWorldSpaceRectangleAroundBattleChara(target, color);
