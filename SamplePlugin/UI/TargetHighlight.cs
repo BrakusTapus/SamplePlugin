@@ -84,15 +84,15 @@ internal class TargetHighlight : Window
                             DrawWorldSpaceRectangleAroundGameObject(player, playerColor);
                         }
                     }
-                    bool highlightGameObjects = Configuration.HighlightAllGameObjects;
-                    if (highlightGameObjects)
-                    {
-                        // Check if the target is not the player character.
-                        if (target != player)
-                        {
-                            HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
-                        }
-                    }
+                    //bool highlightGameObjects = Configuration.HighlightAllGameObjects;
+                    //if (highlightGameObjects)
+                    //{
+                    //    // Check if the target is not the player character.
+                    //    if (target != player)
+                    //    {
+                    //        HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
+                    //    }
+                    //}
                 }
 
                 if (Configuration.HighlightAllBattleCharas)

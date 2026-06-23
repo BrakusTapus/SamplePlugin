@@ -441,17 +441,17 @@ public class MainWindow : Window, IDisposable
 
         if (highlightOverlayValue)
         {
-            ImGui.Indent();
             if (ImGui.Checkbox("Highlight Player?", ref highlightPlayer))
             {
                 Configuration.HighlightPlayer = highlightPlayer;
                 Configuration.Save();
             }
-            if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
-            {
-                Configuration.HighlightAllGameObjects = highlightGameObjects;
-                Configuration.Save();
-            }
+            ImGui.Indent();
+            //if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
+            //{
+            //    Configuration.HighlightAllGameObjects = highlightGameObjects;
+            //    Configuration.Save();
+            //}
 
             // HighlightAllBattleCharas
             if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
@@ -547,42 +547,40 @@ public class MainWindow : Window, IDisposable
                 ImGui.Unindent();
             }
             ImGui.Unindent();
+            ImGui.Unindent();
+        }
+        ImGui.Separator();
 
-            ImGui.Separator();
+        var useGradientColor = Configuration.UseGradientColor;
+        if (ImGui.Checkbox("Use animated gradient color?", ref useGradientColor))
+        {
+            Configuration.UseGradientColor = useGradientColor;
+            Configuration.Save();
+        }
 
-            var useGradientColor = Configuration.UseGradientColor;
-            if (ImGui.Checkbox("Use animated gradient color?", ref useGradientColor))
+        var useGlowEffect = Configuration.UseGlowEffect;
+        if (ImGui.Checkbox("Use glow effect?", ref useGlowEffect))
+        {
+            Configuration.UseGlowEffect = useGlowEffect;
+            Configuration.Save();
+        }
+
+        if (useGlowEffect)
+        {
+            ImGui.Indent();
+
+            var glowSize = Configuration.GlowSize;
+            if (ImGui.SliderFloat("Glow size", ref glowSize, 1f, 30f))
             {
-                Configuration.UseGradientColor = useGradientColor;
+                Configuration.GlowSize = glowSize;
                 Configuration.Save();
             }
 
-            var useGlowEffect = Configuration.UseGlowEffect;
-            if (ImGui.Checkbox("Use glow effect?", ref useGlowEffect))
+            var glowSteps = Configuration.GlowSteps;
+            if (ImGui.SliderInt("Glow steps", ref glowSteps, 2, 20))
             {
-                Configuration.UseGlowEffect = useGlowEffect;
+                Configuration.GlowSteps = glowSteps;
                 Configuration.Save();
-            }
-
-            if (useGlowEffect)
-            {
-                ImGui.Indent();
-
-                var glowSize = Configuration.GlowSize;
-                if (ImGui.SliderFloat("Glow size", ref glowSize, 1f, 30f))
-                {
-                    Configuration.GlowSize = glowSize;
-                    Configuration.Save();
-                }
-
-                var glowSteps = Configuration.GlowSteps;
-                if (ImGui.SliderInt("Glow steps", ref glowSteps, 2, 20))
-                {
-                    Configuration.GlowSteps = glowSteps;
-                    Configuration.Save();
-                }
-
-                ImGui.Unindent();
             }
 
             ImGui.Unindent();
