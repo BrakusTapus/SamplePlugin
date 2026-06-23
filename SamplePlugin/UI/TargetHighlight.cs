@@ -1,5 +1,6 @@
 //TODO Make an easy to use method that can check for a objects role/job
 //TODO seperate highlightable objects/targets based on players/npc/gameobjects/friendly/enemy/aliance/jobs
+//TODO add setting to display hitbox pixel only enemy (useful to see if there are enemies nearby)
 using System;
 using System.Collections.Generic;
 using System.Linq;
