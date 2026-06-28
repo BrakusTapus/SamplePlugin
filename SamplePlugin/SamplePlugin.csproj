@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Version>0.0.0.9</Version>
         <Description>A sample plugin.</Description>
-        <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
         <TargetFramework>net10.0-windows7.0</TargetFramework>
@@ -12,22 +12,17 @@
     <ItemGroup>
         <Content Include="Assets\goat.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>true</Visible>
         </Content>
         <Content Include="Assets\kirbo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>true</Visible>
         </Content>
         <Content Include="Assets\logo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>true</Visible>
         </Content>
     </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="ECommons" Version="3.2.1.15" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Assets\" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Update="DotNet.ReproducibleBuilds" Version="2.0.5" />
