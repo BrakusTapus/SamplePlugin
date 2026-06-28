@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
+        <Author>Kirbo</Author>
         <Version>0.0.1.1</Version>
         <Description>Kirbo's playground plugin.</Description>
         <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
