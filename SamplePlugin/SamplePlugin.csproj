@@ -10,15 +10,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\SamplePlugin\Assets\goat.png">
+        <Content Include="Assets\goat.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>true</Visible>
         </Content>
-        <Content Include="..\SamplePlugin\Assets\kirbo.png">
+        <Content Include="Assets\kirbo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>true</Visible>
         </Content>
-        <Content Include="..\SamplePlugin\Assets\logo.png">
+        <Content Include="Assets\logo.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>true</Visible>
         </Content>
