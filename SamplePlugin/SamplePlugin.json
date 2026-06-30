@@ -1,12 +1,12 @@
 {
-  "Author": "Kirbo",
-  "Name": "Sample Plugin",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
-  "Description": "My playground plugin.",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "sample",
-    "plugin",
-    "kirbo"
-  ]
+    "Author": "Kirbo",
+    "Name": "Sample Plugin",
+    "Punchline": "I turn my enthusiasm into bad code.",
+    "Description": "My playground plugin.",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "sample",
+        "plugin",
+        "kirbo"
+    ]
 }
