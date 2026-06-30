@@ -30,14 +30,20 @@ internal static class NamePlateUpdater
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
+        NamePlateUpdater.Update(handlers);
+        // Build a set of valid GameObjectIds from current handlers
+        HashSet<ulong> currentGameObjectIds = new();
         foreach (INamePlateUpdateHandler handler in handlers)
         {
             if (handler.NamePlateKind == NamePlateKind.PlayerCharacter || handler.NamePlateKind == NamePlateKind.BattleNpcEnemy)
             {
+                currentGameObjectIds.Add(handler.GameObjectId);
+
                 var existing = _allNamePlates.FirstOrDefault(p => p.GameObjectId == handler.GameObjectId);
                 if (existing != null)
                 {
                     // Update existing entry
+                    existing.GameObjectId = handler.GameObjectId;
                     existing.Name = handler.Name.ToString();
                     existing.NameIconId = handler.NameIconId;
                     existing.MarkerIconId = handler.MarkerIconId;
@@ -56,17 +62,37 @@ internal static class NamePlateUpdater
                         MarkerIconId = handler.MarkerIconId,
                         IsBoss = handler.IsBossFromNamePlateIconId(),
                         Kind = handler.NamePlateKind,
-                        BattleChara = handler.BattleChara // Assuming you're tracking this for targetability
+                        BattleChara = handler.BattleChara
                     });
                 }
             }
         }
+
+        // Remove entries that are no longer valid
+        _allNamePlates.RemoveAll(entry => entry.BattleChara == null || !entry.BattleChara.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
+
     }
 
     public static void ClearList()
     {
         _allNamePlates.Clear();
     }
+
+    public static IReadOnlyList<INamePlateUpdateHandler> CurrentNameplates { get; private set; } = new List<INamePlateUpdateHandler>();
+
+    public static void Update(IReadOnlyList<INamePlateUpdateHandler> updated)
+    {
+        CurrentNameplates = updated;
+    }
+    public static INamePlateUpdateHandler? GetCurrentNameplate(this IBattleChara battleChara)
+    {
+        if (battleChara == null)
+            return null;
+
+        return NamePlateUpdater.CurrentNameplates
+            .FirstOrDefault(n => n.GameObjectId == battleChara.GameObjectId);
+    }
+
 }
 
 /// <summary>
@@ -114,4 +140,13 @@ internal class NamePlateEntry
     public IBattleChara? BattleChara { get; set; }
 
     public bool IsTargetable => BattleChara.IsTargetable;
+
+    public static NamePlateEntry? CurrentTargetNameplate
+    {
+        get
+        {
+            var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
+            return NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+        }
+    }
 }

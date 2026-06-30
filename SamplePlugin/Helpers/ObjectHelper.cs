@@ -11,6 +11,7 @@ using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using SamplePlugin.DalamudServices;
@@ -40,7 +41,7 @@ internal static class ObjectHelper
     /// <returns></returns>
     public static float DistanceToPlayer(this IGameObject? obj)
     {
-        var localPlayer = Svc.ClientState.LocalPlayer;
+        var localPlayer = Svc.Objects.LocalPlayer;
         if (obj == null) return float.MaxValue;
         if (localPlayer == null) return float.MaxValue;
         if (obj is not IBattleChara b) return float.MaxValue;
@@ -89,7 +90,7 @@ internal static class ObjectHelper
         get
         {
             int count = 0;
-            foreach (IBattleChara o in MainUpdater.AllTargets)
+            foreach (IBattleChara o in MainUpdater.AllBattleCharas)
             {
                 if (o.DistanceToPlayer() < 30)
                 {
@@ -126,4 +127,24 @@ internal static class ObjectHelper
     {
         return battleChara is IBattleChara b && validJobs != null && validJobs.Contains((byte)b.ClassJob.Value.RowId);
     }
+
+	internal static unsafe bool IsEnemy(this IGameObject obj)
+	{
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (!obj.IsTargetable)
+		{
+			return false;
+		}
+
+		if (ActionManager.CanUseActionOnTarget(142, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142
+		{
+			return true;
+		}
+
+		return false;
+	}
 }

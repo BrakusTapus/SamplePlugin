@@ -1,10 +1,10 @@
 using System;
 using System.Numerics;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Helpers.UI;
 
@@ -13,7 +13,7 @@ public class TestWindow : Window, IDisposable
 {
     private Plugin Plugin;
     private bool disposedValue;
-    public TestWindow(Plugin plugin) : base("Test - Window##TestWindow", ImGuiWindowFlags.None)
+    public TestWindow(Plugin plugin) : base("Test - Window##TestWindow", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -46,8 +46,7 @@ public class TestWindow : Window, IDisposable
 
     public override void Draw()
     {
-        DrawBackground();
-        DrawHeader();
+        DrawBody();
     }
 
     private void DrawHeader()
@@ -57,7 +56,8 @@ public class TestWindow : Window, IDisposable
         { 
             // Get available width in the current ImGui window
             float availableWidth = ImGui.GetContentRegionAvail().X;
-            using (var child = ImRaii.Child("SomeChildWithAScrollbar4", new Vector2(availableWidth, 300), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            ImGui.SetCursorPos(new Vector2(5, 0));
+            using (var child = ImRaii.Child("SomeChildWithAScrollbar4", new Vector2(ImGui.GetWindowWidth(), ImGui.GetWindowHeight()), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (child.Success)
                 {
@@ -81,11 +81,11 @@ public class TestWindow : Window, IDisposable
                         float desiredHeight = desiredWidth / imageAspectRatio;
                         ImGuiHelpers.CenterCursorFor(desiredWidth);
                         // Render the image at scaled size
-                        ImGui.Image(logoImage.ImGuiHandle, new Vector2(desiredWidth, desiredHeight));
+                        ImGui.Image(logoImage.Handle, new Vector2(desiredWidth, desiredHeight));
                     }
-                    ImGui.TextUnformatted("Kirbo - Test Window");
+                    ImGui.Text("Kirbo - Test Window");
                     ImGui.Separator();
-                    ImGui.TextUnformatted("placeholder.");
+                    ImGui.Text("placeholder.");
                     ImGui.Spacing();
                 }
             }
@@ -97,6 +97,31 @@ public class TestWindow : Window, IDisposable
         }
         // Reference class member to ensure non-static
         _ = Plugin;
+    }
+
+    private void DrawBody()
+    {
+        var windowHeight = ImGui.GetWindowHeight();
+        var windowWidth = ImGui.GetWindowWidth();
+        Vector2 windowSize = new Vector2(windowWidth, windowHeight);
+        Vector2 initialCursorPos = ImGui.GetCursorPos(); // Get the current cursor position to account for the title bar and menu bar
+
+        DrawBackground();
+
+        // Calculate the height for the Icons window
+        float iconSize = 48;
+        float iconPadding = 5;
+        float iconWindowHeight = iconSize + (2 * iconPadding);
+        DrawHeader();
+        //DrawIcons(windowSize, initialCursorPos, iconWindowHeight, iconPadding, iconSize);
+
+        // Reserve space for bottom buttons
+        float bottomButtonHeight = 70;
+        float remainingHeight = windowSize.Y - initialCursorPos.Y - iconWindowHeight - bottomButtonHeight - 20; // Adjusted for padding and separators
+
+        //DrawEasyCombatBody(windowSize, initialCursorPos, iconWindowHeight, remainingHeight);
+
+        //DrawBottomButtons(windowSize, bottomButtonHeight);
     }
 
     public static void DrawBackground()

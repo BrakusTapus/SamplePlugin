@@ -11,17 +11,40 @@ public class Configuration : IPluginConfiguration
 {
     public int Version { get; set; } = 0;
 
+    // Config window
     public bool IsConfigWindowMovable { get; set; } = true;
-    public bool DisplayPlayerInfo { get; set; } = true;
-    public bool DisplayTargetInfo { get; set; } = true;
-    public bool DisplayHighLight { get; set; } = true;
-    public bool EnableHighLightOverlay { get; set; } = true;
+
+    // Main window tab bar
+    public bool DisplayPlayerInfoTab { get; set; } = true;
+    public bool DisplayTargetInfoTab { get; set; } = true;
+    public bool DisplayHighLightInfoTab { get; set; } = true;
+
+    // Highlight related settings
+    public bool EnableHighLightOverlay { get; set; } = false;
     public bool HighlightPlayer { get; set; } = false;
+    public bool UseGradientColor { get; set; } = false;
+    public bool UseGlowEffect { get; set; } = false;
+    public float GlowSize { get; set; } = 8f;
+    public int GlowSteps { get; set; } = 8;
     public bool HighlightAllGameObjects { get; set; } = false;
+    public bool HighlightAllBattleCharas { get; set; } = false;
+    public bool HighlightAllBattleCharasTanks { get; set; } = false;
+    public bool HighlightAllBattleCharasHealers { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSMelee { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSRanged { get; set; } = false;
+    public bool HighlightAllBattleCharasDPSCaster { get; set; } = false;
+    public bool EnemyOnly { get; set; } = false;
+    public bool HighlightEnemyTanksOnly { get; set; } = false;
+    public bool HighlightEnemyHealersOnly { get; set; } = false;
+    public bool HighlightEnemyDPSMeleeOnly { get; set; } = false;
+    public bool HighlightEnemyDPSRangedOnly { get; set; } = false;
+    public bool HighlightEnemyDPSCasterOnly { get; set; } = false;
+
 
     // the below exist just to make saving less cumbersome
     public void Save()
     {
         Svc.PluginInterface.SavePluginConfig(this);
+        Svc.Log.Debug($"Saved plugin config.");
     }
 }

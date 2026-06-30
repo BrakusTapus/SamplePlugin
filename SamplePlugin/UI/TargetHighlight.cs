@@ -1,20 +1,22 @@
 //TODO Make an easy to use method that can check for a objects role/job
+//TODO seperate highlightable objects/targets based on players/npc/gameobjects/friendly/enemy/aliance/jobs
+//TODO add setting to display hitbox pixel only enemy (useful to see if there are enemies nearby)
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
-using Dalamud.Interface.Style;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
-using ImGuiNET;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.Data;
 using SamplePlugin.Helpers;
@@ -22,9 +24,10 @@ using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
 namespace SamplePlugin.UI;
+
 internal class TargetHighlight : Window
 {
-    private Plugin Plugin;
+    private Plugin plugin;
     private Configuration Configuration;
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight), ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar)
@@ -36,15 +39,15 @@ internal class TargetHighlight : Window
         Position = new Vector2(0, 0);
         PositionCondition = ImGuiCond.Always;
         RespectCloseHotkey = false;
-        Plugin = plugin;
+        this.plugin = plugin;
         Configuration = plugin.Configuration;
     }
 
-    public override void Draw()
+    public override unsafe void Draw() // TODO needs to be cleaner and add isenemy config
     {
         // Create a dictionary to store the filtered results for each job role.
-        var filteredResults = new Dictionary<JobRole, IEnumerable<IBattleChara>>();
-        if (Svc.ClientState.LocalPlayer == null)
+        Dictionary<JobRole, IEnumerable<IBattleChara>> filteredResults = new Dictionary<JobRole, IEnumerable<IBattleChara>>();
+        if (Svc.Objects.LocalPlayer == null)
         {
             return;
         }
@@ -54,37 +57,156 @@ internal class TargetHighlight : Window
             return;
         }
 
-        var highlightOverlayValue = Configuration.EnableHighLightOverlay;
+        bool highlightOverlayValue = Configuration.EnableHighLightOverlay;
         if (highlightOverlayValue)
         {
             ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
             if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
             {
-                // Filter AllTargets to include only BattleChara objects.
+                // Filter AllGameObjects to include only targetable objects.
                 IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
+                IEnumerable<IBattleChara> battleCharas2 = MainUpdater.AllGameObjects.OfType<IBattleChara>() .Where(b => b.IsTargetable);
 
                 // Get the player character.
-                Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter player = Svc.ClientState.LocalPlayer;
+                IPlayerCharacter player = Svc.Objects.LocalPlayer;
 
                 // Iterate through your BattleChara targets and call TargetHighlight method for each one.
                 foreach (IGameObject target in battleCharas)
                 {
-                    var highlightPlayer = Configuration.HighlightPlayer;
+                    bool highlightPlayer = Configuration.HighlightPlayer;
                     if (highlightPlayer)
                     {
                         if (target == player)
                         {
-                            DrawWorldSpaceRectangleAroundGameObject(player, ImGuiColors.DalamudViolet);
+                            var playerColor = Configuration.UseGradientColor
+                                ? GetGradientColor()
+                                : ImGuiColors.DalamudViolet;
+                            DrawWorldSpaceRectangleAroundGameObject(player, playerColor);
                         }
                     }
-                    var highlightGameObjects = Configuration.HighlightAllGameObjects;
-                    if (highlightGameObjects)
+                    //bool highlightGameObjects = Configuration.HighlightAllGameObjects;
+                    //if (highlightGameObjects)
+                    //{
+                    //    // Check if the target is not the player character.
+                    //    if (target != player)
+                    //    {
+                    //        HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
+                    //    }
+                    //}
+                }
+
+                if (Configuration.HighlightAllBattleCharas)
+                {
+                    foreach (IBattleChara target in battleCharas)
                     {
-                        // Check if the target is not the player character.
-                        if (target != player)
-                        {
-                            HighlightAllGameObjects(target); // Use the updated TargetHighlight method without specifying a color.
-                        }
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD,
+                                           Job.WHM, Job.SCH, Job.AST, Job.SGE,
+                                           Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR,
+                                           Job.BRD, Job.MCH, Job.DNC,
+                                           Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.DalamudWhite;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasTanks)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD)) continue;
+                        if (Configuration.HighlightEnemyTanksOnly && !target.IsEnemy()) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Blue, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedBlue;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.DRK, Job.GNB, Job.WAR, Job.PLD)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasHealers)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.WHM, Job.SCH, Job.AST, Job.SGE)) continue;
+                        if (Configuration.HighlightEnemyHealersOnly && !target.IsEnemy()) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Green, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedGreen;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.WHM, Job.SCH, Job.AST, Job.SGE)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSMelee)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR)) continue;
+                        if (Configuration.HighlightEnemyDPSMeleeOnly && !target.IsEnemy()) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Red, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.DPSRed;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSRanged)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BRD, Job.MCH, Job.DNC)) continue;
+                        if (Configuration.HighlightEnemyDPSRangedOnly && !target.IsEnemy()) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Orange, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedOrange;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BRD, Job.MCH, Job.DNC)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
+                    }
+                }
+
+                if (Configuration.HighlightAllBattleCharasDPSCaster)
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+                        if (Configuration.HighlightEnemyDPSCasterOnly && !target.IsEnemy()) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.Magenta, true);
+                        var color = Configuration.UseGradientColor ? GetGradientColor() : ImGuiColors.ParsedPurple;
+                        DrawWorldSpaceRectangleAroundBattleChara(target, color);
+                    }
+                }
+                else
+                {
+                    foreach (IBattleChara target in battleCharas)
+                    {
+                        if (!target.IsJobs(Job.BLM, Job.SMN, Job.RDM, Job.PCT)) continue;
+                        ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
                     }
                 }
             }
@@ -93,29 +215,118 @@ internal class TargetHighlight : Window
         ImGui.End();
     }
 
-    private unsafe static void HighlightAllGameObjects(IGameObject target)
+
+    /// <summary>
+    /// Returns a smoothly animated rainbow color that cycles over a 1-second period.
+    /// Useful for making highlights visually distinct without needing a static colour choice.
+    /// </summary>
+    private static Vector4 GetGradientColor()
     {
-        var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Address;
+        const float PERIOD = 1f;
+        var t     = (float)ImGui.GetTime() % PERIOD               / PERIOD;
+        var red   = (MathF.Sin(2 * MathF.PI * t)             + 1) / 2;
+        var green = (MathF.Sin(2 * MathF.PI * (t + 1f / 3f)) + 1) / 2;
+        var blue  = (MathF.Sin(2 * MathF.PI * (t + 2f / 3f)) + 1) / 2;
+        return new Vector4(red, green, blue, 1f);
+    }
+
+    /// <summary>
+    /// Draws a layered glow bloom around a rectangle by rendering multiple expanding
+    /// filled rects with decreasing alpha. Call this *before* AddRect so the crisp
+    /// border sits on top of the glow.
+    /// </summary>
+    /// <param name="drawList">The ImGui draw list to render into.</param>
+    /// <param name="min">Top-left corner of the base rectangle.</param>
+    /// <param name="max">Bottom-right corner of the base rectangle.</param>
+    /// <param name="colU32">Packed RGBA colour (use ImGui.GetColorU32).</param>
+    /// <param name="rounding">Corner rounding radius, should match your AddRect call.</param>
+    /// <param name="glowSize">How far (in pixels) the glow spreads outward.</param>
+    /// <param name="steps">Number of glow layers — more = smoother but more draw calls.</param>
+    /// <param name="innerBoost">Extra brightness boost near the rectangle edge (0 = none).</param>
+    private static void AddGlowRect(
+        ImDrawListPtr drawList,
+        Vector2 min,
+        Vector2 max,
+        uint colU32,
+        float rounding,
+        float glowSize = 8f,
+        int steps = 8,
+        float innerBoost = 0.25f)
+    {
+        for (var i = 0; i < steps; i++)
+        {
+            var t      = (i + 1f) / steps;
+            var expand = t        * glowSize;
+
+            // Quadratic falloff so the glow is bright near the rect and fades outward.
+            var a = 1f - t;
+            a *= a;
+            a *= 1f / steps * 2.2f;
+            a *= 1f + (1f - t) * innerBoost;
+
+            // Unpack the base colour, override alpha with the computed falloff value.
+            var c = ColorU32ToVector4(colU32);
+            c.W *= a;
+            var cU32 = ColorVector4ToU32(c);
+
+            var r = rounding + expand * 0.6f;
+            drawList.AddRectFilled(
+                min - new Vector2(expand),
+                max + new Vector2(expand),
+                cU32,
+                r
+            );
+        }
+    }
+
+    // Inline colour conversion helpers
+    private static Vector4 ColorU32ToVector4(uint col)
+    {
+        return new Vector4(
+            (col & 0xFF) / 255f,
+            ((col >> 8) & 0xFF) / 255f,
+            ((col >> 16) & 0xFF) / 255f,
+            ((col >> 24) & 0xFF) / 255f
+        );
+    }
+
+    private static uint ColorVector4ToU32(Vector4 col)
+    {
+        var r = (uint)Math.Clamp((int)(col.X * 255f), 0, 255);
+        var g = (uint)Math.Clamp((int)(col.Y * 255f), 0, 255);
+        var b = (uint)Math.Clamp((int)(col.Z * 255f), 0, 255);
+        var a = (uint)Math.Clamp((int)(col.W * 255f), 0, 255);
+        return r | (g << 8) | (b << 16) | (a << 24);
+    }
+
+
+    private static unsafe void HighlightAllGameObjects(IGameObject target)
+    {
+        GameObject* gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Address;
 
         // World positions
-        var basePosition = target.Position;
-        var topPosition = basePosition with { Y = basePosition.Y + gameObject->Height + 0.85f };
+        Vector3 basePosition = target.Position;
+        Vector3 topPosition = basePosition with { Y = basePosition.Y + gameObject->Height + 0.85f };
 
         // Project both to screen
         if (!Svc.GameGui.WorldToScreen(basePosition, out var screenBase))
+        {
             return;
+        }
 
         if (!Svc.GameGui.WorldToScreen(topPosition, out var screenTop))
+        {
             return;
+        }
 
         // Calculate rectangle width based on distance
-        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
-        var distance = Utils.DistanceBetweenObjects(camera.Position, target.Position, 0);
-        var scale = 100 * (25 / distance);
-        var width = (float)(scale * target.HitboxRadius);
+        FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
+        float distance = Utils.DistanceBetweenObjects(camera.Position, target.Position, 0);
+        float scale = 100 * (25 / distance);
+        float width = (float)(scale * target.HitboxRadius);
 
         // Draw rectangle from top to bottom
-        var drawList = ImGui.GetWindowDrawList();
+        ImDrawListPtr drawList = ImGui.GetWindowDrawList();
         drawList.AddRect(
             new Vector2(screenBase.X - width / 2f, screenTop.Y),
             new Vector2(screenBase.X + width / 2f, screenBase.Y),
@@ -124,10 +335,12 @@ internal class TargetHighlight : Window
             ImDrawFlags.RoundCornersAll,
             3f
         );
-        // Get icon texture
+        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??        
         Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(55).GetWrapOrDefault(); // TODO make it so the icon is job based
         if (icon is null)
+        {
             return;
+        }
 
         // Icon dimensions
         const float iconSize = 22f;
@@ -136,39 +349,43 @@ internal class TargetHighlight : Window
 
         // Draw icon image
         drawList.AddImage(
-            icon.ImGuiHandle,
+            icon.Handle,
             iconTopLeft,
             iconBottomRight
         );
     }
 
-    private unsafe static void DrawWorldSpaceRectangleAroundGameObject(IGameObject gameObject, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    private static unsafe void DrawWorldSpaceRectangleAroundGameObject(IGameObject gameObject, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
     {
         if (gameObject == null || gameObject.Address == IntPtr.Zero)
+        {
             return;
+        }
 
-        var objStruct = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)gameObject.Address;
+        GameObject* objStruct = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)gameObject.Address;
 
         // World-space positions: from base to top of object
-        var baseWorldPos = gameObject.Position;
-        var topWorldPos = baseWorldPos with { Y = baseWorldPos.Y + objStruct->Height + 0.85f };
+        Vector3 baseWorldPos = gameObject.Position;
+        Vector3 topWorldPos = baseWorldPos with { Y = baseWorldPos.Y + objStruct->Height + 0.85f };
 
         // Project world to screen space
-        if (!Svc.GameGui.WorldToScreen(baseWorldPos, out var screenBase) ||
-            !Svc.GameGui.WorldToScreen(topWorldPos, out var screenTop))
+        if (!Svc.GameGui.WorldToScreen(baseWorldPos, out Vector2 screenBase) ||
+            !Svc.GameGui.WorldToScreen(topWorldPos, out Vector2 screenTop))
+        {
             return;
+        }
 
         // Perspective scaling based on camera distance
-        var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
-        var distance = Utils.DistanceBetweenObjects(camera.Position, gameObject.Position, 0);
-        var scale = 100 * (25 / distance);
-        var width = (float)(scale * gameObject.HitboxRadius);
+        FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Object camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
+        float distance = Utils.DistanceBetweenObjects(camera.Position, gameObject.Position, 0);
+        float scale = 100 * (25 / distance);
+        float width = (float)(scale * gameObject.HitboxRadius);
 
         // Convert Vector4 color to uint
         uint packedColor = ImGui.GetColorU32(color);
 
         // Draw rectangle
-        var drawList = ImGui.GetWindowDrawList();
+        ImDrawListPtr drawList = ImGui.GetWindowDrawList();
         drawList.AddRect(
             new Vector2(screenBase.X - width / 2f, screenTop.Y),
             new Vector2(screenBase.X + width / 2f, screenBase.Y),
@@ -177,9 +394,10 @@ internal class TargetHighlight : Window
             drawFlags,
             thickness
         );
+        ((GameObject*)gameObject.Address)->Highlight(ObjectHighlightColor.Orange, true);
     }
 
-    private unsafe static void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
+    private static unsafe void DrawWorldSpaceRectangleAroundBattleChara(IBattleChara battleChara, Vector4 color, float thickness = 3f, float rounding = 5f, ImDrawFlags drawFlags = ImDrawFlags.RoundCornersAll)
     {
         if (battleChara == null || battleChara.Address == IntPtr.Zero)
             return;
@@ -214,9 +432,28 @@ internal class TargetHighlight : Window
             drawFlags,
             thickness
         );
+
+        // Get icon texture --- ImGuiExt.GetJobIcon((IBattleChara)target.)??        
+        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon = ImGuiExt.GetGameIconTexture(battleChara.ClassJob.RowId + 62100).GetWrapOrDefault(); // TODO make it so the icon is job based
+        if (icon is null)
+        {
+            return;
+        }
+
+        // Icon dimensions
+        const float iconSize = 22f;
+        Vector2 iconTopLeft = new Vector2(screenTop.X - iconSize / 2f, screenTop.Y - iconSize - 4f); // 4px padding above rectangle
+        Vector2 iconBottomRight = iconTopLeft + new Vector2(iconSize, iconSize);
+
+        // Draw icon image
+        drawList.AddImage(
+            icon.Handle,
+            iconTopLeft,
+            iconBottomRight
+        );
     }
 
-    private unsafe static void HighlightAllHostiles(IGameObject target)
+    private static unsafe void HighlightAllHostiles(IGameObject target)
     {
         Svc.GameGui.WorldToScreen(target.Position, out var screenPos);
         var camera = FFXIVClientStructs.FFXIV.Client.Graphics.Scene.CameraManager.Instance()->CurrentCamera->Object;
@@ -231,7 +468,7 @@ internal class TargetHighlight : Window
             3f);
     }
 
-    private unsafe static void HighlightWithColor(IGameObject target, Vector4 color)
+    private static unsafe void HighlightWithColor(IGameObject target, Vector4 color)
     {
 
         Svc.GameGui.WorldToScreen(target.Position, out var screenPos);

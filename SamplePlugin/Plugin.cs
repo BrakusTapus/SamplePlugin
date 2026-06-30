@@ -17,6 +17,10 @@ using SamplePlugin.Configs;
 using SamplePlugin.Updaters;
 using ECommons;
 using ECommons.DalamudServices;
+using System;
+using ECommons.ImGuiMethods;
+using ECommons.Logging;
+using Dalamud.Game.DutyState;
 
 namespace SamplePlugin;
 
@@ -32,7 +36,7 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
     private TestWindow TestWindow { get; init; }
-    private TargetHighlight TargetHighlightWindow { get; init; }
+    internal TargetHighlight TargetHighlightWindow { get; init; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
@@ -79,6 +83,10 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button that is doing the same but for the main ui of the plugin
         pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
+        Svc.DutyState.DutyStarted += DutyState_DutyStarted;
+        Svc.DutyState.DutyWiped += DutyState_DutyWiped;
+        Svc.DutyState.DutyRecommenced += DutyState_DutyRecommenced;
+        Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
         if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
@@ -131,8 +139,33 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
 
-    private static void ClientState_TerritoryChanged(ushort obj)
+    private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
+        Notify.Success("Duty Completed!");
+    }
+
+    private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
+    {
+        NamePlateUpdater.ClearList();
+        Notify.Success("Duty Recommenced!");
+    }
+
+    private static void DutyState_DutyWiped(IDutyStateEventArgs e)
+    {
+        NamePlateUpdater.ClearList();
+        Notify.Success("Duty Wiped!");
+    }
+
+    private static void DutyState_DutyStarted(IDutyStateEventArgs e)
+    {
+        NamePlateUpdater.ClearList();
+        Notify.Success("Duty Started!");
+    }
+
+    private static void ClientState_TerritoryChanged(uint id)
+    {
+        NamePlateUpdater.ClearList();
+        Notify.Success("Territory Changed!");
     }
 }

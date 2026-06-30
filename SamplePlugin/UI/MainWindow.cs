@@ -2,19 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.GameHelpers;
+using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.DalamudServices;
+using SamplePlugin.Helpers;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
@@ -22,7 +27,7 @@ namespace SamplePlugin.UI;
 
 public class MainWindow : Window, IDisposable
 {
-    private string GoatImagePath;
+    private readonly string goatImagePath;
     private Plugin Plugin;
     private Configuration Configuration;
 
@@ -54,7 +59,7 @@ public class MainWindow : Window, IDisposable
             ShowTooltip = () => ImGui.SetTooltip(("Toggle settings window.")),
         });
 
-        GoatImagePath = goatImagePath;
+        this.goatImagePath = goatImagePath;
         Plugin = plugin;
         Configuration = plugin.Configuration;
     }
@@ -67,47 +72,64 @@ public class MainWindow : Window, IDisposable
         {
             if (tabheader.Success)
             {
-                using (var tab1 = ImRaii.TabItem("Main Menu"))
+                using (var mainMenuTab = ImRaii.TabItem("Main Menu"))
                 {
-                    if (tab1.Success)
+                    if (mainMenuTab.Success)
                     {
                         DrawImage();
                         DrawPluginInfo();
                     }
                 }
-                var playerInfoValue = Configuration.DisplayPlayerInfo;
+                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
                 if (playerInfoValue)
                 {
-                    using (var tab2 = ImRaii.TabItem("Player Info"))
+                    using (var playerInfoTab = ImRaii.TabItem("Player Info"))
                     {
-                        if (tab2.Success)
+                        if (playerInfoTab.Success)
                         {
                             DrawPlayerInfo();
                         }
                     }
                 }
 
-                var targetInfoValue = Configuration.DisplayTargetInfo;
+                var targetInfoValue = Configuration.DisplayTargetInfoTab;
                 if (targetInfoValue)
                 {
-                    using (var tab3 = ImRaii.TabItem("Target Info"))
+                    using (var targetInfoTab = ImRaii.TabItem("Target Info"))
                     {
-                        if (tab3.Success)
+                        if (targetInfoTab.Success)
                         {
                             DrawTargetInfo();
                         }
                     }
                 }
 
-                var highlightValue = Configuration.DisplayHighLight;
+                var highlightValue = Configuration.DisplayHighLightInfoTab;
                 if (highlightValue)
                 {
-                    using (var tab4 = ImRaii.TabItem("Highlight Info"))
+                    using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
                     {
-                        if (tab4.Success)
+                        if (highlightInfoTab.Success)
                         {
                             DrawHighlightTab();
                         }
+                    }
+                }
+                if (!Configuration.DisplayHighLightInfoTab)
+                {
+                    if (Configuration.EnableHighLightOverlay)
+                    {
+                        Configuration.EnableHighLightOverlay = false;
+                    }
+
+                    if (Configuration.HighlightPlayer)
+                    {
+                        Configuration.HighlightPlayer = false;
+                    }
+
+                    if (Configuration.HighlightAllGameObjects)
+                    {
+                        Configuration.HighlightAllGameObjects = false;
                     }
                 }
             }
@@ -117,8 +139,10 @@ public class MainWindow : Window, IDisposable
     public void DrawImage()
     {
         float availableWidth = ImGui.GetContentRegionAvail().X;
-        var goatImage = Svc.Texture.GetFromFile(GoatImagePath).GetWrapOrDefault();
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, goatImage.Height + 15), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+        IDalamudTextureWrap? goatImage = Svc.Texture.GetFromFile(goatImagePath).GetWrapOrDefault();
+        // Use a fallback height if the image isn't available
+        float childHeight = goatImage != null ? goatImage.Height + 15 : 50;
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)
@@ -126,7 +150,7 @@ public class MainWindow : Window, IDisposable
                 if (goatImage != null)
                 {
                     ImGuiHelpers.CenterCursorFor(goatImage.Width);
-                    ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+                    ImGui.Image(goatImage.Handle, new Vector2(goatImage.Width, goatImage.Height));
                 }
                 else
                 {
@@ -134,6 +158,48 @@ public class MainWindow : Window, IDisposable
                 }
 
                 ImGuiHelpers.ScaledDummy(20.0f);
+            }
+        }
+    }
+
+    public void DrawPluginInfo()
+    {
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar4", Vector2.Zero, true))
+        {
+            if (child.Success)
+            {
+                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
+                if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
+                {
+                    Configuration.DisplayPlayerInfoTab = playerInfoValue;
+                    // can save immediately on change, if you don't want to provide a "Save and Close" button
+                    Configuration.Save();
+                }
+                var targetInfoValue = Configuration.DisplayTargetInfoTab;
+                if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
+                {
+                    Configuration.DisplayTargetInfoTab = targetInfoValue;
+                    Configuration.Save();
+                }
+                var highlightValue = Configuration.DisplayHighLightInfoTab;
+                if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
+                {
+                    Configuration.DisplayHighLightInfoTab = highlightValue;
+                    Configuration.Save();
+                }
+
+                // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
+                // These expect formatting parameter if any part of the text contains a "%", which we can't
+                // provide through our bindings, leading to a Crash to Desktop.
+                // Replacements can be found in the ImGuiHelpers Class
+                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfoTab}");
+
+                if (ImGui.Button("Show Test window"))
+                {
+                    Plugin.ToggleTestUI();
+                }
+
+                ImGui.Spacing();
             }
         }
     }
@@ -148,25 +214,45 @@ public class MainWindow : Window, IDisposable
                 // Example for other services that Dalamud provides.
                 // ClientState provides a wrapper filled with information about the local player object and client.
 
-                var localPlayer = Svc.ClientState.LocalPlayer;
+                var playerState = Svc.PlayerState;
+                if (!playerState.IsLoaded)
+                {
+                    ImGui.Text("Our local player is currently not logged in.");
+                    return;
+                }
+
+                if (!playerState.ClassJob.IsValid)
+                {
+                    ImGui.Text("Our current job is currently not valid.");
+                    return;
+                }
+
+                var localPlayer = Svc.Objects.LocalPlayer;
                 if (localPlayer == null)
                 {
-                    ImGui.TextUnformatted("Our local player is currently not loaded.");
+                    ImGui.Text("Local player is unavailable.");
                     return;
                 }
 
-                if (!localPlayer.ClassJob.IsValid)
-                {
-                    ImGui.TextUnformatted("Our current job is currently not valid.");
-                    return;
-                }
-
+                ImGui.AlignTextToFramePadding();
+                ImGui.Text($"Current job:");
+                ImGui.SameLine(120 * ImGuiHelpers.GlobalScale);
                 // ExtractText() should be the preferred method to read Lumina SeStrings,
                 // as ToString does not provide the actual text values, instead gives an encoded macro string.
-                ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
-                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
-                ImGui.SliderFloat($"Hitbox Radius###{localPlayer.Name}{localPlayer.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
+                ImGuiExt.DrawJobIcon(playerState);
+                ImGui.SameLine();
+                ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
+                //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
 
+                ImGui.NewLine();
+                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
+                ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
+                ImGui.SameLine();
+                if (ImGui.Button("Reset##HitboxRadius"))
+                {
+                    ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius = 0.5f;
+                }
+                ImGui.NewLine();
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Svc.ClientState.TerritoryType;
                 if (Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
@@ -182,106 +268,142 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public void DrawPluginInfo()
-    {
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar4", Vector2.Zero, true))
-        {
-            if (child.Success)
-            {
-                var playerInfoValue = Configuration.DisplayPlayerInfo;
-                if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
-                {
-                    Configuration.DisplayPlayerInfo = playerInfoValue;
-                    // can save immediately on change, if you don't want to provide a "Save and Close" button
-                    Configuration.Save();
-                }
-                var targetInfoValue = Configuration.DisplayTargetInfo;
-                if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
-                {
-                    Configuration.DisplayTargetInfo = targetInfoValue;
-                    Configuration.Save();
-                }
-                var highlightValue = Configuration.DisplayHighLight;
-                if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
-                {
-                    Configuration.DisplayHighLight = highlightValue;
-                    Configuration.Save();
-                }
-
-                // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
-                // These expect formatting parameter if any part of the text contains a "%", which we can't
-                // provide through our bindings, leading to a Crash to Desktop.
-                // Replacements can be found in the ImGuiHelpers Class
-                //ImGui.TextUnformatted($"The random config bool is {Plugin.Configuration.DisplayPlayerInfo}");
-
-                if (ImGui.Button("Show Test window"))
-                {
-                    Plugin.ToggleTestUI();
-                }
-
-                ImGui.Spacing();
-            }
-        }
-    }
-
     public unsafe static void DrawTargetInfo()
     {
-        if (ImGui.Button("Request Redraw"))
+        if (ImGui.Button("Redraw Nameplate"))
         {
             Service.NamePlateGui.RequestRedraw();
         }
+        ImGuiEx.Tooltip("Send a redraw request for nameplates");
         ImGui.SameLine();
         if (ImGui.Button("Clear List"))
         {
             NamePlateUpdater.ClearList();
         }
+        ImGuiEx.Tooltip("Clears the listed nameplates");
+        ImGui.SameLine();
+        ImGui.TextUnformatted("AllNamePlates: " + NamePlateUpdater.AllNamePlates.Count());
         ImGui.Separator();
 
-        foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllTargets)
+        float availableHeight = ImGui.GetContentRegionAvail().Y;
+        float availableWidth = ImGui.GetContentRegionAvail().X;
+        using (var child1 = ImRaii.Child("targetinfochild1", new Vector2(availableWidth / 2, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
         {
-            ImGui.TextUnformatted(item.Name.ToString());
-            ImGui.TextUnformatted(item.GameObjectId.ToString());
-            ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
-        }
-        ImGui.Separator();
-        foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
-        {
-            if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+            if (child1.Success)
             {
-                // Define fixed width for both columns
-                ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 100f);
-                ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
+                var nameplate = Svc.Targets.Target as IBattleChara;
 
-                Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
-                if (icon2 != null)
+                var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
+                var nameplate2 = NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+                var icon = NamePlateEntry.CurrentTargetNameplate?.NameIconId ?? -1;
+                var current = NamePlateEntry.CurrentTargetNameplate;
+                if (nameplate2 != null)
                 {
-                    ImGui.TableNextRow();
-                    ImGui.TableSetColumnIndex(0);
-                    ImGui.TextUnformatted("Name");
-                    ImGui.TableSetColumnIndex(1);
-                    ImGui.TextUnformatted(entry.Name);
-                    ImGui.SameLine();
-                    ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
-
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.BeginTooltip();
-                        ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-                        ImGui.EndTooltip();
-                    }
+                    ImGui.TextUnformatted($"Direct: IconID = {nameplate2.NameIconId}");
+                    ImGui.TextUnformatted($"Direct: IconID = {icon}");
+                    ImGui.TextUnformatted($"1 = {current.Name}");
+                    ImGui.TextUnformatted($"2 = {current.IsBoss}");
+                    ImGui.TextUnformatted($"3 = {current.GameObjectId}");
+                }
+                else
+                {
+                    ImGui.TextUnformatted("Direct: NOT FOUND");
                 }
 
-                ImGui.TableNextRow();
-                ImGui.TableSetColumnIndex(0);
-                ImGui.TextUnformatted("GameObjectId");
-                ImGui.TableSetColumnIndex(1);
-                ImGui.TextUnformatted(entry.GameObjectId.ToString());
-
-                ImGui.EndTable();
+                //foreach (Dalamud.Game.ClientState.Objects.Types.IBattleChara item in MainUpdater.AllBattleCharas)
+                //{
+                //    if (!item.IsTargetable || item == null)
+                //    {
+                //        continue;
+                //    }
+                //    ImGui.TextUnformatted(item.Name.ToString());
+                //    ImGui.TextUnformatted(item.GameObjectId.ToString());
+                //    ImGui.SetNextItemWidth(100);
+                //    ImGui.SliderFloat($"Hitbox Radius###{item.Name}{item.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address)->HitboxRadius, 0f, 100f);
+                //}
             }
+        }
+        ImGui.SameLine();
+        using (var child2 = ImRaii.Child("targetinfochild2", new Vector2((availableWidth / 2) - 10, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
+        {
+            if (child2.Success)
+            {
+                foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
+                {
+                    if (!entry.IsTargetable)
+                    {
+                        continue;
+                    }
+                    if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+                    {
+                        // Define fixed width for both columns
+                        ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 150f);
+                        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
 
-            // Add vertical spacing between entries
-            ImGui.Dummy(new Vector2(0, 10));
+                        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
+                        if (icon2 != null)
+                        {
+                            ImGui.TableNextRow();
+                            ImGui.TableSetColumnIndex(0);
+                            ImGui.TextUnformatted("Name");
+                            ImGui.TableSetColumnIndex(1);
+                            ImGui.TextUnformatted(entry.Name);
+                            ImGui.SameLine();
+                            ImGui.Image(icon2.Handle, new Vector2(22, 22));
+
+                            if (ImGui.IsItemHovered())
+                            {
+                                ImGui.BeginTooltip();
+                                ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
+                                ImGui.EndTooltip();
+                            }
+                        }
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("GameObjectId:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.GameObjectId.ToString());
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Boss from icon:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.IsBoss.ToString());
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Targetable:");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.IsTargetable.ToString());
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Hitbox Radius:");
+                        ImGui.TableSetColumnIndex(1);
+
+                        if (entry.BattleChara != null && entry.BattleChara.Address != IntPtr.Zero)
+                        {
+                            ImGui.SetNextItemWidth(100);
+                            var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entry.BattleChara.Address;
+                            ImGui.SliderFloat(
+                                $"##HitboxRadiusSlider{entry.BattleChara.Name}{entry.BattleChara.EntityId}",
+                                ref gameObject->HitboxRadius,
+                                0f, 100f
+                            );
+                        }
+                        else
+                        {
+                            ImGui.TextUnformatted("N/A (No BattleChara)");
+                        }
+
+                        ImGui.EndTable();
+                    }
+
+                    // Add vertical spacing between entries
+                    ImGui.Dummy(new Vector2(0, 10));
+                }
+            }
         }
 
         //foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
@@ -298,32 +420,171 @@ public class MainWindow : Window, IDisposable
         //}
     }
 
-    public void DrawHighlightTab()
+    public void DrawHighlightTab() // TODO highlighting bnpc's based on jobs should depend on master highlight. refine job highlighting from role to job and add a is enemy toggle.
     {
         var highlightOverlayValue = Configuration.EnableHighLightOverlay;
         if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
         {
             Configuration.EnableHighLightOverlay = highlightOverlayValue;
-            Plugin.ToggleHighlightUI();
+            //Plugin.TargetHighlightWindow.IsOpen = true;
+            Plugin.TargetHighlightWindow.IsOpen = highlightOverlayValue;
             Configuration.Save();
         }
         var highlightPlayer = Configuration.HighlightPlayer;
         var highlightGameObjects = Configuration.HighlightAllGameObjects;
+        var highlightBattleCharas = Configuration.HighlightAllBattleCharas;
+        var highlightBattleCharasTanks = Configuration.HighlightAllBattleCharasTanks;
+        var highlightBattleCharasHealers = Configuration.HighlightAllBattleCharasHealers;
+        var highlightBattleCharasDPSMelee = Configuration.HighlightAllBattleCharasDPSMelee;
+        var highlightBattleCharasDPSRanged = Configuration.HighlightAllBattleCharasDPSRanged;
+        var highlightBattleCharasDPSCaster = Configuration.HighlightAllBattleCharasDPSCaster;
+
         if (highlightOverlayValue)
         {
-            ImGui.Indent();
             if (ImGui.Checkbox("Highlight Player?", ref highlightPlayer))
             {
                 Configuration.HighlightPlayer = highlightPlayer;
                 Configuration.Save();
             }
-            if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
+            ImGui.Indent();
+            //if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
+            //{
+            //    Configuration.HighlightAllGameObjects = highlightGameObjects;
+            //    Configuration.Save();
+            //}
+
+            // HighlightAllBattleCharas
+            if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
             {
-                Configuration.HighlightAllGameObjects = highlightGameObjects;
+                Configuration.HighlightAllBattleCharas = highlightBattleCharas;
                 Configuration.Save();
             }
+
+            // Per-role BattleChara checkboxes
+            ImGui.Indent();
+            if (ImGui.Checkbox("Tanks", ref highlightBattleCharasTanks))
+            {
+                Configuration.HighlightAllBattleCharasTanks = highlightBattleCharasTanks;
+                Configuration.Save();
+            }
+            if (highlightBattleCharasTanks)
+            {
+                ImGui.Indent();
+                var enemyTanksOnly = Configuration.HighlightEnemyTanksOnly;
+                if (ImGui.Checkbox("Enemy tanks only", ref enemyTanksOnly))
+                {
+                    Configuration.HighlightEnemyTanksOnly = enemyTanksOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
+            if (ImGui.Checkbox("Healers", ref highlightBattleCharasHealers))
+            {
+                Configuration.HighlightAllBattleCharasHealers = highlightBattleCharasHealers;
+                Configuration.Save();
+            }
+            if (highlightBattleCharasHealers)
+            {
+                ImGui.Indent();
+                var enemyHealersOnly = Configuration.HighlightEnemyHealersOnly;
+                if (ImGui.Checkbox("Enemy healers only", ref enemyHealersOnly))
+                {
+                    Configuration.HighlightEnemyHealersOnly = enemyHealersOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
+            if (ImGui.Checkbox("DPS Melee", ref highlightBattleCharasDPSMelee))
+            {
+                Configuration.HighlightAllBattleCharasDPSMelee = highlightBattleCharasDPSMelee;
+                Configuration.Save();
+            }
+            if (highlightBattleCharasDPSMelee)
+            {
+                ImGui.Indent();
+                var enemyDPSMeleeOnly = Configuration.HighlightEnemyDPSMeleeOnly;
+                if (ImGui.Checkbox("Enemy melee only", ref enemyDPSMeleeOnly))
+                {
+                    Configuration.HighlightEnemyDPSMeleeOnly = enemyDPSMeleeOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
+            if (ImGui.Checkbox("DPS Ranged", ref highlightBattleCharasDPSRanged))
+            {
+                Configuration.HighlightAllBattleCharasDPSRanged = highlightBattleCharasDPSRanged;
+                Configuration.Save();
+            }
+            if (highlightBattleCharasDPSRanged)
+            {
+                ImGui.Indent();
+                var enemyDPSRangedOnly = Configuration.HighlightEnemyDPSRangedOnly;
+                if (ImGui.Checkbox("Enemy ranged only", ref enemyDPSRangedOnly))
+                {
+                    Configuration.HighlightEnemyDPSRangedOnly = enemyDPSRangedOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+
+            if (ImGui.Checkbox("DPS Caster", ref highlightBattleCharasDPSCaster))
+            {
+                Configuration.HighlightAllBattleCharasDPSCaster = highlightBattleCharasDPSCaster;
+                Configuration.Save();
+            }
+            if (highlightBattleCharasDPSCaster)
+            {
+                ImGui.Indent();
+                var enemyDPSCasterOnly = Configuration.HighlightEnemyDPSCasterOnly;
+                if (ImGui.Checkbox("Enemy caster only", ref enemyDPSCasterOnly))
+                {
+                    Configuration.HighlightEnemyDPSCasterOnly = enemyDPSCasterOnly;
+                    Configuration.Save();
+                }
+                ImGui.Unindent();
+            }
+            ImGui.Unindent();
+            ImGui.Unindent();
+        }
+        ImGui.Separator();
+
+        var useGradientColor = Configuration.UseGradientColor;
+        if (ImGui.Checkbox("Use animated gradient color?", ref useGradientColor))
+        {
+            Configuration.UseGradientColor = useGradientColor;
+            Configuration.Save();
         }
 
+        var useGlowEffect = Configuration.UseGlowEffect;
+        if (ImGui.Checkbox("Use glow effect?", ref useGlowEffect))
+        {
+            Configuration.UseGlowEffect = useGlowEffect;
+            Configuration.Save();
+        }
+
+        if (useGlowEffect)
+        {
+            ImGui.Indent();
+
+            var glowSize = Configuration.GlowSize;
+            if (ImGui.SliderFloat("Glow size", ref glowSize, 1f, 30f))
+            {
+                Configuration.GlowSize = glowSize;
+                Configuration.Save();
+            }
+
+            var glowSteps = Configuration.GlowSteps;
+            if (ImGui.SliderInt("Glow steps", ref glowSteps, 2, 20))
+            {
+                Configuration.GlowSteps = glowSteps;
+                Configuration.Save();
+            }
+
+            ImGui.Unindent();
+        }
     }
 
     //public void DrawNamePlates()
