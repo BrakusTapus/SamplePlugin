@@ -27,15 +27,15 @@ namespace SamplePlugin.UI;
 
 public class MainWindow : Window, IDisposable
 {
-    private readonly string goatImagePath;
+    private readonly string kirboImagePath;
     private Plugin Plugin;
     private Configuration Configuration;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
-    public MainWindow(Plugin plugin, string goatImagePath)
-        : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollbar)
+    public MainWindow(Plugin plugin, string kirboImagePath)
+        : base($"Kirbo's Plugin v{plugin.Version}##With a hidden ID", ImGuiWindowFlags.NoScrollbar)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -59,7 +59,7 @@ public class MainWindow : Window, IDisposable
             ShowTooltip = () => ImGui.SetTooltip(("Toggle settings window.")),
         });
 
-        this.goatImagePath = goatImagePath;
+        this.kirboImagePath = kirboImagePath;
         Plugin = plugin;
         Configuration = plugin.Configuration;
     }
@@ -139,18 +139,18 @@ public class MainWindow : Window, IDisposable
     public void DrawImage()
     {
         float availableWidth = ImGui.GetContentRegionAvail().X;
-        IDalamudTextureWrap? goatImage = Svc.Texture.GetFromFile(goatImagePath).GetWrapOrDefault();
+        IDalamudTextureWrap? kirboImage = Svc.Texture.GetFromFile(kirboImagePath).GetWrapOrDefault();
         // Use a fallback height if the image isn't available
-        float childHeight = goatImage != null ? goatImage.Height + 15 : 50;
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+        float childHeight = kirboImage != null ? kirboImage.Height + 15 : 50;
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar2##Some Child With A Scrollbar nr2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)
             {
-                if (goatImage != null)
+                if (kirboImage != null)
                 {
-                    ImGuiHelpers.CenterCursorFor(goatImage.Width);
-                    ImGui.Image(goatImage.Handle, new Vector2(goatImage.Width, goatImage.Height));
+                    ImGuiHelpers.CenterCursorFor(kirboImage.Width);
+                    ImGui.Image(kirboImage.Handle, new Vector2(kirboImage.Width, kirboImage.Height));
                 }
                 else
                 {
@@ -635,12 +635,12 @@ public class MainWindow : Window, IDisposable
 //    if (child.Success)
 //    {
 //        ImGui.TextUnformatted("Have a goat:");
-//        var goatImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//        if (goatImage != null)
+//        var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+//        if (kirboImage != null)
 //        {
 //            using (ImRaii.PushIndent(55f))
 //            {
-//                ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+//                ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
 //            }
 //        }
 //        else
@@ -691,12 +691,12 @@ public class MainWindow : Window, IDisposable
 //        if (child.Success)
 //        {
 //            ImGui.TextUnformatted("Have a goat:");
-//            var goatImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//            if (goatImage != null)
+//            var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+//            if (kirboImage != null)
 //            {
 //                using (ImRaii.PushIndent(55f))
 //                {
-//                    ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+//                    ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
 //                }
 //            }
 //            else

@@ -29,6 +29,7 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/kirbo";
     private const string CommandTest = "/kirbotest";
     private const string CommandHighlight = "/kirbohl";
+    internal readonly string Version = "0.0.1.3";
 
     public Configuration Configuration { get; init; }
 
@@ -45,14 +46,15 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         // you might normally want to embed resources and load them from the manifest stream
-        var goatImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\goat.png");
-        var kirboImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\kirbo.png");
-        var logoImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\logo.png");
+        var assetsPath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets");
+        var goatImagePath = Path.Combine(assetsPath, "goat.png");
+        var kirboImagePath = Path.Combine(assetsPath, "kirbo.png");
+        var logoImagePath = Path.Combine(assetsPath, "logo.png");
 
         TargetHighlightWindow = new TargetHighlight(this);
         TestWindow = new TestWindow(this);
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
+        MainWindow = new MainWindow(this, kirboImagePath);
 
         WindowSystem.AddWindow(TargetHighlightWindow);
         WindowSystem.AddWindow(TestWindow);
@@ -107,6 +109,10 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
         NamePlateUpdater.Dispose();
         MainUpdater.Dispose();
+        Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
+        Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
+        Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
+        Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
         Svc.Commands.RemoveHandler(CommandName);
         Svc.Commands.RemoveHandler(CommandTest);
