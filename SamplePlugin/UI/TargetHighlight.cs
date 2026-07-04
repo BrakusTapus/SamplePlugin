@@ -60,8 +60,6 @@ internal class TargetHighlight : Window
         bool highlightOverlayValue = Configuration.EnableHighLightOverlay;
         if (highlightOverlayValue)
         {
-            ImGuiWindowFlags imGuiWindowFlags = ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground;
-            if (ImGui.Begin("Canvas_Hightlight", imGuiWindowFlags))
             {
                 // Filter AllGameObjects to include only targetable objects.
                 IEnumerable<IGameObject> battleCharas = MainUpdater.AllGameObjects.OfType<IGameObject>() .Where(b => b.IsTargetable);
@@ -209,10 +207,9 @@ internal class TargetHighlight : Window
                         ((BattleChara*)target.Address)->Highlight(ObjectHighlightColor.None, false);
                     }
                 }
+
             }
         }
-
-        ImGui.End();
     }
 
 
