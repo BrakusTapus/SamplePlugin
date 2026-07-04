@@ -18,6 +18,7 @@ public class Configuration : IPluginConfiguration
     public bool DisplayPlayerInfoTab { get; set; } = true;
     public bool DisplayTargetInfoTab { get; set; } = true;
     public bool DisplayHighLightInfoTab { get; set; } = true;
+    public bool ShowInDevMenu { get; set; } = true;
 
     // Highlight related settings
     public bool EnableHighLightOverlay { get; set; } = false;

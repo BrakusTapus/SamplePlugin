@@ -20,7 +20,7 @@ internal static class MainUpdater
         Svc.Framework.Update += KirboUpdate;
     }
 
-    public static void Dispose()
+    public static void Disable()
     {
         Svc.Framework.Update -= KirboUpdate;
     }

@@ -21,6 +21,7 @@ using System;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
 using Dalamud.Game.DutyState;
+using Dalamud.Bindings.ImGui;
 
 namespace SamplePlugin;
 
@@ -31,6 +32,7 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandHighlight = "/kirbohl";
     internal readonly string Version = "0.0.1.3";
 
+    private readonly IDalamudPluginInterface PluginInterface;
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("SamplePlugin");
@@ -91,10 +93,10 @@ public sealed class Plugin : IDalamudPlugin
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
-        if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
-        {
-            MainWindow.IsOpen = true;
-        }
+        //if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
+        //{
+        //    MainWindow.IsOpen = true;
+        //}
 
         NamePlateUpdater.Enable();
         MainUpdater.Enable();
@@ -102,13 +104,17 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
-        WindowSystem.RemoveAllWindows();
+        Svc.Log.Debug($"Plugin: Dispose started.");
+        //WindowSystem.RemoveAllWindows();
+        NamePlateUpdater.Disable();
+        MainUpdater.Disable();
         TargetHighlightWindow.Dispose();
-        TestWindow.Dispose();
+        //TestWindow.Dispose();
         ConfigWindow.Dispose();
         MainWindow.Dispose();
-        NamePlateUpdater.Dispose();
-        MainUpdater.Dispose();
+        WindowSystem.RemoveAllWindows();
+        //NamePlateUpdater.Disable();
+        //MainUpdater.Disable();
         Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
         Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
         Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
@@ -138,7 +144,20 @@ public sealed class Plugin : IDalamudPlugin
         ToggleHighlightUI();
     }
 
-    private void DrawUI() => WindowSystem.Draw();
+    //private void DrawUI() => WindowSystem.Draw();
+    private void DrawUI()
+    {
+        WindowSystem.Draw();
+        if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
+        {
+            if (ImGui.MenuItem("Kirbo"))
+            {
+                ToggleMainUI();
+            }
+
+            ImGui.EndMainMenuBar();
+        }
+    }
 
     public void ToggleHighlightUI() => TargetHighlightWindow.Toggle();
     public void ToggleTestUI() => TestWindow.Toggle();

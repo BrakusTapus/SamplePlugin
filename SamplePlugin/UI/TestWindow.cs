@@ -9,7 +9,7 @@ using Lumina.Excel.Sheets;
 using SamplePlugin.Helpers.UI;
 
 namespace SamplePlugin.UI;
-public class TestWindow : Window, IDisposable
+public class TestWindow : Window
 {
     private Plugin Plugin;
     private bool disposedValue;
@@ -42,7 +42,7 @@ public class TestWindow : Window, IDisposable
     //    GC.SuppressFinalize(this);
     //}
 
-    public void Dispose() { }
+
 
     public override void Draw()
     {

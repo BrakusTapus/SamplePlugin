@@ -188,6 +188,13 @@ public class MainWindow : Window, IDisposable
                     Configuration.Save();
                 }
 
+                var showInDevMenuValue = Configuration.ShowInDevMenu;
+                if (ImGui.Checkbox("Show in dev menu", ref showInDevMenuValue))
+                {
+                    Configuration.ShowInDevMenu = showInDevMenuValue;
+                    Configuration.Save();
+                }
+
                 // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
                 // These expect formatting parameter if any part of the text contains a "%", which we can't
                 // provide through our bindings, leading to a Crash to Desktop.
