@@ -135,12 +135,7 @@ internal static class ObjectHelper
 			return false;
 		}
 
-		if (!obj.IsTargetable)
-		{
-			return false;
-		}
-
-		if (ActionManager.CanUseActionOnTarget(142, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142
+		if (ActionManager.CanUseActionOnTarget(142, obj.Struct()) || ActionManager.CanUseActionOnTarget(29653, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142 | 29653 = pvp variant
 		{
 			return true;
 		}

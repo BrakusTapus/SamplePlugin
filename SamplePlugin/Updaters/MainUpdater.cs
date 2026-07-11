@@ -49,7 +49,7 @@ internal static class MainUpdater
         // - Distance to player is >= 45
         _allBattleCharas.RemoveAll(battleChara =>
             battleChara == null ||
-            !battleChara.IsTargetable ||
+            //!battleChara.IsTargetable ||
             ObjectHelper.DistanceToPlayer(battleChara) >= 55);
     }
 

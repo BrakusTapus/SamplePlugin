@@ -13,6 +13,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -271,6 +272,16 @@ public class MainWindow : Window, IDisposable
                     ImGui.TextUnformatted("Invalid territory.");
                 }
 
+                var target = Svc.Targets.Target as IBattleChara;
+                var actionmanagerCheck = target != null && FFXIVClientStructs.FFXIV.Client.Game.ActionManager.CanUseActionOnTarget(142, (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Struct());
+                if (target != null)
+                {
+                    ImGui.Text("can use on target " + actionmanagerCheck);
+                }
+                else
+                {
+                    ImGui.Text("target is NULL");
+                }
             }
         }
     }
