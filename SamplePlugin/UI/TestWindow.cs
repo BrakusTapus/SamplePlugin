@@ -9,11 +9,11 @@ using Lumina.Excel.Sheets;
 using SamplePlugin.Helpers.UI;
 
 namespace SamplePlugin.UI;
-public class TestWindow : Window
+public class TestWindow : Window, IDisposable
 {
     private Plugin Plugin;
     private bool disposedValue;
-    public TestWindow(Plugin plugin) : base("Test - Window##TestWindow", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollWithMouse)
+    public TestWindow(Plugin plugin) : base("Test - Window###Test Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -42,7 +42,7 @@ public class TestWindow : Window
     //    GC.SuppressFinalize(this);
     //}
 
-
+    public void Dispose() { }
 
     public override void Draw()
     {
@@ -129,7 +129,7 @@ public class TestWindow : Window
         var windowHeight = ImGui.GetWindowHeight();
         var windowWidth = ImGui.GetWindowWidth();
         ImGui.SetCursorPos(new Vector2(0, 0));
-        using (var background = ImRaii.Child("background", new Vector2(windowWidth, windowHeight), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground))
+        using (var background = ImRaii.Child("###background", new Vector2(windowWidth, windowHeight), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground))
         {
             if (background)
             {
