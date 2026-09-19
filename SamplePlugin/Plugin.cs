@@ -30,19 +30,21 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/kirbo";
     private const string CommandTest = "/kirbotest";
     private const string CommandHighlight = "/kirbohl";
-    internal readonly string Version = "0.0.1.7";
+    public string Version => $"v{GetType().Assembly.GetName().Version}";
+    public string Name => $"Kirbo's {GetType().Assembly.GetName().Name}";
 
-    private readonly IDalamudPluginInterface PluginInterface;
+    internal static Plugin? P;
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("SamplePlugin");
+    private readonly WindowSystem WindowSystem;
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
-    private TestWindow TestWindow { get; init; }
+    internal TestWindow TestWindow { get; init; }
     internal TargetHighlight TargetHighlightWindow { get; init; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        P = this;
         ECommonsMain.Init(pluginInterface, this, Module.All);
         Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -53,15 +55,16 @@ public sealed class Plugin : IDalamudPlugin
         var kirboImagePath = Path.Combine(assetsPath, "kirbo.png");
         var logoImagePath = Path.Combine(assetsPath, "logo.png");
 
-        TargetHighlightWindow = new TargetHighlight(this);
-        TestWindow = new TestWindow(this);
-        ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this, kirboImagePath);
+        ConfigWindow = new ConfigWindow(this);
+        TargetHighlightWindow = new TargetHighlight(this);
+        TestWindow = new TestWindow();
+        WindowSystem = new();
 
+        WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(TargetHighlightWindow);
         WindowSystem.AddWindow(TestWindow);
-        WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(MainWindow);
 
         Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -78,14 +81,12 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Opens Highlight window"
         });
 
-        pluginInterface.UiBuilder.Draw += DrawUI;
-
+        Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        // Adds another button that is doing the same but for the main ui of the plugin
+        Svc.PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         // This adds a button to the plugin installer entry of this plugin which allows
         // to toggle the display status of the configuration ui
-        pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
-
-        // Adds another button that is doing the same but for the main ui of the plugin
-        pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         Svc.DutyState.DutyStarted += DutyState_DutyStarted;
         Svc.DutyState.DutyWiped += DutyState_DutyWiped;
@@ -105,25 +106,30 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         Svc.Log.Debug($"Plugin: Dispose started.");
-        //WindowSystem.RemoveAllWindows();
+        MainWindow.Dispose();
+        TargetHighlightWindow.Dispose();
+        TestWindow.Dispose();
+        ConfigWindow.Dispose();
         NamePlateUpdater.Disable();
         MainUpdater.Disable();
-        TargetHighlightWindow.Dispose();
-        //TestWindow.Dispose();
-        ConfigWindow.Dispose();
-        MainWindow.Dispose();
         WindowSystem.RemoveAllWindows();
-        //NamePlateUpdater.Disable();
-        //MainUpdater.Disable();
+
+        Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
+        Svc.PluginInterface.UiBuilder.Draw -= DrawUI;
+
         Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
         Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
         Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
         Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
-        Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
+
+
         Svc.Commands.RemoveHandler(CommandName);
         Svc.Commands.RemoveHandler(CommandTest);
         Svc.Commands.RemoveHandler(CommandHighlight);
+
         ECommonsMain.Dispose();
+        P = null;
     }
 
     private void OnCommand(string command, string args)
@@ -147,7 +153,6 @@ public sealed class Plugin : IDalamudPlugin
     //private void DrawUI() => WindowSystem.Draw();
     private void DrawUI()
     {
-        WindowSystem.Draw();
         if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
         {
             if (ImGui.MenuItem("Kirbo"))

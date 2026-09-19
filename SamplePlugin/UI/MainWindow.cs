@@ -36,7 +36,7 @@ public class MainWindow : Window, IDisposable
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
     public MainWindow(Plugin plugin, string kirboImagePath)
-        : base($"Kirbo's Plugin v{plugin.Version}##With a hidden ID", ImGuiWindowFlags.NoScrollbar)
+        : base($"Kirbo's Plugin v{plugin.GetType().Assembly.GetName().Version}###Plugin", ImGuiWindowFlags.NoScrollbar)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -135,6 +135,8 @@ public class MainWindow : Window, IDisposable
                 }
             }
         }
+
+
     }
 
     public void DrawImage()

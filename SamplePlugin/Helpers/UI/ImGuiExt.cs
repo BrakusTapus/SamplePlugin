@@ -29,6 +29,25 @@ namespace SamplePlugin.Helpers.UI;
 internal static unsafe class ImGuiExt
 {
     /// <summary>
+    /// Load an image via a url (or full path name + image name)
+    /// </summary>
+    /// <param name="url"></param>
+    //public static void LoadImageFromStream(string url)
+    //{
+    //    float paddingWidth = ImGui.GetStyle().WindowPadding.X;
+    //    float paddingHeight = ImGui.GetStyle().WindowPadding.Y;
+    //    float windowY = ImGui.GetWindowHeight();
+    //    float windowX = ImGui.GetWindowWidth();
+    //    Vector2 imageSize = new(windowX - paddingWidth, windowY - paddingHeight);
+    //    /// var imagePath = Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName!, "Assets", "Images", $"Dark.png");
+
+    //    if (ImageLoaderHandler.TryGetTextureWrap(url, out Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? image))
+    //    {
+    //        ImGui.Image(image.ImGuiHandle, imageSize);
+    //    }
+    //}
+
+    /// <summary>
     /// Obtain an icon texture in the game using its ID.
     /// </summary>
     /// <param name="iconId"></param>

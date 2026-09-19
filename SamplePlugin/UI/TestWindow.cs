@@ -1,26 +1,27 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Configuration;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.Reflection;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Helpers.UI;
 
 namespace SamplePlugin.UI;
 public class TestWindow : Window, IDisposable
 {
-    private Plugin Plugin;
-    private bool disposedValue;
-    public TestWindow(Plugin plugin) : base("Test - Window###Test Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollWithMouse)
+    private static string Name => "Test Window";
+    public TestWindow() : base($"{Name}###TestWindow", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
             MinimumSize = new Vector2(150, 100),
             MaximumSize = new Vector2(3440, 1440)
         };
-        Plugin = plugin;
     }
 
     //protected virtual void Dispose(bool disposing)
@@ -96,7 +97,7 @@ public class TestWindow : Window, IDisposable
             Svc.Log.Error($"Failed to load logo: {ex.Message}");
         }
         // Reference class member to ensure non-static
-        _ = Plugin;
+        //_ = P;
     }
 
     private void DrawBody()
