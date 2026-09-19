@@ -30,7 +30,7 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/kirbo";
     private const string CommandTest = "/kirbotest";
     private const string CommandHighlight = "/kirbohl";
-    internal readonly string Version = "0.0.1.6";
+    internal readonly string Version = "0.0.1.7";
 
     private readonly IDalamudPluginInterface PluginInterface;
     public Configuration Configuration { get; init; }

@@ -10,7 +10,7 @@
 
     <!-- Build Parameters -->    
     <PropertyGroup>
-        <Version>0.0.1.6</Version>
+        <Version>0.0.1.7</Version>
         <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
         <Author>Kirbo</Author>
         <Name>Sample Plugin</Name>
@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="ECommons" Version="3.2.1.18" />
+        <PackageReference Include="ECommons" Version="3.2.1.20" />
         <PackageReference Update="DotNet.ReproducibleBuilds" Version="2.0.5" />
     </ItemGroup>
 </Project>
