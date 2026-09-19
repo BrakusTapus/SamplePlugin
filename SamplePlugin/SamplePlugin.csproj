@@ -10,7 +10,7 @@
 
     <!-- Build Parameters -->    
     <PropertyGroup>
-        <Version>0.0.1.7</Version>
+        <Version>0.0.1.8</Version>
         <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
         <Author>Kirbo</Author>
         <Name>Sample Plugin</Name>
