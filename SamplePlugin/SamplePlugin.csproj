@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
+
+    <!-- Metadata -->
     <PropertyGroup>
-        <Author>Kirbo</Author>
-        <Version>0.0.1.4</Version>
-        <Description>Kirbo's playground plugin.</Description>
-        <PackageProjectUrl>https://github.com/BrakusTapus/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
         <TargetFramework>net10.0-windows7.0</TargetFramework>
     </PropertyGroup>
+
+    <!-- Build Parameters -->    
+    <PropertyGroup>
+        <Version>0.0.1.6</Version>
+        <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
+        <Author>Kirbo</Author>
+        <Name>Sample Plugin</Name>
+        <Punchline>Kirbo's badly written code.</Punchline>
+        <Description>Kirbo's playground plugin.</Description>
+        <RepoUrl>https://github.com/BrakusTapus/SamplePlugin</RepoUrl>
+        <Tags>sample;plugin;kirbo</Tags>
+    </PropertyGroup>    
 
     <ItemGroup>
         <Content Include="Assets\goat.png">
