@@ -15,9 +15,11 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using SamplePlugin.DalamudServices;
+using SamplePlugin.Data;
 using SamplePlugin.Updaters;
 
 namespace SamplePlugin.Helpers;
+
 internal static class ObjectHelper
 {
     /// <summary>
@@ -128,18 +130,24 @@ internal static class ObjectHelper
         return battleChara is IBattleChara b && validJobs != null && validJobs.Contains((byte)b.ClassJob.Value.RowId);
     }
 
-	internal static unsafe bool IsEnemy(this IGameObject obj)
-	{
-		if (obj == null)
-		{
-			return false;
-		}
+    public static JobRole GetRole(this IBattleChara chara)
+    {
+        var job = chara.ClassJob.Value;
+        return job.JobIndex == 0 ? JobRole.None : job.GetJobRole(); // JobIndex check skips base classes like GLA/CNJ
+    }
 
-		if (ActionManager.CanUseActionOnTarget(142, obj.Struct()) || ActionManager.CanUseActionOnTarget(29653, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142 | 29653 = pvp variant
-		{
-			return true;
-		}
+    internal static unsafe bool IsEnemy(this IGameObject obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
 
-		return false;
-	}
+        if (ActionManager.CanUseActionOnTarget(142, obj.Struct()) || ActionManager.CanUseActionOnTarget(29653, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142 | 29653 = pvp variant
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
