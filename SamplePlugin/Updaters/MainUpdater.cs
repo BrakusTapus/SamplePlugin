@@ -5,9 +5,11 @@ using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
 using SamplePlugin.Helpers;
 
+namespace SamplePlugin.Updaters;
+
 internal static class MainUpdater
 {
-    private const float MaxDistance = 55f;
+    private const float MaxDistance = 90f;
 
     public static IReadOnlyList<IGameObject> AllGameObjects => _allGameObjects;
     public static IReadOnlyList<IBattleChara> AllBattleCharas => _allBattleCharas;
