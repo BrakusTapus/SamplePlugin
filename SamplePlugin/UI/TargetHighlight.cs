@@ -108,8 +108,8 @@ internal sealed class TargetHighlight : Window
                 if (role.EnemyOnly(config) && !chara.IsEnemy())
                     continue;
 
-                ((GameObject*)chara.Address)->Highlight(role.Outline, true);
-                outlinedThisFrame.Add(chara.GameObjectId);
+                //((GameObject*)chara.Address)->Highlight(role.Outline, true);
+                //outlinedThisFrame.Add(chara.GameObjectId);
                 DrawBox(drawList, chara, Pick(role.Color));
             }
             else if (config.HighlightAllBattleCharas)
