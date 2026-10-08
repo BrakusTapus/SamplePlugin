@@ -24,41 +24,36 @@ internal sealed class TargetHighlight : Window
         Job[] Jobs,
         Func<Configuration, bool> Enabled,
         Func<Configuration, bool> EnemyOnly,
-        Vector4 Color,
-        ObjectHighlightColor Outline);
+        Vector4 Color//,
+        /*ObjectHighlightColor Outline*/);
 
     private static readonly RoleStyle[] Roles =
     {
         new(new[] { Job.DRK, Job.GNB, Job.WAR, Job.PLD },
             c => c.HighlightAllBattleCharasTanks, c => c.HighlightEnemyTanksOnly,
-            ImGuiColors.ParsedBlue, ObjectHighlightColor.Blue),
+            ImGuiColors.ParsedBlue),
 
         new(new[] { Job.WHM, Job.SCH, Job.AST, Job.SGE },
             c => c.HighlightAllBattleCharasHealers, c => c.HighlightEnemyHealersOnly,
-            ImGuiColors.ParsedGreen, ObjectHighlightColor.Green),
+            ImGuiColors.ParsedGreen),
 
         new(new[] { Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR },
             c => c.HighlightAllBattleCharasDPSMelee, c => c.HighlightEnemyDPSMeleeOnly,
-            ImGuiColors.DPSRed, ObjectHighlightColor.Red),
+            ImGuiColors.DPSRed),
 
         new(new[] { Job.BRD, Job.MCH, Job.DNC },
             c => c.HighlightAllBattleCharasDPSRanged, c => c.HighlightEnemyDPSRangedOnly,
-            ImGuiColors.ParsedOrange, ObjectHighlightColor.Orange),
+            ImGuiColors.ParsedOrange),
 
         new(new[] { Job.BLM, Job.SMN, Job.RDM, Job.PCT },
             c => c.HighlightAllBattleCharasDPSCaster, c => c.HighlightEnemyDPSCasterOnly,
-            ImGuiColors.ParsedPurple, ObjectHighlightColor.Magenta),
+            ImGuiColors.ParsedPurple),
     };
 
     private const float IconSize = 22f;
     private const float Padding = 4f;
 
     private readonly Configuration config;
-
-    // Which objects we put a game-side outline on last frame / this frame,
-    // so we only ever clear outlines that WE added.
-    private readonly HashSet<ulong> outlinedLastFrame = new();
-    private readonly HashSet<ulong> outlinedThisFrame = new();
 
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight),
@@ -80,7 +75,6 @@ internal sealed class TargetHighlight : Window
         var player = Svc.Objects.LocalPlayer;
         if (player == null || Svc.Condition[ConditionFlag.BetweenAreas] || !config.EnableHighLightOverlay)
         {
-            FlushOutlines();
             return;
         }
 
@@ -118,25 +112,6 @@ internal sealed class TargetHighlight : Window
             }
         }
 
-        FlushOutlines();
-    }
-
-    /// <summary>
-    /// Clears the game-side outline on anything we outlined last frame but not this frame.
-    /// </summary>
-    private unsafe void FlushOutlines()
-    {
-        foreach (var id in outlinedLastFrame)
-        {
-            if (outlinedThisFrame.Contains(id)) continue;
-            var obj = Svc.Objects.SearchById(id);
-            if (obj != null && obj.Address != IntPtr.Zero)
-                ((GameObject*)obj.Address)->Highlight(ObjectHighlightColor.None, false);
-        }
-
-        outlinedLastFrame.Clear();
-        outlinedLastFrame.UnionWith(outlinedThisFrame);
-        outlinedThisFrame.Clear();
     }
 
     /// <summary>
@@ -203,8 +178,6 @@ internal sealed class TargetHighlight : Window
 
     public void Dispose()
     {
-        // Remove any outlines we added when the plugin unloads.
-        outlinedThisFrame.Clear();
-        FlushOutlines();
+
     }
 }
