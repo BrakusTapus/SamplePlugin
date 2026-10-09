@@ -48,6 +48,7 @@ public sealed class Plugin : IDalamudPlugin
         ECommonsMain.Init(pluginInterface, this, Module.All);
         Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration.MigrateIfNeeded();
 
         // you might normally want to embed resources and load them from the manifest stream
         var assetsPath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets");
@@ -58,6 +59,7 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow = new MainWindow(this, kirboImagePath);
         ConfigWindow = new ConfigWindow(this);
         TargetHighlightWindow = new TargetHighlight(this);
+        TargetHighlightWindow.IsOpen = Configuration.EnableHighLightOverlay;
         TestWindow = new TestWindow();
         WindowSystem = new();
 

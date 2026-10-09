@@ -31,6 +31,7 @@ public class MainWindow : Window, IDisposable
     private readonly string kirboImagePath;
     private Plugin Plugin;
     private Configuration Configuration;
+    private readonly HighlightTab highlightTab;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -63,6 +64,7 @@ public class MainWindow : Window, IDisposable
         this.kirboImagePath = kirboImagePath;
         Plugin = plugin;
         Configuration = plugin.Configuration;
+        highlightTab = new HighlightTab(plugin);
     }
 
     public void Dispose() { }
@@ -440,172 +442,7 @@ public class MainWindow : Window, IDisposable
         //}
     }
 
-    public void DrawHighlightTab() // TODO highlighting bnpc's based on jobs should depend on master highlight. refine job highlighting from role to job and add a is enemy toggle.
-    {
-        var highlightOverlayValue = Configuration.EnableHighLightOverlay;
-        if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
-        {
-            Configuration.EnableHighLightOverlay = highlightOverlayValue;
-            //Plugin.TargetHighlightWindow.IsOpen = true;
-            Plugin.TargetHighlightWindow.IsOpen = highlightOverlayValue;
-            Configuration.Save();
-        }
-        var highlightPlayer = Configuration.HighlightPlayer;
-        var highlightGameObjects = Configuration.HighlightAllGameObjects;
-        var highlightBattleCharas = Configuration.HighlightAllBattleCharas;
-        var highlightBattleCharasTanks = Configuration.HighlightAllBattleCharasTanks;
-        var highlightBattleCharasHealers = Configuration.HighlightAllBattleCharasHealers;
-        var highlightBattleCharasDPSMelee = Configuration.HighlightAllBattleCharasDPSMelee;
-        var highlightBattleCharasDPSRanged = Configuration.HighlightAllBattleCharasDPSRanged;
-        var highlightBattleCharasDPSCaster = Configuration.HighlightAllBattleCharasDPSCaster;
-
-        if (highlightOverlayValue)
-        {
-            if (ImGui.Checkbox("Highlight Player?", ref highlightPlayer))
-            {
-                Configuration.HighlightPlayer = highlightPlayer;
-                Configuration.Save();
-            }
-            ImGui.Indent();
-            //if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
-            //{
-            //    Configuration.HighlightAllGameObjects = highlightGameObjects;
-            //    Configuration.Save();
-            //}
-
-            // HighlightAllBattleCharas
-            if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
-            {
-                Configuration.HighlightAllBattleCharas = highlightBattleCharas;
-                Configuration.Save();
-            }
-
-            // Per-role BattleChara checkboxes
-            ImGui.Indent();
-            if (ImGui.Checkbox("Tanks", ref highlightBattleCharasTanks))
-            {
-                Configuration.HighlightAllBattleCharasTanks = highlightBattleCharasTanks;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasTanks)
-            {
-                ImGui.Indent();
-                var enemyTanksOnly = Configuration.HighlightEnemyTanksOnly;
-                if (ImGui.Checkbox("Enemy tanks only", ref enemyTanksOnly))
-                {
-                    Configuration.HighlightEnemyTanksOnly = enemyTanksOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("Healers", ref highlightBattleCharasHealers))
-            {
-                Configuration.HighlightAllBattleCharasHealers = highlightBattleCharasHealers;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasHealers)
-            {
-                ImGui.Indent();
-                var enemyHealersOnly = Configuration.HighlightEnemyHealersOnly;
-                if (ImGui.Checkbox("Enemy healers only", ref enemyHealersOnly))
-                {
-                    Configuration.HighlightEnemyHealersOnly = enemyHealersOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Melee", ref highlightBattleCharasDPSMelee))
-            {
-                Configuration.HighlightAllBattleCharasDPSMelee = highlightBattleCharasDPSMelee;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSMelee)
-            {
-                ImGui.Indent();
-                var enemyDPSMeleeOnly = Configuration.HighlightEnemyDPSMeleeOnly;
-                if (ImGui.Checkbox("Enemy melee only", ref enemyDPSMeleeOnly))
-                {
-                    Configuration.HighlightEnemyDPSMeleeOnly = enemyDPSMeleeOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Ranged", ref highlightBattleCharasDPSRanged))
-            {
-                Configuration.HighlightAllBattleCharasDPSRanged = highlightBattleCharasDPSRanged;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSRanged)
-            {
-                ImGui.Indent();
-                var enemyDPSRangedOnly = Configuration.HighlightEnemyDPSRangedOnly;
-                if (ImGui.Checkbox("Enemy ranged only", ref enemyDPSRangedOnly))
-                {
-                    Configuration.HighlightEnemyDPSRangedOnly = enemyDPSRangedOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Caster", ref highlightBattleCharasDPSCaster))
-            {
-                Configuration.HighlightAllBattleCharasDPSCaster = highlightBattleCharasDPSCaster;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSCaster)
-            {
-                ImGui.Indent();
-                var enemyDPSCasterOnly = Configuration.HighlightEnemyDPSCasterOnly;
-                if (ImGui.Checkbox("Enemy caster only", ref enemyDPSCasterOnly))
-                {
-                    Configuration.HighlightEnemyDPSCasterOnly = enemyDPSCasterOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-            ImGui.Unindent();
-            ImGui.Unindent();
-        }
-        ImGui.Separator();
-
-        var useGradientColor = Configuration.UseGradientColor;
-        if (ImGui.Checkbox("Use animated gradient color?", ref useGradientColor))
-        {
-            Configuration.UseGradientColor = useGradientColor;
-            Configuration.Save();
-        }
-
-        var useGlowEffect = Configuration.UseGlowEffect;
-        if (ImGui.Checkbox("Use glow effect?", ref useGlowEffect))
-        {
-            Configuration.UseGlowEffect = useGlowEffect;
-            Configuration.Save();
-        }
-
-        if (useGlowEffect)
-        {
-            ImGui.Indent();
-
-            var glowSize = Configuration.GlowSize;
-            if (ImGui.SliderFloat("Glow size", ref glowSize, 1f, 30f))
-            {
-                Configuration.GlowSize = glowSize;
-                Configuration.Save();
-            }
-
-            var glowSteps = Configuration.GlowSteps;
-            if (ImGui.SliderInt("Glow steps", ref glowSteps, 2, 20))
-            {
-                Configuration.GlowSteps = glowSteps;
-                Configuration.Save();
-            }
-
-            ImGui.Unindent();
-        }
-    }
+    public void DrawHighlightTab() => highlightTab.Draw();
 
     //public void DrawNamePlates()
     //{
