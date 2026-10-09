@@ -51,7 +51,7 @@ internal static class HighlightCatalog
 
         // ---- NPCs and objects ------------------------------------------------------------------------
         Kind("eventnpc",  "Event NPCs",       ObjectKind.EventNpc,       new Vector4(0.11f, 0.62f, 0.46f, 1f)),
-        Kind("mob",       "Enemies (mobs)",   ObjectKind.BattleNpc,      new Vector4(0.85f, 0.35f, 0.19f, 1f), Relation.Enemy | Relation.Others, Relation.Enemy),
+        Kind("battlenpc", "Battle NPCs",      ObjectKind.BattleNpc,      new Vector4(0.85f, 0.35f, 0.19f, 1f), Relation.Enemy | Relation.Others, Relation.Enemy),
         Kind("treasure",  "Treasure chests",  ObjectKind.Treasure,       new Vector4(0.94f, 0.62f, 0.15f, 1f)),
         Kind("aetheryte", "Aetherytes",       ObjectKind.Aetheryte,      new Vector4(0.22f, 0.54f, 0.87f, 1f)),
         Kind("gathpoint", "Gathering points", ObjectKind.GatheringPoint, new Vector4(0.39f, 0.60f, 0.13f, 1f)),
