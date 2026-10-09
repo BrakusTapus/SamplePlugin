@@ -75,13 +75,14 @@ internal sealed class HighlightTab
         var columns = RelationInfo.Columns;
         var scale = ImGuiHelpers.GlobalScale;
 
-        using var table = ImRaii.Table("highlight_rules", columns.Length + 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit);
+        using var table = ImRaii.Table("highlight_rules", columns.Length + 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit);
         if (!table.Success)
             return;
 
         ImGui.TableSetupColumn("What", ImGuiTableColumnFlags.WidthStretch);
         foreach (var rel in columns)
             ImGui.TableSetupColumn(rel.Label(), ImGuiTableColumnFlags.WidthFixed, 62f * scale);
+        ImGui.TableSetupColumn("Hidden", ImGuiTableColumnFlags.WidthFixed, 56f * scale);
         ImGui.TableSetupColumn("Color", ImGuiTableColumnFlags.WidthFixed, 44f * scale);
         ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.WidthFixed, 26f * scale);
 
@@ -117,6 +118,16 @@ internal sealed class HighlightTab
                     Config.Save();
                 }
             }
+
+            ImGui.TableNextColumn();
+            var hidden = settings.IncludeHidden;
+            if (ImGui.Checkbox($"##hidden_{category.Id}", ref hidden))
+            {
+                settings.IncludeHidden = hidden;
+                Config.Save();
+            }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Also highlight objects that are untargetable or have no name (invisible helpers, minigame hazards...).");
 
             // Colour
             ImGui.TableNextColumn();
@@ -162,8 +173,10 @@ internal sealed class HighlightTab
         }
 
         ImGui.TableSetColumnIndex(columns.Length + 1);
-        ImGui.TableHeader("Color");
+        ImGui.TableHeader("Hidden");
         ImGui.TableSetColumnIndex(columns.Length + 2);
+        ImGui.TableHeader("Color");
+        ImGui.TableSetColumnIndex(columns.Length + 3);
         ImGui.TableHeader(" ");
     }
 

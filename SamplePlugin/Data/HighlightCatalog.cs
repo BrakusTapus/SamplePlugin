@@ -57,6 +57,7 @@ internal static class HighlightCatalog
         Kind("gathpoint", "Gathering points", ObjectKind.GatheringPoint, new Vector4(0.39f, 0.60f, 0.13f, 1f)),
         Kind("eventobj",  "Event objects",    ObjectKind.EventObj,       new Vector4(0.53f, 0.53f, 0.50f, 1f)),
         Kind("minion",    "Minions",          ObjectKind.Companion,      new Vector4(0.83f, 0.33f, 0.49f, 1f)),
+        Kind("areaobject",  "Area Object",    ObjectKind.AreaObject,       new Vector4(0.53f, 0.53f, 0.50f, 1f)),
     };
 
     // Declared after All on purpose: static fields initialise in the order they are written.

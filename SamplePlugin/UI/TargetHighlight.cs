@@ -69,8 +69,6 @@ internal sealed class TargetHighlight : Window
         {
             if (obj.Address == IntPtr.Zero || obj.GameObjectId == player.GameObjectId)
                 continue;
-            if (obj is IBattleChara && !obj.IsTargetable)
-                continue;
 
             // Layer 1: classify once...
             var info = ObjectInfo.From(obj);
@@ -81,11 +79,18 @@ internal sealed class TargetHighlight : Window
                 if ((settings.Relations & info.Relation) == 0 || !category.Matches(info))
                     continue;
 
+                // Untargetable or unnamed objects are usually invisible helpers; only draw them if the rule opts in.
+                if (!settings.IncludeHidden && IsHidden(obj))
+                    continue;
+
                 DrawBox(drawList, obj, Pick(settings.Color), info.Role != JobRole.None);
                 break;
             }
         }
     }
+
+    private static bool IsHidden(IGameObject obj) =>
+        (obj is IBattleChara && !obj.IsTargetable) || obj.Name.TextValue.Length == 0;
 
     private void RefreshRules()
     {

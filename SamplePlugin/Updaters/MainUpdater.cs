@@ -26,7 +26,7 @@ internal static class MainUpdater
     public static unsafe bool IsInAlliance(uint entityId) =>
         _inAlliance && GroupManager.Instance()->MainGroup.IsEntityIdInAlliance(entityId);
 
-    public static void Enable()  => Svc.Framework.Update += OnUpdate;
+    public static void Enable() => Svc.Framework.Update += OnUpdate;
     public static void Disable() => Svc.Framework.Update -= OnUpdate;
 
     private static unsafe void OnUpdate(IFramework framework)
@@ -49,10 +49,10 @@ internal static class MainUpdater
         {
             if (obj.Address == IntPtr.Zero) continue;
             if (obj.DistanceToPlayer() >= MaxDistance) continue;
-            if (obj.Name.TextValue.Length == 0) continue; // last: this is the one that allocates
 
             _allGameObjects.Add(obj);
-            if (obj is IBattleChara chara)
+
+            if (obj is IBattleChara chara && chara.Name.TextValue.Length > 0)
                 _allBattleCharas.Add(chara);
         }
     }

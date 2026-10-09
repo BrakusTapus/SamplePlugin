@@ -12,4 +12,6 @@ public class CategorySettings
     public Relation Relations { get; set; } = Relation.None;
 
     public Vector4 Color { get; set; } = new(1f, 1f, 1f, 1f);
+
+    public bool IncludeHidden { get; set; } = false;
 }
