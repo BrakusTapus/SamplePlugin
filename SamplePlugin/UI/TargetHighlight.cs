@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
@@ -8,9 +7,9 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
-using ECommons.ExcelServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using SamplePlugin.Configs;
+using SamplePlugin.Data;
 using SamplePlugin.Helpers;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
@@ -19,41 +18,17 @@ namespace SamplePlugin.UI;
 
 internal sealed class TargetHighlight : Window
 {
-    // One row per role. Adding a role = adding one line here + its config flags.
-    private sealed record RoleStyle(
-        Job[] Jobs,
-        Func<Configuration, bool> Enabled,
-        Func<Configuration, bool> EnemyOnly,
-        Vector4 Color//,
-        /*ObjectHighlightColor Outline*/);
-
-    private static readonly RoleStyle[] Roles =
-    {
-        new(new[] { Job.DRK, Job.GNB, Job.WAR, Job.PLD },
-            c => c.HighlightAllBattleCharasTanks, c => c.HighlightEnemyTanksOnly,
-            ImGuiColors.ParsedBlue),
-
-        new(new[] { Job.WHM, Job.SCH, Job.AST, Job.SGE },
-            c => c.HighlightAllBattleCharasHealers, c => c.HighlightEnemyHealersOnly,
-            ImGuiColors.ParsedGreen),
-
-        new(new[] { Job.MNK, Job.DRG, Job.NIN, Job.SAM, Job.RPR, Job.VPR },
-            c => c.HighlightAllBattleCharasDPSMelee, c => c.HighlightEnemyDPSMeleeOnly,
-            ImGuiColors.DPSRed),
-
-        new(new[] { Job.BRD, Job.MCH, Job.DNC },
-            c => c.HighlightAllBattleCharasDPSRanged, c => c.HighlightEnemyDPSRangedOnly,
-            ImGuiColors.ParsedOrange),
-
-        new(new[] { Job.BLM, Job.SMN, Job.RDM, Job.PCT },
-            c => c.HighlightAllBattleCharasDPSCaster, c => c.HighlightEnemyDPSCasterOnly,
-            ImGuiColors.ParsedPurple),
-    };
-
     private const float IconSize = 22f;
     private const float Padding = 4f;
 
+    // Environmental objects often have a tiny (or zero) hitbox; without a floor their box collapses to a sliver.
+    private const float MinRadius = 0.4f;
+    private const float MinHeight = 1.0f;
+
     private readonly Configuration config;
+
+    // Active categories for THIS frame, in catalog order (= priority order). Reused to avoid allocations.
+    private readonly List<(HighlightCategory Category, CategorySettings Settings)> rules = new();
 
     public TargetHighlight(Plugin plugin)
         : base(nameof(TargetHighlight),
@@ -70,48 +45,56 @@ internal sealed class TargetHighlight : Window
         config = plugin.Configuration;
     }
 
-    public override unsafe void Draw()
+    public override void Draw()
     {
         var player = Svc.Objects.LocalPlayer;
         if (player == null || Svc.Condition[ConditionFlag.BetweenAreas] || !config.EnableHighLightOverlay)
-        {
             return;
-        }
+
+        RefreshRules();
+        if (rules.Count == 0 && !config.HighlightPlayer)
+            return;
 
         var drawList = ImGui.GetBackgroundDrawList();
         var rainbow = GetGradientColor(); // compute once per frame, not once per object
-
         Vector4 Pick(Vector4 normal) => config.UseGradientColor ? rainbow : normal;
 
         if (config.HighlightPlayer)
-        {
-            DrawBox(drawList, player, Pick(ImGuiColors.DalamudViolet));
-        }
+            DrawBox(drawList, player, Pick(ImGuiColors.DalamudViolet), player.GetJobRole() != JobRole.None);
 
-        foreach (var chara in MainUpdater.AllGameObjects.OfType<IBattleChara>())
+        if (rules.Count == 0)
+            return;
+
+        foreach (var obj in MainUpdater.AllGameObjects)
         {
-            if (!chara.IsTargetable || chara.Address == IntPtr.Zero || chara.GameObjectId == player.GameObjectId)
+            if (obj.Address == IntPtr.Zero || obj.GameObjectId == player.GameObjectId)
+                continue;
+            if (obj is IBattleChara && !obj.IsTargetable)
                 continue;
 
-            var role = Roles.FirstOrDefault(r => chara.IsJobs(r.Jobs));
-            if (role == null)
-                continue; // not a combat job
+            // Layer 1: classify once...
+            var info = ObjectInfo.From(obj);
 
-            if (role.Enabled(config))
+            // ...Layer 3: first enabled category that matches wins.
+            foreach (var (category, settings) in rules)
             {
-                if (role.EnemyOnly(config) && !chara.IsEnemy())
+                if ((settings.Relations & info.Relation) == 0 || !category.Matches(info))
                     continue;
 
-                //((GameObject*)chara.Address)->Highlight(role.Outline, true);
-                //outlinedThisFrame.Add(chara.GameObjectId);
-                DrawBox(drawList, chara, Pick(role.Color));
-            }
-            else if (config.HighlightAllBattleCharas)
-            {
-                DrawBox(drawList, chara, Pick(ImGuiColors.DalamudWhite));
+                DrawBox(drawList, obj, Pick(settings.Color), info.Role != JobRole.None);
+                break;
             }
         }
+    }
 
+    private void RefreshRules()
+    {
+        rules.Clear();
+        foreach (var category in HighlightCatalog.All)
+        {
+            if (config.Highlights.TryGetValue(category.Id, out var settings) && settings.Relations != Relation.None)
+                rules.Add((category, settings));
+        }
     }
 
     /// <summary>
@@ -124,8 +107,8 @@ internal sealed class TargetHighlight : Window
         max = new Vector2(float.MinValue);
 
         var pos = obj.Position;
-        var r = obj.HitboxRadius;
-        var h = ((GameObject*)obj.Address)->Height + 0.85f;
+        var r = MathF.Max(obj.HitboxRadius, MinRadius);
+        var h = MathF.Max(((GameObject*)obj.Address)->Height, MinHeight) + 0.85f;
 
         for (var i = 0; i < 8; i++)
         {
@@ -145,16 +128,16 @@ internal sealed class TargetHighlight : Window
     }
 
     /// <summary>
-    /// Single draw routine for every object type: rectangle, plus a job icon for battle charas.
+    /// Single draw routine for every object type: a rectangle, plus a job icon for characters that have a job.
     /// </summary>
-    private static void DrawBox(ImDrawListPtr drawList, IGameObject obj, Vector4 color)
+    private static void DrawBox(ImDrawListPtr drawList, IGameObject obj, Vector4 color, bool showJobIcon)
     {
         if (obj.Address == IntPtr.Zero || !TryGetScreenRect(obj, out var min, out var max))
             return;
 
         drawList.AddRect(min, max, ImGui.GetColorU32(color), 5f, ImDrawFlags.RoundCornersAll, 3f);
 
-        if (obj is not IBattleChara chara)
+        if (!showJobIcon || obj is not IBattleChara chara)
             return;
 
         var icon = ImGuiExt.GetGameIconTexture(chara.ClassJob.RowId + 62100).GetWrapOrDefault();
@@ -178,6 +161,5 @@ internal sealed class TargetHighlight : Window
 
     public void Dispose()
     {
-
     }
 }
