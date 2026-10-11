@@ -21,11 +21,14 @@ internal static class NamePlateUpdater
     public static void Enable()
     {
         Service.NamePlateGui.OnNamePlateUpdate += OnNamePlateUpdate;
+        Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now enabled!");
     }
 
-    public static void Dispose()
+    public static void Disable()
     {
+        ClearList();
         Service.NamePlateGui.OnNamePlateUpdate -= OnNamePlateUpdate;
+        Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now disabled!");
     }
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)

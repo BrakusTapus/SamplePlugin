@@ -21,6 +21,7 @@ using System;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
 using Dalamud.Game.DutyState;
+using Dalamud.Bindings.ImGui;
 
 namespace SamplePlugin;
 
@@ -29,35 +30,43 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/kirbo";
     private const string CommandTest = "/kirbotest";
     private const string CommandHighlight = "/kirbohl";
+    public string Version => $"v{GetType().Assembly.GetName().Version}";
+    public string Name => $"Kirbo's {GetType().Assembly.GetName().Name}";
 
+    internal static Plugin? P;
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("SamplePlugin");
+    private readonly WindowSystem WindowSystem;
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
-    private TestWindow TestWindow { get; init; }
+    internal TestWindow TestWindow { get; init; }
     internal TargetHighlight TargetHighlightWindow { get; init; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        P = this;
         ECommonsMain.Init(pluginInterface, this, Module.All);
         Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration.MigrateIfNeeded();
 
         // you might normally want to embed resources and load them from the manifest stream
-        var goatImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\goat.png");
-        var kirboImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\kirbo.png");
-        var logoImagePath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets\\logo.png");
+        var assetsPath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets");
+        var goatImagePath = Path.Combine(assetsPath, "goat.png");
+        var kirboImagePath = Path.Combine(assetsPath, "kirbo.png");
+        var logoImagePath = Path.Combine(assetsPath, "logo.png");
 
-        TargetHighlightWindow = new TargetHighlight(this);
-        TestWindow = new TestWindow(this);
+        MainWindow = new MainWindow(this, kirboImagePath);
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
+        TargetHighlightWindow = new TargetHighlight(this);
+        TargetHighlightWindow.IsOpen = Configuration.EnableHighLightOverlay;
+        TestWindow = new TestWindow();
+        WindowSystem = new();
 
+        WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(TargetHighlightWindow);
         WindowSystem.AddWindow(TestWindow);
-        WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(MainWindow);
 
         Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -74,14 +83,12 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Opens Highlight window"
         });
 
-        pluginInterface.UiBuilder.Draw += DrawUI;
-
+        Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        // Adds another button that is doing the same but for the main ui of the plugin
+        Svc.PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         // This adds a button to the plugin installer entry of this plugin which allows
         // to toggle the display status of the configuration ui
-        pluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
-
-        // Adds another button that is doing the same but for the main ui of the plugin
-        pluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
         Svc.DutyState.DutyStarted += DutyState_DutyStarted;
         Svc.DutyState.DutyWiped += DutyState_DutyWiped;
@@ -89,10 +96,10 @@ public sealed class Plugin : IDalamudPlugin
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
-        if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
-        {
-            MainWindow.IsOpen = true;
-        }
+        //if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
+        //{
+        //    MainWindow.IsOpen = true;
+        //}
 
         NamePlateUpdater.Enable();
         MainUpdater.Enable();
@@ -100,18 +107,31 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
-        WindowSystem.RemoveAllWindows();
+        Svc.Log.Debug($"Plugin: Dispose started.");
+        MainWindow.Dispose();
         TargetHighlightWindow.Dispose();
         TestWindow.Dispose();
         ConfigWindow.Dispose();
-        MainWindow.Dispose();
-        NamePlateUpdater.Dispose();
-        MainUpdater.Dispose();
+        NamePlateUpdater.Disable();
+        MainUpdater.Disable();
+        WindowSystem.RemoveAllWindows();
+
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
+        Svc.PluginInterface.UiBuilder.Draw -= DrawUI;
+
+        Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
+        Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
+        Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
+        Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
+
+
         Svc.Commands.RemoveHandler(CommandName);
         Svc.Commands.RemoveHandler(CommandTest);
         Svc.Commands.RemoveHandler(CommandHighlight);
+
         ECommonsMain.Dispose();
+        P = null;
     }
 
     private void OnCommand(string command, string args)
@@ -132,7 +152,19 @@ public sealed class Plugin : IDalamudPlugin
         ToggleHighlightUI();
     }
 
-    private void DrawUI() => WindowSystem.Draw();
+    //private void DrawUI() => WindowSystem.Draw();
+    private void DrawUI()
+    {
+        if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
+        {
+            if (ImGui.MenuItem("Kirbo"))
+            {
+                ToggleMainUI();
+            }
+
+            ImGui.EndMainMenuBar();
+        }
+    }
 
     public void ToggleHighlightUI() => TargetHighlightWindow.Toggle();
     public void ToggleTestUI() => TestWindow.Toggle();

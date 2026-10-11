@@ -13,6 +13,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
+using ECommons.GameFunctions;
 using ECommons.GameHelpers;
 using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -27,15 +28,16 @@ namespace SamplePlugin.UI;
 
 public class MainWindow : Window, IDisposable
 {
-    private readonly string goatImagePath;
+    private readonly string kirboImagePath;
     private Plugin Plugin;
     private Configuration Configuration;
+    private readonly HighlightTab highlightTab;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
-    public MainWindow(Plugin plugin, string goatImagePath)
-        : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollbar)
+    public MainWindow(Plugin plugin, string kirboImagePath)
+        : base($"Kirbo's Plugin v{plugin.GetType().Assembly.GetName().Version}###Plugin", ImGuiWindowFlags.NoScrollbar)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -59,9 +61,10 @@ public class MainWindow : Window, IDisposable
             ShowTooltip = () => ImGui.SetTooltip(("Toggle settings window.")),
         });
 
-        this.goatImagePath = goatImagePath;
+        this.kirboImagePath = kirboImagePath;
         Plugin = plugin;
         Configuration = plugin.Configuration;
+        highlightTab = new HighlightTab(plugin);
     }
 
     public void Dispose() { }
@@ -134,23 +137,25 @@ public class MainWindow : Window, IDisposable
                 }
             }
         }
+
+
     }
 
     public void DrawImage()
     {
         float availableWidth = ImGui.GetContentRegionAvail().X;
-        IDalamudTextureWrap? goatImage = Svc.Texture.GetFromFile(goatImagePath).GetWrapOrDefault();
+        IDalamudTextureWrap? kirboImage = Svc.Texture.GetFromFile(kirboImagePath).GetWrapOrDefault();
         // Use a fallback height if the image isn't available
-        float childHeight = goatImage != null ? goatImage.Height + 15 : 50;
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+        float childHeight = kirboImage != null ? kirboImage.Height + 15 : 50;
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar2##Some Child With A Scrollbar nr2", new Vector2(availableWidth, childHeight), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
         {
             // Check if this child is drawing
             if (child.Success)
             {
-                if (goatImage != null)
+                if (kirboImage != null)
                 {
-                    ImGuiHelpers.CenterCursorFor(goatImage.Width);
-                    ImGui.Image(goatImage.Handle, new Vector2(goatImage.Width, goatImage.Height));
+                    ImGuiHelpers.CenterCursorFor(kirboImage.Width);
+                    ImGui.Image(kirboImage.Handle, new Vector2(kirboImage.Width, kirboImage.Height));
                 }
                 else
                 {
@@ -185,6 +190,13 @@ public class MainWindow : Window, IDisposable
                 if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
                 {
                     Configuration.DisplayHighLightInfoTab = highlightValue;
+                    Configuration.Save();
+                }
+
+                var showInDevMenuValue = Configuration.ShowInDevMenu;
+                if (ImGui.Checkbox("Show in dev menu", ref showInDevMenuValue))
+                {
+                    Configuration.ShowInDevMenu = showInDevMenuValue;
                     Configuration.Save();
                 }
 
@@ -264,6 +276,16 @@ public class MainWindow : Window, IDisposable
                     ImGui.TextUnformatted("Invalid territory.");
                 }
 
+                var target = Svc.Targets.Target as IBattleChara;
+                var actionmanagerCheck = target != null && FFXIVClientStructs.FFXIV.Client.Game.ActionManager.CanUseActionOnTarget(142, (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Struct());
+                if (target != null)
+                {
+                    ImGui.Text("can use on target " + actionmanagerCheck);
+                }
+                else
+                {
+                    ImGui.Text("target is NULL");
+                }
             }
         }
     }
@@ -420,172 +442,7 @@ public class MainWindow : Window, IDisposable
         //}
     }
 
-    public void DrawHighlightTab() // TODO highlighting bnpc's based on jobs should depend on master highlight. refine job highlighting from role to job and add a is enemy toggle.
-    {
-        var highlightOverlayValue = Configuration.EnableHighLightOverlay;
-        if (ImGui.Checkbox("Enable highlight overlay?", ref highlightOverlayValue))
-        {
-            Configuration.EnableHighLightOverlay = highlightOverlayValue;
-            //Plugin.TargetHighlightWindow.IsOpen = true;
-            Plugin.TargetHighlightWindow.IsOpen = highlightOverlayValue;
-            Configuration.Save();
-        }
-        var highlightPlayer = Configuration.HighlightPlayer;
-        var highlightGameObjects = Configuration.HighlightAllGameObjects;
-        var highlightBattleCharas = Configuration.HighlightAllBattleCharas;
-        var highlightBattleCharasTanks = Configuration.HighlightAllBattleCharasTanks;
-        var highlightBattleCharasHealers = Configuration.HighlightAllBattleCharasHealers;
-        var highlightBattleCharasDPSMelee = Configuration.HighlightAllBattleCharasDPSMelee;
-        var highlightBattleCharasDPSRanged = Configuration.HighlightAllBattleCharasDPSRanged;
-        var highlightBattleCharasDPSCaster = Configuration.HighlightAllBattleCharasDPSCaster;
-
-        if (highlightOverlayValue)
-        {
-            if (ImGui.Checkbox("Highlight Player?", ref highlightPlayer))
-            {
-                Configuration.HighlightPlayer = highlightPlayer;
-                Configuration.Save();
-            }
-            ImGui.Indent();
-            //if (ImGui.Checkbox("Highlight All GameObjects?", ref highlightGameObjects))
-            //{
-            //    Configuration.HighlightAllGameObjects = highlightGameObjects;
-            //    Configuration.Save();
-            //}
-
-            // HighlightAllBattleCharas
-            if (ImGui.Checkbox("Highlight All Battlecharas?", ref highlightBattleCharas))
-            {
-                Configuration.HighlightAllBattleCharas = highlightBattleCharas;
-                Configuration.Save();
-            }
-
-            // Per-role BattleChara checkboxes
-            ImGui.Indent();
-            if (ImGui.Checkbox("Tanks", ref highlightBattleCharasTanks))
-            {
-                Configuration.HighlightAllBattleCharasTanks = highlightBattleCharasTanks;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasTanks)
-            {
-                ImGui.Indent();
-                var enemyTanksOnly = Configuration.HighlightEnemyTanksOnly;
-                if (ImGui.Checkbox("Enemy tanks only", ref enemyTanksOnly))
-                {
-                    Configuration.HighlightEnemyTanksOnly = enemyTanksOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("Healers", ref highlightBattleCharasHealers))
-            {
-                Configuration.HighlightAllBattleCharasHealers = highlightBattleCharasHealers;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasHealers)
-            {
-                ImGui.Indent();
-                var enemyHealersOnly = Configuration.HighlightEnemyHealersOnly;
-                if (ImGui.Checkbox("Enemy healers only", ref enemyHealersOnly))
-                {
-                    Configuration.HighlightEnemyHealersOnly = enemyHealersOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Melee", ref highlightBattleCharasDPSMelee))
-            {
-                Configuration.HighlightAllBattleCharasDPSMelee = highlightBattleCharasDPSMelee;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSMelee)
-            {
-                ImGui.Indent();
-                var enemyDPSMeleeOnly = Configuration.HighlightEnemyDPSMeleeOnly;
-                if (ImGui.Checkbox("Enemy melee only", ref enemyDPSMeleeOnly))
-                {
-                    Configuration.HighlightEnemyDPSMeleeOnly = enemyDPSMeleeOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Ranged", ref highlightBattleCharasDPSRanged))
-            {
-                Configuration.HighlightAllBattleCharasDPSRanged = highlightBattleCharasDPSRanged;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSRanged)
-            {
-                ImGui.Indent();
-                var enemyDPSRangedOnly = Configuration.HighlightEnemyDPSRangedOnly;
-                if (ImGui.Checkbox("Enemy ranged only", ref enemyDPSRangedOnly))
-                {
-                    Configuration.HighlightEnemyDPSRangedOnly = enemyDPSRangedOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-
-            if (ImGui.Checkbox("DPS Caster", ref highlightBattleCharasDPSCaster))
-            {
-                Configuration.HighlightAllBattleCharasDPSCaster = highlightBattleCharasDPSCaster;
-                Configuration.Save();
-            }
-            if (highlightBattleCharasDPSCaster)
-            {
-                ImGui.Indent();
-                var enemyDPSCasterOnly = Configuration.HighlightEnemyDPSCasterOnly;
-                if (ImGui.Checkbox("Enemy caster only", ref enemyDPSCasterOnly))
-                {
-                    Configuration.HighlightEnemyDPSCasterOnly = enemyDPSCasterOnly;
-                    Configuration.Save();
-                }
-                ImGui.Unindent();
-            }
-            ImGui.Unindent();
-            ImGui.Unindent();
-        }
-        ImGui.Separator();
-
-        var useGradientColor = Configuration.UseGradientColor;
-        if (ImGui.Checkbox("Use animated gradient color?", ref useGradientColor))
-        {
-            Configuration.UseGradientColor = useGradientColor;
-            Configuration.Save();
-        }
-
-        var useGlowEffect = Configuration.UseGlowEffect;
-        if (ImGui.Checkbox("Use glow effect?", ref useGlowEffect))
-        {
-            Configuration.UseGlowEffect = useGlowEffect;
-            Configuration.Save();
-        }
-
-        if (useGlowEffect)
-        {
-            ImGui.Indent();
-
-            var glowSize = Configuration.GlowSize;
-            if (ImGui.SliderFloat("Glow size", ref glowSize, 1f, 30f))
-            {
-                Configuration.GlowSize = glowSize;
-                Configuration.Save();
-            }
-
-            var glowSteps = Configuration.GlowSteps;
-            if (ImGui.SliderInt("Glow steps", ref glowSteps, 2, 20))
-            {
-                Configuration.GlowSteps = glowSteps;
-                Configuration.Save();
-            }
-
-            ImGui.Unindent();
-        }
-    }
+    public void DrawHighlightTab() => highlightTab.Draw();
 
     //public void DrawNamePlates()
     //{
@@ -635,12 +492,12 @@ public class MainWindow : Window, IDisposable
 //    if (child.Success)
 //    {
 //        ImGui.TextUnformatted("Have a goat:");
-//        var goatImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//        if (goatImage != null)
+//        var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+//        if (kirboImage != null)
 //        {
 //            using (ImRaii.PushIndent(55f))
 //            {
-//                ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+//                ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
 //            }
 //        }
 //        else
@@ -691,12 +548,12 @@ public class MainWindow : Window, IDisposable
 //        if (child.Success)
 //        {
 //            ImGui.TextUnformatted("Have a goat:");
-//            var goatImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//            if (goatImage != null)
+//            var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
+//            if (kirboImage != null)
 //            {
 //                using (ImRaii.PushIndent(55f))
 //                {
-//                    ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
+//                    ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
 //                }
 //            }
 //            else

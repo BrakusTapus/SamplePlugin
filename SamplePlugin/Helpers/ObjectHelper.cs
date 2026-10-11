@@ -15,9 +15,11 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using SamplePlugin.DalamudServices;
+using SamplePlugin.Data;
 using SamplePlugin.Updaters;
 
 namespace SamplePlugin.Helpers;
+
 internal static class ObjectHelper
 {
     /// <summary>
@@ -44,7 +46,6 @@ internal static class ObjectHelper
         var localPlayer = Svc.Objects.LocalPlayer;
         if (obj == null) return float.MaxValue;
         if (localPlayer == null) return float.MaxValue;
-        if (obj is not IBattleChara b) return float.MaxValue;
 
         var distance = Vector3.Distance(localPlayer.Position, obj.Position) - (localPlayer.HitboxRadius + obj.HitboxRadius);
         return distance;
@@ -101,50 +102,45 @@ internal static class ObjectHelper
         }
     }
 
-    /// <summary>
-    /// Is the target in the jobs.
-    /// </summary>
-    /// <param name="battleChara">The game object.</param>
-    /// <param name="validJobs">The valid jobs.</param>
-    /// <returns>True if the object is in the valid jobs, otherwise false.</returns>
-    public static bool IsJobs(this IBattleChara battleChara, params Job[] validJobs)
+    internal static unsafe bool IsEnemy(this IGameObject obj)
     {
-        if (battleChara == null || validJobs == null || validJobs.Length == 0)
+        if (obj == null)
         {
             return false;
         }
 
-        HashSet<byte> validJobSet = [];
-        foreach (Job job in validJobs)
+        if (ActionManager.CanUseActionOnTarget(142, obj.Struct()) || ActionManager.CanUseActionOnTarget(29653, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142 | 29653 = pvp variant
         {
-            _ = validJobSet.Add((byte)(uint)job);
+            return true;
         }
 
-        return battleChara.IsJobs(validJobSet);
+        return false;
     }
 
-    private static bool IsJobs(this IGameObject battleChara, HashSet<byte> validJobs)
+    /// <summary>Role of a character's job, built on the ECommons job helpers. Base classes count as their upgraded job (GLA = PLD).</summary>
+    public static JobRole GetJobRole(this IBattleChara chara)
     {
-        return battleChara is IBattleChara b && validJobs != null && validJobs.Contains((byte)b.ClassJob.Value.RowId);
+        var job = ((Job)chara.ClassJob.RowId).GetUpgradedJob();
+
+        if (job.IsTank()) return JobRole.Tank;
+        if (job.IsHealer()) return JobRole.Healer;
+        if (job.IsMeleeDps()) return JobRole.Melee;
+        if (job.IsPhysicalRangedDps()) return JobRole.RangedPhysical;
+        if (job.IsMagicalRangedDps()) return JobRole.RangedMagical;
+        if (job.IsDoh()) return JobRole.DiscipleOfTheHand;
+        if (job.IsDol()) return JobRole.DiscipleOfTheLand;
+        return JobRole.None;
     }
 
-	internal static unsafe bool IsEnemy(this IGameObject obj)
-	{
-		if (obj == null)
-		{
-			return false;
-		}
-
-		if (!obj.IsTargetable)
-		{
-			return false;
-		}
-
-		if (ActionManager.CanUseActionOnTarget(142, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142
-		{
-			return true;
-		}
-
-		return false;
-	}
+    /// <summary>Exactly one relation per object, checked most-specific first.</summary>
+    internal static Relation GetRelation(this IGameObject obj)
+    {
+        if (obj is IBattleChara)
+        {
+            if (MainUpdater.IsInParty(obj.EntityId)) return Relation.Party;
+            if (MainUpdater.IsInAlliance(obj.EntityId)) return Relation.Alliance;
+            if (obj.IsEnemy()) return Relation.Enemy;
+        }
+        return Relation.Others;
+    }
 }
