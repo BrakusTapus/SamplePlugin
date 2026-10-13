@@ -1,4 +1,4 @@
-﻿using SamplePlugin.Helpers.Structs;
+using SamplePlugin.Helpers.Structs;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -10,8 +10,10 @@ using System.Linq;
 
 namespace SamplePlugin.Helpers.Extensions;
 
-public static unsafe class PlayerExtensions {
-    extension(IPlayerCharacter pc) {
+public static unsafe class PlayerExtensions
+{
+    extension(IPlayerCharacter pc)
+    {
         public float CurrentSpeed => ((ControlCustom*)Control.Instance())->CurrentGroundSpeed;
         public float Speed { get => pc.CurrentSpeed / 6f; set => SetSpeed(6 * value); }
         public ReviveState ReviveState => pc.IsDead ? AgentRevive.Instance()->State : ReviveState.Alive;
@@ -21,7 +23,8 @@ public static unsafe class PlayerExtensions {
 
         public void SetPosition(Vector3 destination) => pc.Character->SetPosition(destination.X, destination.Y, destination.Z);
 
-        private static void SetSpeed(float speedBase) {
+        private static void SetSpeed(float speedBase)
+        {
             ((ControlCustom*)Control.Instance())->GroundSpeedBase = speedBase;
             SetMoveControlData(speedBase);
         }

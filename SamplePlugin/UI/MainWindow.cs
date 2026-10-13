@@ -256,8 +256,12 @@ public class MainWindow : Window, IDisposable
                 ImGui.SameLine();
                 ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
                 //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
-
                 ImGui.NewLine();
+
+                ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
+                ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
+                ImGui.NewLine();
+
                 ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
                 ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
                 ImGui.SameLine();
@@ -266,6 +270,7 @@ public class MainWindow : Window, IDisposable
                     ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius = 0.5f;
                 }
                 ImGui.NewLine();
+
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Svc.ClientState.TerritoryType;
                 if (Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
@@ -276,6 +281,7 @@ public class MainWindow : Window, IDisposable
                 {
                     ImGui.TextUnformatted("Invalid territory.");
                 }
+
 
                 var target = Svc.Targets.Target as IBattleChara;
                 var actionmanagerCheck = target != null && FFXIVClientStructs.FFXIV.Client.Game.ActionManager.CanUseActionOnTarget(142, (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Struct());
@@ -288,8 +294,6 @@ public class MainWindow : Window, IDisposable
                     ImGui.Text("target is NULL");
                 }
 
-                ImGui.NewLine();
-                ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed);
             }
         }
     }

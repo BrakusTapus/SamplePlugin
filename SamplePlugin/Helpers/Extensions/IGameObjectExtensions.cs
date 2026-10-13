@@ -10,8 +10,10 @@ using Lumina.Excel.Sheets;
 
 namespace SamplePlugin.Helpers.Extensions;
 
-public static class IGameObjectExtensions {
-    extension(IGameObject obj) {
+public static class IGameObjectExtensions
+{
+    extension(IGameObject obj)
+    {
         public unsafe BattleChara* BattleChara => (BattleChara*)obj.Address;
         public unsafe Character* Character => (Character*)obj.Address;
 
@@ -27,7 +29,8 @@ public static class IGameObjectExtensions {
 
     public static bool WithinRange(this IGameObject? obj, Vector3 position, float range) => obj is not null && Vector3.Distance(obj.Position, position) < range;
     public static unsafe bool IsTargetingPlayer(this IGameObject obj) => obj.TargetObjectId == GameObjectManager.Instance()->Objects.IndexSorted[0].Value->GetGameObjectId().ObjectId;
-    public static unsafe EventHandlerInfo? EventInfo(this IGameObject obj) {
+    public static unsafe EventHandlerInfo? EventInfo(this IGameObject obj)
+    {
         if (obj == null) return null;
         var cs = (GameObject*)obj.Address;
         return cs == null || cs->EventHandler == null ? null : cs->EventHandler->Info;
