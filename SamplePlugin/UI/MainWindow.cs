@@ -21,6 +21,7 @@ using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers;
+using SamplePlugin.Helpers.Extensions;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
@@ -286,6 +287,9 @@ public class MainWindow : Window, IDisposable
                 {
                     ImGui.Text("target is NULL");
                 }
+
+                ImGui.NewLine();
+                ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed);
             }
         }
     }
