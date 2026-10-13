@@ -217,7 +217,7 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public unsafe static void DrawPlayerInfo()
+    public unsafe void DrawPlayerInfo()
     {
         using (var child = ImRaii.Child("SomeChildWithAScrollbar3", Vector2.Zero, true))
         {
@@ -258,8 +258,55 @@ public class MainWindow : Window, IDisposable
                 //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
                 ImGui.NewLine();
 
+                var speed = Configuration.SpeedMultiplier;
+                var step = Configuration.SpeedStep;
+
                 ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
                 ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
+                ImGui.NewLine();
+
+
+                ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
+                if (ImGui.SliderFloat("##SpeedSlider", ref speed, 0.5f, 5f, "%.2f"))
+                {
+                    speed = MathF.Round(speed, 2);
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("-##SpeedDown"))
+                {
+                    speed = MathF.Max(0.1f, MathF.Round(speed - step, 2));
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("+##SpeedUp"))
+                {
+                    speed = MathF.Round(speed + step, 2);
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Reset##SpeedReset"))
+                {
+                    Configuration.SpeedMultiplier = 1f;
+                    localPlayer.Speed = 1f;
+                    Configuration.Save();
+                }
+
+                ImGui.SetNextItemWidth(80 * ImGuiHelpers.GlobalScale);
+                if (ImGui.InputFloat("Step size", ref step, 0f, 0f, "%.2f"))
+                {
+                    Configuration.SpeedStep = Math.Clamp(step, 0.01f, 1f);
+                    Configuration.Save();
+                }
                 ImGui.NewLine();
 
                 ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
