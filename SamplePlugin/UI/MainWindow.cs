@@ -417,14 +417,16 @@ public class MainWindow : Window, IDisposable
                         ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 150f);
                         ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
 
-                        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
+                        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId)?.GetWrapOrDefault();
+
+                        ImGui.TableNextRow();
+                        ImGui.TableSetColumnIndex(0);
+                        ImGui.TextUnformatted("Name");
+                        ImGui.TableSetColumnIndex(1);
+                        ImGui.TextUnformatted(entry.Name);
+
                         if (icon2 != null)
                         {
-                            ImGui.TableNextRow();
-                            ImGui.TableSetColumnIndex(0);
-                            ImGui.TextUnformatted("Name");
-                            ImGui.TableSetColumnIndex(1);
-                            ImGui.TextUnformatted(entry.Name);
                             ImGui.SameLine();
                             ImGui.Image(icon2.Handle, new Vector2(22, 22));
 

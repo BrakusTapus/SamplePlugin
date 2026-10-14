@@ -145,7 +145,7 @@ internal sealed class TargetHighlight : Window
         if (!showJobIcon || obj is not IBattleChara chara)
             return;
 
-        var icon = ImGuiExt.GetGameIconTexture(chara.ClassJob.RowId + 62100).GetWrapOrDefault();
+        var icon = ImGuiExt.GetGameIconTexture(chara.ClassJob.RowId + 62100)?.GetWrapOrDefault();
         if (icon is null)
             return;
 
