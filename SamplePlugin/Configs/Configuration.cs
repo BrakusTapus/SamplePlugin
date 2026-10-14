@@ -24,6 +24,10 @@ public class Configuration : IPluginConfiguration
     public bool DisplayHighLightInfoTab { get; set; } = true;
     public bool ShowInDevMenu { get; set; } = true;
 
+    // Player info tab
+    public float SpeedMultiplier { get; set; } = 1f;
+    public float SpeedStep { get; set; } = 0.05f;
+
     // Highlight related settings
     public bool EnableHighLightOverlay { get; set; } = false;
     public bool HighlightPlayer { get; set; } = false;
@@ -67,9 +71,9 @@ public class Configuration : IPluginConfiguration
     private void MigrateLegacyHighlightFlags()
     {
         // Old "role on" without "enemy only" meant everyone; with "enemy only" it meant enemies.
-        AddFromLegacy("tank",   HighlightAllBattleCharasTanks,    HighlightEnemyTanksOnly);
-        AddFromLegacy("healer", HighlightAllBattleCharasHealers,  HighlightEnemyHealersOnly);
-        AddFromLegacy("melee",  HighlightAllBattleCharasDPSMelee, HighlightEnemyDPSMeleeOnly);
+        AddFromLegacy("tank", HighlightAllBattleCharasTanks, HighlightEnemyTanksOnly);
+        AddFromLegacy("healer", HighlightAllBattleCharasHealers, HighlightEnemyHealersOnly);
+        AddFromLegacy("melee", HighlightAllBattleCharasDPSMelee, HighlightEnemyDPSMeleeOnly);
         AddFromLegacy("ranged", HighlightAllBattleCharasDPSRanged, HighlightEnemyDPSRangedOnly);
         AddFromLegacy("caster", HighlightAllBattleCharasDPSCaster, HighlightEnemyDPSCasterOnly);
         // Old "Highlight All Battlecharas" was the white fallback box for every other combat job.

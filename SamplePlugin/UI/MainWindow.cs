@@ -21,6 +21,7 @@ using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
 using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers;
+using SamplePlugin.Helpers.Extensions;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
 
@@ -216,7 +217,7 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    public unsafe static void DrawPlayerInfo()
+    public unsafe void DrawPlayerInfo()
     {
         using (var child = ImRaii.Child("SomeChildWithAScrollbar3", Vector2.Zero, true))
         {
@@ -255,8 +256,59 @@ public class MainWindow : Window, IDisposable
                 ImGui.SameLine();
                 ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
                 //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
-
                 ImGui.NewLine();
+
+                var speed = Configuration.SpeedMultiplier;
+                var step = Configuration.SpeedStep;
+
+                ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
+                ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
+                ImGui.NewLine();
+
+
+                ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
+                if (ImGui.SliderFloat("##SpeedSlider", ref speed, 0.5f, 5f, "%.2f"))
+                {
+                    speed = MathF.Round(speed, 2);
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("-##SpeedDown"))
+                {
+                    speed = MathF.Max(0.1f, MathF.Round(speed - step, 2));
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("+##SpeedUp"))
+                {
+                    speed = MathF.Round(speed + step, 2);
+                    Configuration.SpeedMultiplier = speed;
+                    localPlayer.Speed = speed;
+                    Configuration.Save();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Reset##SpeedReset"))
+                {
+                    Configuration.SpeedMultiplier = 1f;
+                    localPlayer.Speed = 1f;
+                    Configuration.Save();
+                }
+
+                ImGui.SetNextItemWidth(80 * ImGuiHelpers.GlobalScale);
+                if (ImGui.InputFloat("Step size", ref step, 0f, 0f, "%.2f"))
+                {
+                    Configuration.SpeedStep = Math.Clamp(step, 0.01f, 1f);
+                    Configuration.Save();
+                }
+                ImGui.NewLine();
+
                 ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
                 ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
                 ImGui.SameLine();
@@ -265,6 +317,7 @@ public class MainWindow : Window, IDisposable
                     ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius = 0.5f;
                 }
                 ImGui.NewLine();
+
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Svc.ClientState.TerritoryType;
                 if (Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
@@ -276,6 +329,7 @@ public class MainWindow : Window, IDisposable
                     ImGui.TextUnformatted("Invalid territory.");
                 }
 
+
                 var target = Svc.Targets.Target as IBattleChara;
                 var actionmanagerCheck = target != null && FFXIVClientStructs.FFXIV.Client.Game.ActionManager.CanUseActionOnTarget(142, (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Struct());
                 if (target != null)
@@ -286,6 +340,7 @@ public class MainWindow : Window, IDisposable
                 {
                     ImGui.Text("target is NULL");
                 }
+
             }
         }
     }
