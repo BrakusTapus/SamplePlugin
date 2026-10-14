@@ -49,12 +49,20 @@ internal static unsafe class ImGuiExt
 
     /// <summary>
     /// Obtain an icon texture in the game using its ID.
+    /// Returns null if the ID is 0 or the icon doesn't exist.
     /// </summary>
-    /// <param name="iconId"></param>
-    /// <returns></returns>
-    internal static ISharedImmediateTexture GetGameIconTexture(uint iconId)
+    internal static ISharedImmediateTexture? GetGameIconTexture(uint iconId)
     {
-        var path = Svc.Texture.GetIconPath(new GameIconLookup(iconId));
+        if (iconId == 0)
+        {
+            return null;
+        }
+
+        if (!Svc.Texture.TryGetIconPath(new GameIconLookup(iconId), out var path) || string.IsNullOrEmpty(path))
+        {
+            return null;
+        }
+
         return Svc.Texture.GetFromGame(path);
     }
 
