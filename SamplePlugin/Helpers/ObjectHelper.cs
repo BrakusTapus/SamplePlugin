@@ -44,7 +44,7 @@ internal static class ObjectHelper
     public static float DistanceToPlayer(this IGameObject? obj)
     {
         var localPlayer = Svc.Objects.LocalPlayer;
-        if (obj == null) return float.MaxValue;
+        if (obj == null || obj.Address == nint.Zero) return float.MaxValue;
         if (localPlayer == null) return float.MaxValue;
 
         var distance = Vector3.Distance(localPlayer.Position, obj.Position) - (localPlayer.HitboxRadius + obj.HitboxRadius);
