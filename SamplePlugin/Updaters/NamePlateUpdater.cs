@@ -72,7 +72,7 @@ internal static class NamePlateUpdater
         }
 
         // Remove entries that are no longer valid
-        _allNamePlates.RemoveAll(entry => entry.BattleChara == null || !entry.BattleChara.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
+        _allNamePlates.RemoveAll(entry => !entry.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
 
     }
 
@@ -142,7 +142,11 @@ internal class NamePlateEntry
     /// </summary>
     public IBattleChara? BattleChara { get; set; }
 
-    public bool IsTargetable => BattleChara.IsTargetable;
+    public bool IsTargetable =>
+        BattleChara is { } chara
+        && chara.Address != nint.Zero
+        && chara.IsValid()
+        && chara.IsTargetable;
 
     public static NamePlateEntry? CurrentTargetNameplate
     {
