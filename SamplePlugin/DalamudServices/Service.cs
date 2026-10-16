@@ -55,6 +55,7 @@ public class Service
         if (IsInitialized)
         {
             Svc.Log.Warning("Services already initialized, skipping");
+            return;
         }
         IsInitialized = true;
         try

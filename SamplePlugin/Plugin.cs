@@ -108,23 +108,26 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         Svc.Log.Debug($"Plugin: Dispose started.");
+
+        NamePlateUpdater.Disable();
+        MainUpdater.Disable();
+
+        Svc.PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
+        Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
+        Svc.PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUI;
+
+        WindowSystem.RemoveAllWindows();
+
         MainWindow.Dispose();
         TargetHighlightWindow.Dispose();
         TestWindow.Dispose();
         ConfigWindow.Dispose();
-        NamePlateUpdater.Disable();
-        MainUpdater.Disable();
-        WindowSystem.RemoveAllWindows();
 
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
-        Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
-        //Svc.PluginInterface.UiBuilder.Draw -= DrawUI;
-
         Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
         Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
         Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
         Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
-
 
         Svc.Commands.RemoveHandler(CommandName);
         Svc.Commands.RemoveHandler(CommandTest);
@@ -148,7 +151,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnHighlightCommand(string command, string args)
     {
-        // in response to the slash command, just toggle the display status of our main ui
         ToggleHighlightUI();
     }
 
@@ -165,7 +167,15 @@ public sealed class Plugin : IDalamudPlugin
     //    }
     //}
 
-    public void ToggleHighlightUI() => TargetHighlightWindow.Toggle();
+    public void ToggleHighlightUI()
+    {
+        // Flip the setting, keep the window in sync with it, and save.
+        Configuration.EnableHighLightOverlay = !Configuration.EnableHighLightOverlay;
+        TargetHighlightWindow.IsOpen = Configuration.EnableHighLightOverlay;
+        Configuration.Save();
+
+        Svc.Log.Debug($"Highlight overlay is now {(Configuration.EnableHighLightOverlay ? "enabled" : "disabled")}.");
+    }
     public void ToggleTestUI() => TestWindow.Toggle();
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
@@ -173,30 +183,30 @@ public sealed class Plugin : IDalamudPlugin
     private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
-        Notify.Success("Duty Completed!");
+        Svc.Log.Debug("Duty completed.");
     }
 
     private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
-        Notify.Success("Duty Recommenced!");
+        Svc.Log.Debug("Duty recommenced.");
     }
 
     private static void DutyState_DutyWiped(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
-        Notify.Success("Duty Wiped!");
+        Svc.Log.Debug("Duty wiped.");
     }
 
     private static void DutyState_DutyStarted(IDutyStateEventArgs e)
     {
         NamePlateUpdater.ClearList();
-        Notify.Success("Duty Started!");
+        Svc.Log.Debug("Duty started.");
     }
 
     private static void ClientState_TerritoryChanged(uint id)
     {
         NamePlateUpdater.ClearList();
-        Notify.Success("Territory Changed!");
+        Svc.Log.Debug($"Territory changed to {id}.");
     }
 }
