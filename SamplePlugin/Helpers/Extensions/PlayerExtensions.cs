@@ -1,12 +1,12 @@
-using SamplePlugin.Helpers.Structs;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Dalamud.Plugin.Services;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Linq;
+using SamplePlugin.Helpers.Structs;
 
 namespace SamplePlugin.Helpers.Extensions;
 

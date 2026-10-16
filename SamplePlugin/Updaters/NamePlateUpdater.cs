@@ -121,21 +121,6 @@ internal class NamePlateEntry
     /// <summary>The kind of the nameplate (player, NPC, etc.).</summary>
     public NamePlateKind Kind { get; set; }
 
-    /// <summary>Distance from the camera to the nameplate, in yalms.</summary>
-    public float DistanceYalms { get; set; }
-
-    /// <summary>
-    /// Gets the <see cref="IGameObject"/> associated with this nameplate, if possible. Performs an object table scan
-    /// and caches the result if successful.
-    /// </summary>
-    public IGameObject? GameObject { get; }
-
-    /// <summary>
-    /// Gets a read-only view of the nameplate info object data for a nameplate. Modifications to
-    /// <see cref="NamePlateUpdateHandler"/> fields do not affect fields in the returned view.
-    /// </summary>
-    public INamePlateInfoView InfoView { get; }
-
     /// <summary>
     /// Gets the <see cref="IBattleChara"/> associated with this nameplate, if possible. Returns null if the nameplate
     /// has an associated <see cref="IGameObject"/>, but that object cannot be assigned to <see cref="IBattleChara"/>.

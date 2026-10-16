@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using ECommons.DalamudServices;
@@ -14,7 +8,6 @@ using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
-using SamplePlugin.DalamudServices;
 using SamplePlugin.Data;
 using SamplePlugin.Updaters;
 

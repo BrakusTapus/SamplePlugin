@@ -1,27 +1,16 @@
 //TODO add mimic emote feature
 //TODO organize main window with proper tabs/settings
-using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
 using System.IO;
+using Dalamud.Game.Command;
+using Dalamud.Game.DutyState;
 using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using SamplePlugin.UI;
-using SamplePlugin.DalamudServices;
-using Dalamud.Game.Gui.NamePlate;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Serilog;
-using System.Collections.Generic;
-using SamplePlugin.Configs;
-using SamplePlugin.Updaters;
+using Dalamud.Plugin;
 using ECommons;
 using ECommons.DalamudServices;
-using System;
-using ECommons.ImGuiMethods;
-using ECommons.Logging;
-using Dalamud.Game.DutyState;
-using Dalamud.Bindings.ImGui;
+using SamplePlugin.Configs;
+using SamplePlugin.DalamudServices;
+using SamplePlugin.UI;
+using SamplePlugin.Updaters;
 
 namespace SamplePlugin;
 
