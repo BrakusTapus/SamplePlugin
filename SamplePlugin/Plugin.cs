@@ -118,7 +118,7 @@ public sealed class Plugin : IDalamudPlugin
 
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
         Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
-        Svc.PluginInterface.UiBuilder.Draw -= DrawUI;
+        //Svc.PluginInterface.UiBuilder.Draw -= DrawUI;
 
         Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
         Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
@@ -153,18 +153,17 @@ public sealed class Plugin : IDalamudPlugin
     }
 
     //private void DrawUI() => WindowSystem.Draw();
-    private void DrawUI()
-    {
-        if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
-        {
-            if (ImGui.MenuItem("Kirbo"))
-            {
-                ToggleMainUI();
-            }
-
-            ImGui.EndMainMenuBar();
-        }
-    }
+    //private void DrawUI()
+    //{
+    //    if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
+    //    {
+    //        if (ImGui.MenuItem("Kirbo"))
+    //        {
+    //            ToggleMainUI();
+    //        }
+    //        ImGui.EndMainMenuBar();
+    //    }
+    //}
 
     public void ToggleHighlightUI() => TargetHighlightWindow.Toggle();
     public void ToggleTestUI() => TestWindow.Toggle();
