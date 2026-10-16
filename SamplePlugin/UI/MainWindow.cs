@@ -229,9 +229,9 @@ public class MainWindow : Window, IDisposable
                 // ClientState provides a wrapper filled with information about the local player object and client.
 
                 var playerState = Svc.PlayerState;
-                if (!playerState.IsLoaded)
+                if (playerState == null || !playerState.IsLoaded)
                 {
-                    ImGui.Text("Our local player is currently not logged in.");
+                    ImGui.Text("IPlayerState is either null or not loaded!");
                     return;
                 }
 
@@ -259,13 +259,18 @@ public class MainWindow : Window, IDisposable
                 //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
                 ImGui.NewLine();
 
+                //var birthDay = playerState.BirthDay > 0 ? playerState.BirthDay.ToString() : "?";
+                //var birthMonth = playerState.BirthMonth > 0 ? playerState.BirthMonth.ToString() : "?";
+
+                //ImGui.Text($"Birthday: Day {birthDay}, Month {birthMonth}");
+                //ImGui.NewLine();
+
                 var speed = Configuration.SpeedMultiplier;
                 var step = Configuration.SpeedStep;
 
                 ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
                 ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
                 ImGui.NewLine();
-
 
                 ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
                 if (ImGui.SliderFloat("##SpeedSlider", ref speed, 0.5f, 5f, "%.2f"))
