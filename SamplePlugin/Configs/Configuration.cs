@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Dalamud.Configuration;
-using Dalamud.Plugin;
 using ECommons.DalamudServices;
-using SamplePlugin.DalamudServices;
 using SamplePlugin.Data;
 
 namespace SamplePlugin.Configs;

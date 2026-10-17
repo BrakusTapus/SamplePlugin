@@ -1,14 +1,10 @@
 using System;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Configuration;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
-using ECommons.Reflection;
-using Lumina.Excel.Sheets;
 using SamplePlugin.Helpers.UI;
 
 namespace SamplePlugin.UI;
