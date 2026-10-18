@@ -66,72 +66,45 @@ public class MainWindow : Window, IDisposable
     {
         using (var tabheader = ImRaii.TabBar("ATabBar"))
         {
-            if (tabheader.Success)
+            if (!tabheader.Success)
+                return;
+
+            using (var mainMenuTab = ImRaii.TabItem("Main Menu"))
             {
-                using (var mainMenuTab = ImRaii.TabItem("Main Menu"))
+                if (mainMenuTab.Success)
                 {
-                    if (mainMenuTab.Success)
-                    {
-                        DrawImage();
-                        DrawPluginInfo();
-                    }
+                    DrawImage();
+                    DrawPluginInfo();
                 }
-                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
-                if (playerInfoValue)
+            }
+
+            if (Configuration.DisplayPlayerInfoTab)
+            {
+                using (var playerInfoTab = ImRaii.TabItem("Player Info"))
                 {
-                    using (var playerInfoTab = ImRaii.TabItem("Player Info"))
-                    {
-                        if (playerInfoTab.Success)
-                        {
-                            DrawPlayerInfo();
-                        }
-                    }
+                    if (playerInfoTab.Success)
+                        DrawPlayerInfo();
                 }
+            }
 
-                var targetInfoValue = Configuration.DisplayTargetInfoTab;
-                if (targetInfoValue)
+            if (Configuration.DisplayTargetInfoTab)
+            {
+                using (var targetInfoTab = ImRaii.TabItem("Target Info"))
                 {
-                    using (var targetInfoTab = ImRaii.TabItem("Target Info"))
-                    {
-                        if (targetInfoTab.Success)
-                        {
-                            DrawTargetInfo();
-                        }
-                    }
+                    if (targetInfoTab.Success)
+                        DrawTargetInfo();
                 }
+            }
 
-                var highlightValue = Configuration.DisplayHighLightInfoTab;
-                if (highlightValue)
+            if (Configuration.DisplayHighLightInfoTab)
+            {
+                using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
                 {
-                    using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
-                    {
-                        if (highlightInfoTab.Success)
-                        {
-                            DrawHighlightTab();
-                        }
-                    }
-                }
-                if (!Configuration.DisplayHighLightInfoTab)
-                {
-                    if (Configuration.EnableHighLightOverlay)
-                    {
-                        Configuration.EnableHighLightOverlay = false;
-                    }
-
-                    if (Configuration.HighlightPlayer)
-                    {
-                        Configuration.HighlightPlayer = false;
-                    }
-
-                    if (Configuration.HighlightAllGameObjects)
-                    {
-                        Configuration.HighlightAllGameObjects = false;
-                    }
+                    if (highlightInfoTab.Success)
+                        DrawHighlightTab();
                 }
             }
         }
-
-
     }
 
     public void DrawImage()
@@ -183,6 +156,15 @@ public class MainWindow : Window, IDisposable
                 if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
                 {
                     Configuration.DisplayHighLightInfoTab = highlightValue;
+
+                    if (!highlightValue)
+                    {
+                        // Hiding the tab also switches the overlay off.
+                        Configuration.EnableHighLightOverlay = false;
+                        Configuration.HighlightPlayer = false;
+                        Plugin.TargetHighlightWindow.IsOpen = false;
+                    }
+
                     Configuration.Save();
                 }
 
