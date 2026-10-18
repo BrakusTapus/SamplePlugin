@@ -13,7 +13,7 @@
     <PropertyGroup>
         <Author>Kirbo</Author>
         <Name>Sample Plugin</Name>
-        <Version>0.0.2.2</Version>
+        <Version>0.0.2.3</Version>
         <Punchline>Kirbo's badly written code.</Punchline>
         <Description>Kirbo's playground plugin.</Description>
         <RepoUrl>https://github.com/BrakusTapus/SamplePlugin</RepoUrl>
