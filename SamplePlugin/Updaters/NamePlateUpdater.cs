@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
-using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
-using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers;
 
 namespace SamplePlugin.Updaters;
@@ -20,14 +17,14 @@ internal static class NamePlateUpdater
 
     public static void Enable()
     {
-        Service.NamePlateGui.OnNamePlateUpdate += OnNamePlateUpdate;
+        Svc.NamePlates.OnNamePlateUpdate += OnNamePlateUpdate;
         Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now enabled!");
     }
 
     public static void Disable()
     {
         ClearList();
-        Service.NamePlateGui.OnNamePlateUpdate -= OnNamePlateUpdate;
+        Svc.NamePlates.OnNamePlateUpdate -= OnNamePlateUpdate;
         Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now disabled!");
     }
 

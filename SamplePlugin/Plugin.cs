@@ -1,5 +1,4 @@
 //TODO add mimic emote feature
-//TODO organize main window with proper tabs/settings
 using System.IO;
 using Dalamud.Game.Command;
 using Dalamud.Game.DutyState;
@@ -8,7 +7,6 @@ using Dalamud.Plugin;
 using ECommons;
 using ECommons.DalamudServices;
 using SamplePlugin.Configs;
-using SamplePlugin.DalamudServices;
 using SamplePlugin.UI;
 using SamplePlugin.Updaters;
 
@@ -35,7 +33,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         P = this;
         ECommonsMain.Init(pluginInterface, this, Module.DalamudReflector, Module.ObjectFunctions);
-        Service.Init(pluginInterface);
+        //Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.MigrateIfNeeded();
 

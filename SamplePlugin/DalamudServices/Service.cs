@@ -1,12 +1,12 @@
-using System;
-using Dalamud.IoC;
-using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
-using ECommons.DalamudServices;
+//using System;
+//using Dalamud.IoC;
+//using Dalamud.Plugin;
+//using Dalamud.Plugin.Services;
+//using ECommons.DalamudServices;
 
-namespace SamplePlugin.DalamudServices;
-public class Service
-{
+//namespace SamplePlugin.DalamudServices;
+//public class Service
+//{
     //[PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     //[PluginService] public static IAddonEventManager AddonEventManager { get; private set; } = null!;
     //[PluginService] public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
@@ -33,7 +33,7 @@ public class Service
     //[PluginService] public static IJobGauges JobGauges { get; private set; } = null!;
     //[PluginService] public static IKeyState KeyState { get; private set; } = null!;
     //[PluginService] public static IMarketBoard MarketBoard { get; private set; } = null!;
-    [PluginService] public static INamePlateGui NamePlateGui { get; private set; } = null!;
+    //[PluginService] public static INamePlateGui NamePlateGui { get; private set; } = null!;
     //[PluginService] public static INotificationManager NotificationManager { get; private set; } = null!;
     //[PluginService] public static IObjectTable ObjectTable { get; private set; } = null!;
     //[PluginService] public static IPartyFinderGui PartyFinderGui { get; private set; } = null!;
@@ -41,29 +41,29 @@ public class Service
     //[PluginService] public static ISigScanner SigScanner { get; private set; } = null!;
     //[PluginService] public static ITargetManager TargetManager { get; private set; } = null!;
     //[PluginService] public static ITextureProvider TextureProvider { get; private set; } = null!;
-    [PluginService] public static ITextureReadbackProvider TextureReadbackProvider { get; private set; } = null!;
+    //[PluginService] public static ITextureReadbackProvider TextureReadbackProvider { get; private set; } = null!;
     //[PluginService] public static ITextureSubstitutionProvider TextureSubstitutionProvider { get; private set; } = null!;
     //[PluginService] public static ITitleScreenMenu TitleScreenMenu { get; private set; } = null!;
     //[PluginService] public static IToastGui ToastGui { get; private set; } = null!;
 
-    internal static bool IsInitialized = false;
+    //internal static bool IsInitialized = false;
 
-    public static void Init(IDalamudPluginInterface pi)
-    {
-        if (IsInitialized)
-        {
-            Svc.Log.Warning("Services already initialized, skipping");
-            return;
-        }
-        IsInitialized = true;
-        try
-        {
-            pi.Create<Service>();
-        }
-        catch (Exception ex)
-        {
-            Svc.Log.Error(ex.ToString());
-        }
-    }
+    //public static void Init(IDalamudPluginInterface pi)
+    //{
+    //    if (IsInitialized)
+    //    {
+    //        Svc.Log.Warning("Services already initialized, skipping");
+    //        return;
+    //    }
+    //    IsInitialized = true;
+    //    try
+    //    {
+    //        pi.Create<Service>();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Svc.Log.Error(ex.ToString());
+    //    }
+    //}
 
-}
+//}

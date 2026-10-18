@@ -13,7 +13,6 @@ using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
 using Lumina.Excel.Sheets;
 using SamplePlugin.Configs;
-using SamplePlugin.DalamudServices;
 using SamplePlugin.Helpers.Extensions;
 using SamplePlugin.Helpers.UI;
 using SamplePlugin.Updaters;
@@ -348,7 +347,7 @@ public class MainWindow : Window, IDisposable
     {
         if (ImGui.Button("Redraw Nameplate"))
         {
-            Service.NamePlateGui.RequestRedraw();
+            Svc.NamePlates.RequestRedraw();
         }
         ImGuiEx.Tooltip("Send a redraw request for nameplates");
         ImGui.SameLine();
