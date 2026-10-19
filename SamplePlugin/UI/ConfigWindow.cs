@@ -2,9 +2,9 @@ using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
-using SamplePlugin.Configs;
+using KirboToolbox.Configs;
 
-namespace SamplePlugin.UI;
+namespace KirboToolbox.UI;
 
 public class ConfigWindow : Window, IDisposable
 {

@@ -6,9 +6,9 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using SamplePlugin.Helpers.Structs;
+using KirboToolbox.Helpers.Structs;
 
-namespace SamplePlugin.Helpers.Extensions;
+namespace KirboToolbox.Helpers.Extensions;
 
 public static unsafe class PlayerExtensions
 {

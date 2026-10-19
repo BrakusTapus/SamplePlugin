@@ -3,9 +3,9 @@ using System.Linq;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
 using ECommons.DalamudServices;
-using SamplePlugin.Helpers;
+using KirboToolbox.Helpers;
 
-namespace SamplePlugin.Updaters;
+namespace KirboToolbox.Updaters;
 
 /// <summary>
 /// Updates and stores a list of active NamePlate entries.

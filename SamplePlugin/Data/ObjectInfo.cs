@@ -1,8 +1,8 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using SamplePlugin.Helpers;
+using KirboToolbox.Helpers;
 
-namespace SamplePlugin.Data;
+namespace KirboToolbox.Data;
 
 /// <summary>
 /// Layer 1 result: everything we need to know about an object, computed ONCE per object per frame.

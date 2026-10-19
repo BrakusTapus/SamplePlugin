@@ -1,4 +1,4 @@
-namespace SamplePlugin.Features;
+namespace KirboToolbox.Features;
 internal class MimicEmote
 {
 }

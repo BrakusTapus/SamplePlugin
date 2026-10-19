@@ -5,9 +5,9 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
-using SamplePlugin.Helpers.UI;
+using KirboToolbox.Helpers.UI;
 
-namespace SamplePlugin.UI;
+namespace KirboToolbox.UI;
 public class TestWindow : Window, IDisposable
 {
     private static string Name => "Test Window";

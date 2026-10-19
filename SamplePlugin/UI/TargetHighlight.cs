@@ -8,13 +8,13 @@ using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using SamplePlugin.Configs;
-using SamplePlugin.Data;
-using SamplePlugin.Helpers;
-using SamplePlugin.Helpers.UI;
-using SamplePlugin.Updaters;
+using KirboToolbox.Configs;
+using KirboToolbox.Data;
+using KirboToolbox.Helpers;
+using KirboToolbox.Helpers.UI;
+using KirboToolbox.Updaters;
 
-namespace SamplePlugin.UI;
+namespace KirboToolbox.UI;
 
 internal sealed class TargetHighlight : Window
 {

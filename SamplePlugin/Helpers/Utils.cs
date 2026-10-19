@@ -1,7 +1,7 @@
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 
-namespace SamplePlugin.Helpers;
+namespace KirboToolbox.Helpers;
 internal unsafe static class Utils
 {
     internal static float DistanceBetweenObjects(IGameObject source, IGameObject target)

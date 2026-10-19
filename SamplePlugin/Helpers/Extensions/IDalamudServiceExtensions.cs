@@ -2,7 +2,7 @@ using System;
 using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
 
-namespace SamplePlugin.Helpers.Extensions;
+namespace KirboToolbox.Helpers.Extensions;
 
 public static class IDalamudServiceExtensions
 {

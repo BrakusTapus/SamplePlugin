@@ -1,7 +1,7 @@
 using System.Numerics;
 using Dalamud.Interface.Colors;
 
-namespace SamplePlugin.Helpers.UI;
+namespace KirboToolbox.Helpers.UI;
 
 /// <summary>
 /// A set of fancy color for use in plugins. You can redefine them to match necessary style!

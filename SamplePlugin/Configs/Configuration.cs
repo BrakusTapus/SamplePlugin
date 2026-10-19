@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Dalamud.Configuration;
 using ECommons.DalamudServices;
-using SamplePlugin.Data;
+using KirboToolbox.Data;
 
-namespace SamplePlugin.Configs;
+namespace KirboToolbox.Configs;
 
 [Serializable]
 public class Configuration : IPluginConfiguration

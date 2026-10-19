@@ -8,10 +8,10 @@ using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
-using SamplePlugin.Data;
-using SamplePlugin.Updaters;
+using KirboToolbox.Data;
+using KirboToolbox.Updaters;
 
-namespace SamplePlugin.Helpers;
+namespace KirboToolbox.Helpers;
 
 internal static class ObjectHelper
 {

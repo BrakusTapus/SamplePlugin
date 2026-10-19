@@ -13,9 +13,9 @@ using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
 using Lumina.Excel.Sheets;
-using SamplePlugin.Data;
+using KirboToolbox.Data;
 
-namespace SamplePlugin.Helpers.UI;
+namespace KirboToolbox.Helpers.UI;
 
 internal static unsafe class ImGuiExt
 {

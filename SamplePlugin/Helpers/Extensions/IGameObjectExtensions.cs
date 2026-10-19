@@ -5,7 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
-namespace SamplePlugin.Helpers.Extensions;
+namespace KirboToolbox.Helpers.Extensions;
 
 public static class IGameObjectExtensions
 {

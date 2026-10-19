@@ -6,11 +6,11 @@ using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using ECommons;
 using ECommons.DalamudServices;
-using SamplePlugin.Configs;
-using SamplePlugin.UI;
-using SamplePlugin.Updaters;
+using KirboToolbox.Configs;
+using KirboToolbox.UI;
+using KirboToolbox.Updaters;
 
-namespace SamplePlugin;
+namespace KirboToolbox;
 
 public sealed class Plugin : IDalamudPlugin
 {

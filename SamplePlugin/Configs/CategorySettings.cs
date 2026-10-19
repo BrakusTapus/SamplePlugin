@@ -1,8 +1,8 @@
 using System;
 using System.Numerics;
-using SamplePlugin.Data;
+using KirboToolbox.Data;
 
-namespace SamplePlugin.Configs;
+namespace KirboToolbox.Configs;
 
 /// <summary>Saved settings for ONE highlight category. A category is "active" if it has an entry in Configuration.Highlights.</summary>
 [Serializable]

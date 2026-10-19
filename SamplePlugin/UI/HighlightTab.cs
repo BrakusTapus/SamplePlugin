@@ -4,10 +4,10 @@ using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using SamplePlugin.Configs;
-using SamplePlugin.Data;
+using KirboToolbox.Configs;
+using KirboToolbox.Data;
 
-namespace SamplePlugin.UI;
+namespace KirboToolbox.UI;
 
 /// <summary>
 /// The "Highlight Info" tab: a list of the active highlight rules plus an Add menu.

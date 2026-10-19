@@ -5,7 +5,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Interface.Colors;
 
-namespace SamplePlugin.Data;
+namespace KirboToolbox.Data;
 
 /// <summary>
 /// One selectable thing in the highlight tab. The Add menu and the rules table are both generated from

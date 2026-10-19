@@ -12,7 +12,7 @@
     <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
     <PropertyGroup>
         <Author>Kirbo</Author>
-        <Name>Sample Plugin</Name>
+        <Name>Kirbo Toolbox</Name>
         <Version>0.0.2.3</Version>
         <Punchline>Kirbo's badly written code.</Punchline>
         <Description>Kirbo's playground plugin.</Description>

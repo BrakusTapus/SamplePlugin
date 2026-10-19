@@ -12,12 +12,12 @@ using ECommons.DalamudServices;
 using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
 using Lumina.Excel.Sheets;
-using SamplePlugin.Configs;
-using SamplePlugin.Helpers.Extensions;
-using SamplePlugin.Helpers.UI;
-using SamplePlugin.Updaters;
+using KirboToolbox.Configs;
+using KirboToolbox.Helpers.Extensions;
+using KirboToolbox.Helpers.UI;
+using KirboToolbox.Updaters;
 
-namespace SamplePlugin.UI;
+namespace KirboToolbox.UI;
 
 public class MainWindow : Window, IDisposable
 {

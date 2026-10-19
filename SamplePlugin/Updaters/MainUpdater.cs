@@ -4,9 +4,9 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
-using SamplePlugin.Helpers;
+using KirboToolbox.Helpers;
 
-namespace SamplePlugin.Updaters;
+namespace KirboToolbox.Updaters;
 
 internal static class MainUpdater
 {

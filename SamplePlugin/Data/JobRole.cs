@@ -1,6 +1,6 @@
 using Lumina.Excel.Sheets;
 
-namespace SamplePlugin.Data;
+namespace KirboToolbox.Data;
 
 /// <summary>
 /// The role of jobs.
