@@ -37,23 +37,37 @@ internal static class MainUpdater
 
         // Party comes from Dalamud's party list (it also covers cross-world parties).
         foreach (var member in Svc.Party)
+        {
             _partyIds.Add(member.EntityId);
+        }
 
         // Alliance has no Dalamud service, so ask the game. The flag lets us skip the call outside alliances.
         var groups = GroupManager.Instance();
         _inAlliance = groups != null && groups->MainGroup.IsAlliance;
 
-        if (Svc.Objects.LocalPlayer == null) return;
+        if (Svc.Objects.LocalPlayer == null)
+        {
+            return;
+        }
 
         foreach (var obj in Svc.Objects)
         {
-            if (obj.Address == IntPtr.Zero) continue;
-            if (obj.DistanceToPlayer() >= MaxDistance) continue;
+            if (obj.Address == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            if (obj.DistanceToPlayer() >= MaxDistance)
+            {
+                continue;
+            }
 
             _allGameObjects.Add(obj);
 
             if (obj is IBattleChara chara && chara.Name.TextValue.Length > 0)
+            {
                 _allBattleCharas.Add(chara);
+            }
         }
     }
 }

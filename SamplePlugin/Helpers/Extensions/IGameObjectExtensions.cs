@@ -28,7 +28,11 @@ public static class IGameObjectExtensions
     public static unsafe bool IsTargetingPlayer(this IGameObject obj) => obj.TargetObjectId == GameObjectManager.Instance()->Objects.IndexSorted[0].Value->GetGameObjectId().ObjectId;
     public static unsafe EventHandlerInfo? EventInfo(this IGameObject obj)
     {
-        if (obj == null) return null;
+        if (obj == null)
+        {
+            return null;
+        }
+
         var cs = (GameObject*)obj.Address;
         return cs == null || cs->EventHandler == null ? null : cs->EventHandler->Info;
     }

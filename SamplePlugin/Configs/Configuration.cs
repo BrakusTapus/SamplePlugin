@@ -53,7 +53,9 @@ public class Configuration : IPluginConfiguration
     public void MigrateIfNeeded()
     {
         if (Version >= CurrentVersion)
+        {
             return;
+        }
 
         MigrateLegacyHighlightFlags();
         Version = CurrentVersion;
@@ -77,7 +79,9 @@ public class Configuration : IPluginConfiguration
     private void AddFromLegacy(string id, bool enabled, bool enemyOnly)
     {
         if (!enabled || Highlights.ContainsKey(id) || !HighlightCatalog.ById.TryGetValue(id, out var category))
+        {
             return;
+        }
 
         Highlights[id] = new CategorySettings
         {

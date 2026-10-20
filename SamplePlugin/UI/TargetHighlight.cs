@@ -49,26 +49,36 @@ internal sealed class TargetHighlight : Window
     {
         var player = Svc.Objects.LocalPlayer;
         if (player == null || Svc.Condition[ConditionFlag.BetweenAreas] || !config.EnableHighLightOverlay)
+        {
             return;
+        }
 
         RefreshRules();
         if (rules.Count == 0 && !config.HighlightPlayer)
+        {
             return;
+        }
 
         var drawList = ImGui.GetBackgroundDrawList();
         var rainbow = GetGradientColor(); // compute once per frame, not once per object
         Vector4 Pick(Vector4 normal) => config.UseGradientColor ? rainbow : normal;
 
         if (config.HighlightPlayer)
+        {
             DrawBox(drawList, player, Pick(ImGuiColors.DalamudViolet), player.GetJobRole() != JobRole.None);
+        }
 
         if (rules.Count == 0)
+        {
             return;
+        }
 
         foreach (var obj in MainUpdater.AllGameObjects)
         {
             if (obj.Address == IntPtr.Zero || obj.GameObjectId == player.GameObjectId)
+            {
                 continue;
+            }
 
             // Layer 1: classify once...
             var info = ObjectInfo.From(obj);
@@ -77,11 +87,15 @@ internal sealed class TargetHighlight : Window
             foreach (var (category, settings) in rules)
             {
                 if ((settings.Relations & info.Relation) == 0 || !category.Matches(info))
+                {
                     continue;
+                }
 
                 // Untargetable or unnamed objects are usually invisible helpers; only draw them if the rule opts in.
                 if (!settings.IncludeHidden && IsHidden(obj))
+                {
                     continue;
+                }
 
                 DrawBox(drawList, obj, Pick(settings.Color), info.Role != JobRole.None);
                 break;
@@ -98,7 +112,9 @@ internal sealed class TargetHighlight : Window
         foreach (var category in HighlightCatalog.All)
         {
             if (config.Highlights.TryGetValue(category.Id, out var settings) && settings.Relations != Relation.None)
+            {
                 rules.Add((category, settings));
+            }
         }
     }
 
@@ -123,7 +139,9 @@ internal sealed class TargetHighlight : Window
                 (i & 4) == 0 ? -r : r);
 
             if (!Svc.GameGui.WorldToScreen(corner, out var screen))
+            {
                 return false;
+            }
 
             min = Vector2.Min(min, screen);
             max = Vector2.Max(max, screen);
@@ -138,16 +156,22 @@ internal sealed class TargetHighlight : Window
     private static void DrawBox(ImDrawListPtr drawList, IGameObject obj, Vector4 color, bool showJobIcon)
     {
         if (obj.Address == IntPtr.Zero || !TryGetScreenRect(obj, out var min, out var max))
+        {
             return;
+        }
 
         drawList.AddRect(min, max, ImGui.GetColorU32(color), 5f, ImDrawFlags.RoundCornersAll, 3f);
 
         if (!showJobIcon || obj is not IBattleChara chara)
+        {
             return;
+        }
 
         var icon = ImGuiExt.GetGameIconTexture(chara.ClassJob.RowId + 62100)?.GetWrapOrDefault();
         if (icon is null)
+        {
             return;
+        }
 
         var iconMin = new Vector2((min.X + max.X) / 2f - IconSize / 2f, min.Y - IconSize - Padding);
         drawList.AddImage(icon.Handle, iconMin, iconMin + new Vector2(IconSize));

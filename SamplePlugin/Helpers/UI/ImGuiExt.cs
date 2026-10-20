@@ -64,7 +64,9 @@ internal static unsafe class ImGuiExt
     internal static void HelpMarker(string desc)
     {
         if (desc.Length == 0)
+        {
             return;
+        }
 
         ImGuiComponents.HelpMarker(desc);
     }
@@ -73,7 +75,9 @@ internal static unsafe class ImGuiExt
     {
         // Load the texture based on the given ID
         if (!GetTexture(textureId, out var texture))
+        {
             return;
+        }
 
         // Get the current window size
         Vector2 windowSize = ImGui.GetWindowSize();

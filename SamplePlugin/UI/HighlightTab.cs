@@ -37,7 +37,9 @@ internal sealed class HighlightTab
         }
 
         if (!enabled)
+        {
             return;
+        }
 
         var self = Config.HighlightPlayer;
         if (ImGui.Checkbox("Highlight yourself", ref self))
@@ -77,11 +79,16 @@ internal sealed class HighlightTab
 
         using var table = ImRaii.Table("highlight_rules", columns.Length + 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit);
         if (!table.Success)
+        {
             return;
+        }
 
         ImGui.TableSetupColumn("What", ImGuiTableColumnFlags.WidthStretch);
         foreach (var rel in columns)
+        {
             ImGui.TableSetupColumn(rel.Label(), ImGuiTableColumnFlags.WidthFixed, 62f * scale);
+        }
+
         ImGui.TableSetupColumn("Hidden", ImGuiTableColumnFlags.WidthFixed, 56f * scale);
         ImGui.TableSetupColumn("Color", ImGuiTableColumnFlags.WidthFixed, 44f * scale);
         ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.WidthFixed, 26f * scale);
@@ -97,9 +104,14 @@ internal sealed class HighlightTab
             // What (click the label to toggle the whole row)
             ImGui.TableNextColumn();
             if (ImGui.Selectable($"{category.Label}##row_{category.Id}"))
+            {
                 ToggleRow(category, settings);
+            }
+
             if (ImGui.IsItemHovered())
+            {
                 ImGui.SetTooltip("Click to toggle the whole row.");
+            }
 
             // Relation checkboxes
             foreach (var rel in columns)
@@ -127,7 +139,9 @@ internal sealed class HighlightTab
                 Config.Save();
             }
             if (ImGui.IsItemHovered())
+            {
                 ImGui.SetTooltip("Also highlight objects that are untargetable or have no name (invisible helpers, minigame hazards...).");
+            }
 
             // Colour
             ImGui.TableNextColumn();
@@ -141,9 +155,14 @@ internal sealed class HighlightTab
             // Remove
             ImGui.TableNextColumn();
             if (ImGui.SmallButton($"X##remove_{category.Id}"))
+            {
                 removeId = category.Id;
+            }
+
             if (ImGui.IsItemHovered())
+            {
                 ImGui.SetTooltip("Stop highlighting this.");
+            }
         }
 
         if (removeId != null)
@@ -167,9 +186,14 @@ internal sealed class HighlightTab
             ImGui.TableSetColumnIndex(i + 1);
             ImGui.TableHeader(rel.Label());
             if (ImGui.IsItemHovered())
+            {
                 ImGui.SetTooltip($"{rel.Tooltip()}\nClick to toggle the whole column.");
+            }
+
             if (ImGui.IsItemClicked())
+            {
                 ToggleColumn(rules, rel);
+            }
         }
 
         ImGui.TableSetColumnIndex(columns.Length + 1);
@@ -191,7 +215,9 @@ internal sealed class HighlightTab
     {
         var applicable = rules.Where(c => (c.Available & rel) != 0).ToList();
         if (applicable.Count == 0)
+        {
             return;
+        }
 
         var anyOff = applicable.Any(c => (Config.Highlights[c.Id].Relations & rel) == 0);
         foreach (var c in applicable)
@@ -212,7 +238,9 @@ internal sealed class HighlightTab
 
         using var popup = ImRaii.Popup(AddPopupId);
         if (!popup.Success)
+        {
             return;
+        }
 
         var scale = ImGuiHelpers.GlobalScale;
         ImGui.SetNextItemWidth(280f * scale);
@@ -221,7 +249,9 @@ internal sealed class HighlightTab
 
         using var child = ImRaii.Child("##highlight_add_list", new Vector2(280f * scale, 240f * scale));
         if (!child.Success)
+        {
             return;
+        }
 
         var term = search.Trim();
         var anyShown = false;
@@ -232,7 +262,9 @@ internal sealed class HighlightTab
                 .Where(c => !Config.Highlights.ContainsKey(c.Id) && MatchesSearch(c, term))
                 .ToList();
             if (items.Count == 0)
+            {
                 continue;
+            }
 
             anyShown = true;
             ImGui.TextDisabled(group.Key);
@@ -240,7 +272,9 @@ internal sealed class HighlightTab
             foreach (var category in items)
             {
                 if (!ImGui.Selectable($"{category.Label}##add_{category.Id}"))
+                {
                     continue;
+                }
 
                 Config.Highlights[category.Id] = new CategorySettings
                 {
@@ -253,7 +287,9 @@ internal sealed class HighlightTab
         }
 
         if (!anyShown)
+        {
             ImGui.TextDisabled(term.Length == 0 ? "Everything is already added." : "No matches.");
+        }
     }
 
     private static bool MatchesSearch(HighlightCategory c, string term) =>
@@ -264,7 +300,9 @@ internal sealed class HighlightTab
     private void DrawAppearance()
     {
         if (!ImGui.CollapsingHeader("Appearance (all highlights)"))
+        {
             return;
+        }
 
         var gradient = Config.UseGradientColor;
         if (ImGui.Checkbox("Use animated gradient color", ref gradient))

@@ -67,7 +67,9 @@ public class MainWindow : Window, IDisposable
         using (var tabheader = ImRaii.TabBar("ATabBar"))
         {
             if (!tabheader.Success)
+            {
                 return;
+            }
 
             using (var mainMenuTab = ImRaii.TabItem("Main Menu"))
             {
@@ -83,7 +85,9 @@ public class MainWindow : Window, IDisposable
                 using (var playerInfoTab = ImRaii.TabItem("Player Info"))
                 {
                     if (playerInfoTab.Success)
+                    {
                         DrawPlayerInfo();
+                    }
                 }
             }
 
@@ -92,7 +96,9 @@ public class MainWindow : Window, IDisposable
                 using (var targetInfoTab = ImRaii.TabItem("Target Info"))
                 {
                     if (targetInfoTab.Success)
+                    {
                         DrawTargetInfo();
+                    }
                 }
             }
 
@@ -101,7 +107,9 @@ public class MainWindow : Window, IDisposable
                 using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
                 {
                     if (highlightInfoTab.Success)
+                    {
                         DrawHighlightTab();
+                    }
                 }
             }
         }

@@ -24,7 +24,9 @@ internal static class ObjectHelper
     public static bool IsBossFromNamePlateIconId(this INamePlateUpdateHandler handler)
     {
         if (handler.BattleChara == null)
+        {
             return false;
+        }
 
         return handler.NameIconId is 61710 or 61711 or 61712;
     }
@@ -37,8 +39,15 @@ internal static class ObjectHelper
     public static float DistanceToPlayer(this IGameObject? obj)
     {
         var localPlayer = Svc.Objects.LocalPlayer;
-        if (obj == null || obj.Address == nint.Zero) return float.MaxValue;
-        if (localPlayer == null) return float.MaxValue;
+        if (obj == null || obj.Address == nint.Zero)
+        {
+            return float.MaxValue;
+        }
+
+        if (localPlayer == null)
+        {
+            return float.MaxValue;
+        }
 
         var distance = Vector3.Distance(localPlayer.Position, obj.Position) - (localPlayer.HitboxRadius + obj.HitboxRadius);
         return distance;
@@ -53,9 +62,20 @@ internal static class ObjectHelper
     /// </returns>
     internal static unsafe bool CanSee(this IGameObject obj)
     {
-        if (obj == null) return false;
-        if (Player.Object == null) return false;
-        if (obj.Struct() == null) return false;
+        if (obj == null)
+        {
+            return false;
+        }
+
+        if (Player.Object == null)
+        {
+            return false;
+        }
+
+        if (obj.Struct() == null)
+        {
+            return false;
+        }
 
         const uint specificEnemyId = 3830; // Bioculture Node in Aetherial Chemical Research Facility
         if (obj.GameObjectId == specificEnemyId)
@@ -115,13 +135,41 @@ internal static class ObjectHelper
     {
         var job = ((Job)chara.ClassJob.RowId).GetUpgradedJob();
 
-        if (job.IsTank()) return JobRole.Tank;
-        if (job.IsHealer()) return JobRole.Healer;
-        if (job.IsMeleeDps()) return JobRole.Melee;
-        if (job.IsPhysicalRangedDps()) return JobRole.RangedPhysical;
-        if (job.IsMagicalRangedDps()) return JobRole.RangedMagical;
-        if (job.IsDoh()) return JobRole.DiscipleOfTheHand;
-        if (job.IsDol()) return JobRole.DiscipleOfTheLand;
+        if (job.IsTank())
+        {
+            return JobRole.Tank;
+        }
+
+        if (job.IsHealer())
+        {
+            return JobRole.Healer;
+        }
+
+        if (job.IsMeleeDps())
+        {
+            return JobRole.Melee;
+        }
+
+        if (job.IsPhysicalRangedDps())
+        {
+            return JobRole.RangedPhysical;
+        }
+
+        if (job.IsMagicalRangedDps())
+        {
+            return JobRole.RangedMagical;
+        }
+
+        if (job.IsDoh())
+        {
+            return JobRole.DiscipleOfTheHand;
+        }
+
+        if (job.IsDol())
+        {
+            return JobRole.DiscipleOfTheLand;
+        }
+
         return JobRole.None;
     }
 
@@ -130,9 +178,20 @@ internal static class ObjectHelper
     {
         if (obj is IBattleChara)
         {
-            if (MainUpdater.IsInParty(obj.EntityId)) return Relation.Party;
-            if (MainUpdater.IsInAlliance(obj.EntityId)) return Relation.Alliance;
-            if (obj.IsEnemy()) return Relation.Enemy;
+            if (MainUpdater.IsInParty(obj.EntityId))
+            {
+                return Relation.Party;
+            }
+
+            if (MainUpdater.IsInAlliance(obj.EntityId))
+            {
+                return Relation.Alliance;
+            }
+
+            if (obj.IsEnemy())
+            {
+                return Relation.Enemy;
+            }
         }
         return Relation.Others;
     }

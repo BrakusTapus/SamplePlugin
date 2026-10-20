@@ -87,7 +87,9 @@ internal static class NamePlateUpdater
     public static INamePlateUpdateHandler? GetCurrentNameplate(this IBattleChara battleChara)
     {
         if (battleChara == null)
+        {
             return null;
+        }
 
         return NamePlateUpdater.CurrentNameplates
             .FirstOrDefault(n => n.GameObjectId == battleChara.GameObjectId);
