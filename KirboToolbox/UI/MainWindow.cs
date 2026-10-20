@@ -22,8 +22,8 @@ namespace KirboToolbox.UI;
 public class MainWindow : Window, IDisposable
 {
     private readonly string kirboImagePath;
-    private Plugin Plugin;
-    private Configuration Configuration;
+    private readonly Plugin plugin;
+    private readonly Configuration configuration;
     private readonly HighlightTab highlightTab;
 
     // We give this window a hidden ID using ##
@@ -55,8 +55,8 @@ public class MainWindow : Window, IDisposable
         });
 
         this.kirboImagePath = kirboImagePath;
-        this.Plugin = plugin;
-        Configuration = plugin.Configuration;
+        this.plugin = plugin;
+        configuration = plugin.Configuration;
         highlightTab = new HighlightTab(plugin);
     }
 
@@ -80,7 +80,7 @@ public class MainWindow : Window, IDisposable
                 }
             }
 
-            if (Configuration.DisplayPlayerInfoTab)
+            if (configuration.DisplayPlayerInfoTab)
             {
                 using (var playerInfoTab = ImRaii.TabItem("Player Info"))
                 {
@@ -91,7 +91,7 @@ public class MainWindow : Window, IDisposable
                 }
             }
 
-            if (Configuration.DisplayTargetInfoTab)
+            if (configuration.DisplayTargetInfoTab)
             {
                 using (var targetInfoTab = ImRaii.TabItem("Target Info"))
                 {
@@ -102,7 +102,7 @@ public class MainWindow : Window, IDisposable
                 }
             }
 
-            if (Configuration.DisplayHighLightInfoTab)
+            if (configuration.DisplayHighLightInfoTab)
             {
                 using (var highlightInfoTab = ImRaii.TabItem("Highlight Info"))
                 {
@@ -147,33 +147,33 @@ public class MainWindow : Window, IDisposable
         {
             if (child.Success)
             {
-                var playerInfoValue = Configuration.DisplayPlayerInfoTab;
+                var playerInfoValue = configuration.DisplayPlayerInfoTab;
                 if (ImGui.Checkbox("Enable player info tab?", ref playerInfoValue))
                 {
-                    Configuration.DisplayPlayerInfoTab = playerInfoValue;
+                    configuration.DisplayPlayerInfoTab = playerInfoValue;
                     // can save immediately on change, if you don't want to provide a "Save and Close" button
-                    Configuration.Save();
+                    configuration.Save();
                 }
-                var targetInfoValue = Configuration.DisplayTargetInfoTab;
+                var targetInfoValue = configuration.DisplayTargetInfoTab;
                 if (ImGui.Checkbox("Enable target info tab?", ref targetInfoValue))
                 {
-                    Configuration.DisplayTargetInfoTab = targetInfoValue;
-                    Configuration.Save();
+                    configuration.DisplayTargetInfoTab = targetInfoValue;
+                    configuration.Save();
                 }
-                var highlightValue = Configuration.DisplayHighLightInfoTab;
+                var highlightValue = configuration.DisplayHighLightInfoTab;
                 if (ImGui.Checkbox("Enable highlight tab?", ref highlightValue))
                 {
-                    Configuration.DisplayHighLightInfoTab = highlightValue;
+                    configuration.DisplayHighLightInfoTab = highlightValue;
 
                     if (!highlightValue)
                     {
                         // Hiding the tab also switches the overlay off.
-                        Configuration.EnableHighLightOverlay = false;
-                        Configuration.HighlightPlayer = false;
-                        Plugin.TargetHighlightWindow.IsOpen = false;
+                        configuration.EnableHighLightOverlay = false;
+                        configuration.HighlightPlayer = false;
+                        plugin.TargetHighlightWindow.IsOpen = false;
                     }
 
-                    Configuration.Save();
+                    configuration.Save();
                 }
 
                 // ShowInDevMenu is currently unused.
@@ -192,7 +192,7 @@ public class MainWindow : Window, IDisposable
 
                 if (ImGui.Button("Show Test window"))
                 {
-                    Plugin.ToggleTestUI();
+                    plugin.ToggleTestUI();
                 }
 
                 ImGui.Spacing();
@@ -238,17 +238,10 @@ public class MainWindow : Window, IDisposable
                 ImGuiExt.DrawJobIcon(playerState);
                 ImGui.SameLine();
                 ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
-                //ImGui.TextUnformatted($"Our current job is ({playerState.ClassJob.RowId}) \"{playerState.ClassJob.Value.Abbreviation.ExtractText()}\"");
                 ImGui.NewLine();
 
-                //var birthDay = playerState.BirthDay > 0 ? playerState.BirthDay.ToString() : "?";
-                //var birthMonth = playerState.BirthMonth > 0 ? playerState.BirthMonth.ToString() : "?";
-
-                //ImGui.Text($"Birthday: Day {birthDay}, Month {birthMonth}");
-                //ImGui.NewLine();
-
-                var speed = Configuration.SpeedMultiplier;
-                var step = Configuration.SpeedStep;
+                var speed = configuration.SpeedMultiplier;
+                var step = configuration.SpeedStep;
 
                 ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
                 ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
@@ -258,42 +251,42 @@ public class MainWindow : Window, IDisposable
                 if (ImGui.SliderFloat("##SpeedSlider", ref speed, 0.5f, 5f, "%.2f"))
                 {
                     speed = MathF.Round(speed, 2);
-                    Configuration.SpeedMultiplier = speed;
+                    configuration.SpeedMultiplier = speed;
                     localPlayer.Speed = speed;
-                    Configuration.Save();
+                    configuration.Save();
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Button("-##SpeedDown"))
                 {
                     speed = MathF.Max(0.1f, MathF.Round(speed - step, 2));
-                    Configuration.SpeedMultiplier = speed;
+                    configuration.SpeedMultiplier = speed;
                     localPlayer.Speed = speed;
-                    Configuration.Save();
+                    configuration.Save();
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Button("+##SpeedUp"))
                 {
                     speed = MathF.Round(speed + step, 2);
-                    Configuration.SpeedMultiplier = speed;
+                    configuration.SpeedMultiplier = speed;
                     localPlayer.Speed = speed;
-                    Configuration.Save();
+                    configuration.Save();
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Button("Reset##SpeedReset"))
                 {
-                    Configuration.SpeedMultiplier = 1f;
+                    configuration.SpeedMultiplier = 1f;
                     localPlayer.Speed = 1f;
-                    Configuration.Save();
+                    configuration.Save();
                 }
 
                 ImGui.SetNextItemWidth(80 * ImGuiHelpers.GlobalScale);
                 if (ImGui.InputFloat("Step size", ref step, 0f, 0f, "%.2f"))
                 {
-                    Configuration.SpeedStep = Math.Clamp(step, 0.01f, 1f);
-                    Configuration.Save();
+                    configuration.SpeedStep = Math.Clamp(step, 0.01f, 1f);
+                    configuration.Save();
                 }
                 ImGui.NewLine();
 
@@ -389,7 +382,7 @@ public class MainWindow : Window, IDisposable
                         ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 150f);
                         ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
 
-                        Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId)?.GetWrapOrDefault();
+                        IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId)?.GetWrapOrDefault();
 
                         ImGui.TableNextRow();
                         ImGui.TableSetColumnIndex(0);
@@ -456,172 +449,8 @@ public class MainWindow : Window, IDisposable
                 }
             }
         }
-
-        //foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
-        //{
-        //    Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
-        //    ImGui.TextUnformatted($"Name: {entry.Name}");
-        //    ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-        //    if (icon2 != null)
-        //    {
-        //        ImGui.SameLine();
-        //        ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
-        //    }
-        //    ImGui.TextUnformatted($"GameObjectId: {entry.GameObjectId.ToString()}");
-        //}
     }
 
     public void DrawHighlightTab() => highlightTab.Draw();
 
-    //public void DrawNamePlates()
-    //{
-    //    using (ImRaii.IEndObject child = ImRaii.Child("NamePlatesChild", Vector2.Zero, true))
-    //    {
-    //        if (child.Success)
-    //        {
-    //            if (ImGui.Button("Request Redraw"))
-    //            {
-    //                Feature.namePlateEntries.Clear();
-    //                Service.NamePlateGui.RequestRedraw();
-    //            }
-    //            if (Feature.namePlateEntries.Count == 0)
-    //            {
-    //                ImGui.TextUnformatted("No relevant nameplates detected.");
-    //            }
-    //            else
-    //            {
-    //                foreach (NamePlateEntry entry in Feature.namePlateEntries)
-    //                {
-    //                    Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId).GetWrapOrDefault();
-    //                    ImGui.TextUnformatted($"Name: {entry.Name}");
-    //                    ImGui.TextUnformatted($"ObjectId: {entry.ObjectId:X8}");
-    //                    ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-    //                    if (icon2 != null)
-    //                    {
-    //                        ImGui.SameLine();
-    //                        ImGui.Image(icon2.ImGuiHandle, new Vector2(22, 22));
-    //                    }
-    //                    ImGui.TextUnformatted($"IsBoss: {entry.IsBoss}");
-    //                    ImGui.Separator();
-    //                }
-    //            }
-    //        }
-
-    //    }
-    //}
-
 }
-
-// Normally a BeginChild() would have to be followed by an unconditional EndChild(),
-// ImRaii takes care of this after the scope ends.
-// This works for all ImGui functions that require specific handling, examples are BeginTable() or Indent().
-//using (var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true))
-//{
-//    // Check if this child is drawing
-//    if (child.Success)
-//    {
-//        ImGui.TextUnformatted("Have a goat:");
-//        var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//        if (kirboImage != null)
-//        {
-//            using (ImRaii.PushIndent(55f))
-//            {
-//                ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
-//            }
-//        }
-//        else
-//        {
-//            ImGui.TextUnformatted("Image not found.");
-//        }
-
-//        ImGuiHelpers.ScaledDummy(20.0f);
-
-//        // Example for other services that Dalamud provides.
-//        // ClientState provides a wrapper filled with information about the local player object and client.
-
-//        var localPlayer = Service.ClientState.LocalPlayer;
-//        if (localPlayer == null)
-//        {
-//            ImGui.TextUnformatted("Our local player is currently not loaded.");
-//            return;
-//        }
-
-//        if (!localPlayer.ClassJob.IsValid)
-//        {
-//            ImGui.TextUnformatted("Our current job is currently not valid.");
-//            return;
-//        }
-
-//        // ExtractText() should be the preferred method to read Lumina SeStrings,
-//        // as ToString does not provide the actual text values, instead gives an encoded macro string.
-//        ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
-
-//        // Example for quarrying Lumina directly, getting the name of our current area.
-//        var territoryId = Service.ClientState.TerritoryType;
-//        if (Service.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-//        {
-//            ImGui.TextUnformatted($"We are currently in ({territoryId}) \"{territoryRow.PlaceName.Value.Name.ExtractText()}\"");
-//        }
-//        else
-//        {
-//            ImGui.TextUnformatted("Invalid territory.");
-//        }
-//    }
-//}
-
-//public void DrawImage()
-//{
-//    using (var child = ImRaii.Child("SomeChildWithAScrollbar2", Vector2.Zero, true))
-//    {
-//        // Check if this child is drawing
-//        if (child.Success)
-//        {
-//            ImGui.TextUnformatted("Have a goat:");
-//            var kirboImage = Service.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-//            if (kirboImage != null)
-//            {
-//                using (ImRaii.PushIndent(55f))
-//                {
-//                    ImGui.Image(kirboImage.ImGuiHandle, new Vector2(kirboImage.Width, kirboImage.Height));
-//                }
-//            }
-//            else
-//            {
-//                ImGui.TextUnformatted("Image not found.");
-//            }
-
-//            ImGuiHelpers.ScaledDummy(20.0f);
-
-//            // Example for other services that Dalamud provides.
-//            // ClientState provides a wrapper filled with information about the local player object and client.
-
-//            var localPlayer = Service.ClientState.LocalPlayer;
-//            if (localPlayer == null)
-//            {
-//                ImGui.TextUnformatted("Our local player is currently not loaded.");
-//                return;
-//            }
-
-//            if (!localPlayer.ClassJob.IsValid)
-//            {
-//                ImGui.TextUnformatted("Our current job is currently not valid.");
-//                return;
-//            }
-
-//            // ExtractText() should be the preferred method to read Lumina SeStrings,
-//            // as ToString does not provide the actual text values, instead gives an encoded macro string.
-//            ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation.ExtractText()}\"");
-
-//            // Example for quarrying Lumina directly, getting the name of our current area.
-//            var territoryId = Service.ClientState.TerritoryType;
-//            if (Service.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-//            {
-//                ImGui.TextUnformatted($"We are currently in ({territoryId}) \"{territoryRow.PlaceName.Value.Name.ExtractText()}\"");
-//            }
-//            else
-//            {
-//                ImGui.TextUnformatted("Invalid territory.");
-//            }
-//        }
-//    }
-//}
