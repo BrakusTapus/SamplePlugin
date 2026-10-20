@@ -55,7 +55,7 @@ public class MainWindow : Window, IDisposable
         });
 
         this.kirboImagePath = kirboImagePath;
-        Plugin = plugin;
+        this.Plugin = plugin;
         Configuration = plugin.Configuration;
         highlightTab = new HighlightTab(plugin);
     }
@@ -356,12 +356,9 @@ public class MainWindow : Window, IDisposable
         {
             if (child1.Success)
             {
-                var nameplate = Svc.Targets.Target as IBattleChara;
 
                 var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
                 var nameplate2 = NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
-                var icon = NamePlateEntry.CurrentTargetNameplate?.NameIconId ?? -1;
-                var current = NamePlateEntry.CurrentTargetNameplate;
                 if (nameplate2 != null)
                 {
                     ImGui.TextUnformatted($"Direct: IconID = {nameplate2.NameIconId}");
