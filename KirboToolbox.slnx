@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="SamplePlugin/KirboToolbox.csproj">
+  <Project Path="KirboToolbox/KirboToolbox.csproj">
     <Platform Project="x64" />
   </Project>
 </Solution>
