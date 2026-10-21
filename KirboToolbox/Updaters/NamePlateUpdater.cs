@@ -12,8 +12,8 @@ namespace KirboToolbox.Updaters;
 /// </summary>
 internal static class NamePlateUpdater
 {
-    public static IReadOnlyList<NamePlateEntry> AllNamePlates => _allNamePlates;
-    private static readonly List<NamePlateEntry> _allNamePlates = new();
+    public static IReadOnlyList<NamePlateEntry> AllNamePlates => Entries;
+    private static readonly List<NamePlateEntry> Entries = new();
 
     public static void Enable()
     {
@@ -39,7 +39,7 @@ internal static class NamePlateUpdater
             {
                 currentGameObjectIds.Add(handler.GameObjectId);
 
-                var existing = _allNamePlates.FirstOrDefault(p => p.GameObjectId == handler.GameObjectId);
+                var existing = Entries.FirstOrDefault(p => p.GameObjectId == handler.GameObjectId);
                 if (existing != null)
                 {
                     // Update existing entry
@@ -54,7 +54,7 @@ internal static class NamePlateUpdater
                 else
                 {
                     // Add new entry
-                    _allNamePlates.Add(new NamePlateEntry
+                    Entries.Add(new NamePlateEntry
                     {
                         GameObjectId = handler.GameObjectId,
                         Name = handler.Name.ToString(),
@@ -69,13 +69,13 @@ internal static class NamePlateUpdater
         }
 
         // Remove entries that are no longer valid
-        _allNamePlates.RemoveAll(entry => !entry.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
+        Entries.RemoveAll(entry => !entry.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
 
     }
 
     public static void ClearList()
     {
-        _allNamePlates.Clear();
+        Entries.Clear();
     }
 
     public static IReadOnlyList<INamePlateUpdateHandler> CurrentNameplates { get; private set; } = new List<INamePlateUpdateHandler>();
