@@ -90,6 +90,9 @@ csharp_style_deconstructed_variable_declaration = true:silent
 
 # StyleCop.Analyzers
 dotnet_diagnostic.SA1400.severity = none
+# Sonar
+dotnet_diagnostic.S6640.severity = none
+dotnet_diagnostic.S3776.severity = suggestion
 
 # ReSharper properties
 resharper_align_linq_query = true
