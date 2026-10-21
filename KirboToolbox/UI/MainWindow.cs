@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Numerics;
+
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
@@ -8,14 +9,17 @@ using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+
 using ECommons.DalamudServices;
 using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
-using Lumina.Excel.Sheets;
+
 using KirboToolbox.Configs;
 using KirboToolbox.Helpers.Extensions;
 using KirboToolbox.Helpers.UI;
 using KirboToolbox.Updaters;
+
+using Lumina.Excel.Sheets;
 
 namespace KirboToolbox.UI;
 
