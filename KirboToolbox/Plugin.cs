@@ -1,4 +1,4 @@
-//TODO add mimic emote feature
+// add mimic emote feature
 using System.IO;
 using Dalamud.Game.Command;
 using Dalamud.Game.DutyState;
@@ -20,10 +20,9 @@ public sealed class Plugin : IDalamudPlugin
     public string Version => $"v{GetType().Assembly.GetName().Version}";
     public string Name => $"Kirbo's {GetType().Assembly.GetName().Name}";
 
-    internal static Plugin? P;
     public Configuration Configuration { get; init; }
 
-    private readonly WindowSystem WindowSystem;
+    private readonly WindowSystem windowSystem;
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
     internal TestWindow TestWindow { get; init; }
@@ -31,29 +30,25 @@ public sealed class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
-        P = this;
         ECommonsMain.Init(pluginInterface, this, Module.DalamudReflector, Module.ObjectFunctions);
-        //Service.Init(pluginInterface);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.MigrateIfNeeded();
 
         // you might normally want to embed resources and load them from the manifest stream
         var assetsPath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets");
-        var goatImagePath = Path.Combine(assetsPath, "goat.png");
         var kirboImagePath = Path.Combine(assetsPath, "kirbo.png");
-        var logoImagePath = Path.Combine(assetsPath, "logo.png");
 
         MainWindow = new MainWindow(this, kirboImagePath);
         ConfigWindow = new ConfigWindow(this);
         TargetHighlightWindow = new TargetHighlight(this);
         TargetHighlightWindow.IsOpen = Configuration.EnableHighLightOverlay;
         TestWindow = new TestWindow();
-        WindowSystem = new();
+        windowSystem = new();
 
-        WindowSystem.AddWindow(MainWindow);
-        WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(TargetHighlightWindow);
-        WindowSystem.AddWindow(TestWindow);
+        windowSystem.AddWindow(MainWindow);
+        windowSystem.AddWindow(ConfigWindow);
+        windowSystem.AddWindow(TargetHighlightWindow);
+        windowSystem.AddWindow(TestWindow);
 
         Svc.Commands.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
@@ -70,7 +65,7 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Opens Highlight window"
         });
 
-        Svc.PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        Svc.PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         // Adds another button that is doing the same but for the main ui of the plugin
         Svc.PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         // This adds a button to the plugin installer entry of this plugin which allows
@@ -83,11 +78,6 @@ public sealed class Plugin : IDalamudPlugin
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
-        //if (Svc.PluginInterface.Reason == PluginLoadReason.Reload && !MainWindow.IsOpen)
-        //{
-        //    MainWindow.IsOpen = true;
-        //}
-
         NamePlateUpdater.Enable();
         MainUpdater.Enable();
     }
@@ -99,11 +89,11 @@ public sealed class Plugin : IDalamudPlugin
         NamePlateUpdater.Disable();
         MainUpdater.Disable();
 
-        Svc.PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
+        Svc.PluginInterface.UiBuilder.Draw -= windowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
         Svc.PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUI;
 
-        WindowSystem.RemoveAllWindows();
+        windowSystem.RemoveAllWindows();
 
         MainWindow.Dispose();
         TargetHighlightWindow.Dispose();
@@ -121,7 +111,6 @@ public sealed class Plugin : IDalamudPlugin
         Svc.Commands.RemoveHandler(CommandHighlight);
 
         ECommonsMain.Dispose();
-        P = null;
     }
 
     private void OnCommand(string command, string args)
@@ -140,19 +129,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         ToggleHighlightUI();
     }
-
-    //private void DrawUI() => WindowSystem.Draw();
-    //private void DrawUI()
-    //{
-    //    if (Configuration.ShowInDevMenu && Svc.PluginInterface.IsDevMenuOpen && ImGui.BeginMainMenuBar())
-    //    {
-    //        if (ImGui.MenuItem("Kirbo"))
-    //        {
-    //            ToggleMainUI();
-    //        }
-    //        ImGui.EndMainMenuBar();
-    //    }
-    //}
 
     public void ToggleHighlightUI()
     {
