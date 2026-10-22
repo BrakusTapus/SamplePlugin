@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
@@ -9,10 +10,13 @@ using Dalamud.Interface.Textures;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
+
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
+
 using Lumina.Excel.Sheets;
+
 using KirboToolbox.Data;
 
 namespace KirboToolbox.Helpers.UI;
@@ -20,23 +24,38 @@ namespace KirboToolbox.Helpers.UI;
 internal static unsafe class ImGuiExt
 {
     /// <summary>
-    /// Load an image via a url (or full path name + image name)
+    /// Draws an image from a web URL (or a full file path), scaled down to fit.
+    /// The aspect ratio is always kept. By default the image fills at most the available window width.
     /// </summary>
-    /// <param name="url"></param>
-    //public static void LoadImageFromStream(string url)
-    //{
-    //    float paddingWidth = ImGui.GetStyle().WindowPadding.X;
-    //    float paddingHeight = ImGui.GetStyle().WindowPadding.Y;
-    //    float windowY = ImGui.GetWindowHeight();
-    //    float windowX = ImGui.GetWindowWidth();
-    //    Vector2 imageSize = new(windowX - paddingWidth, windowY - paddingHeight);
-    //    /// var imagePath = Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName!, "Assets", "Images", $"Dark.png");
+    /// <param name="url">Direct link to an image, e.g. https://example.com/image.png</param>
+    /// <param name="maxWidth">Optional width limit in pixels. The window width is always a limit too.</param>
+    /// <param name="maxHeight">Optional height limit in pixels.</param>
+    /// <param name="allowUpscale">If true, small images are enlarged to fill the space. Default is false.</param>
+    internal static void DrawImageFromUrl(string url, float? maxWidth = null, float? maxHeight = null, bool allowUpscale = false)
+    {
+        if (!ThreadLoadImageHandler.TryGetTextureWrap(url, out var image))
+        {
+            ImGui.TextDisabled("Loading image...");
+            return;
+        }
 
-    //    if (ImageLoaderHandler.TryGetTextureWrap(url, out Dalamud.Interface.Textures.TextureWraps.IDalamudTextureWrap? image))
-    //    {
-    //        ImGui.Image(image.ImGuiHandle, imageSize);
-    //    }
-    //}
+        var width = Math.Min(maxWidth ?? float.MaxValue, ImGui.GetContentRegionAvail().X);
+        var height = maxHeight ?? float.MaxValue;
+
+        // How much we need to shrink (or grow) the image so it fits in both directions.
+        var scale = Math.Min(width / image.Width, height / image.Height);
+        if (!allowUpscale)
+        {
+            scale = Math.Min(scale, 1f);
+        }
+
+        if (scale <= 0f)
+        {
+            return;
+        }
+
+        ImGui.Image(image.Handle, new Vector2(image.Width, image.Height) * scale);
+    }
 
     /// <summary>
     /// Obtain an icon texture in the game using its ID.
