@@ -1,12 +1,16 @@
-// add mimic emote feature
+using System;
 using System.IO;
+
 using Dalamud.Game.Command;
 using Dalamud.Game.DutyState;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+
 using ECommons;
 using ECommons.DalamudServices;
+
 using KirboToolbox.Configs;
+using KirboToolbox.Helpers.Extensions;
 using KirboToolbox.UI;
 using KirboToolbox.Updaters;
 
@@ -86,6 +90,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         Svc.Log.Debug($"Plugin: Dispose started.");
 
+        ResetPlayerSpeed();
         NamePlateUpdater.Disable();
         MainUpdater.Disable();
 
@@ -111,6 +116,32 @@ public sealed class Plugin : IDalamudPlugin
         Svc.Commands.RemoveHandler(CommandHighlight);
 
         ECommonsMain.Dispose();
+    }
+
+    /// <summary>
+    /// Puts the player's movement speed back to normal so we don't leave modified game memory behind.
+    /// </summary>
+    private void ResetPlayerSpeed()
+    {
+        try
+        {
+            var player = Svc.Objects.LocalPlayer;
+            if (player == null)
+            {
+                return; // Not logged in, nothing to reset.
+            }
+
+            player.Speed = 1f;
+
+            // Keep the saved slider value in sync with the real game speed.
+            Configuration.SpeedMultiplier = 1f;
+            Configuration.Save();
+        }
+        catch (Exception ex)
+        {
+            // Never let a failure here stop the rest of the cleanup.
+            Svc.Log.Error(ex, "Failed to reset movement speed on unload.");
+        }
     }
 
     private void OnCommand(string command, string args)
