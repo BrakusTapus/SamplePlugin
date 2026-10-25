@@ -11,7 +11,7 @@ using ECommons.DalamudServices;
 
 using KirboToolbox.Configs;
 using KirboToolbox.UI;
-using KirboToolbox.Core.Services;
+using KirboToolbox.Core.Trackers;
 using KirboToolbox.Features.Highlight;
 using KirboToolbox.Core.Extensions;
 

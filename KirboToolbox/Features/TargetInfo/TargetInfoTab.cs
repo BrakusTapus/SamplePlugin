@@ -11,7 +11,7 @@ using ECommons.ImGuiMethods;
 
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
-using KirboToolbox.Core.Services;
+using KirboToolbox.Core.Trackers;
 using KirboToolbox.Helpers.UI;
 
 namespace KirboToolbox.Features.TargetInfo;

@@ -14,7 +14,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
 using KirboToolbox.Configs;
 using KirboToolbox.Core.Game;
-using KirboToolbox.Core.Services;
+using KirboToolbox.Core.Trackers;
 using KirboToolbox.Helpers;
 using KirboToolbox.Helpers.UI;
 
