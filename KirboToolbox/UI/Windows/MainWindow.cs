@@ -15,7 +15,7 @@ using KirboToolbox.Features.Highlight;
 using KirboToolbox.Features.PlayerInfo;
 using KirboToolbox.Features.TargetInfo;
 
-namespace KirboToolbox.UI;
+namespace KirboToolbox.UI.Windows;
 
 public class MainWindow : Window, IDisposable
 {

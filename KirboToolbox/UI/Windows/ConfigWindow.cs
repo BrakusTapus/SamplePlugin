@@ -6,7 +6,7 @@ using Dalamud.Interface.Windowing;
 
 using KirboToolbox.Configs;
 
-namespace KirboToolbox.UI;
+namespace KirboToolbox.UI.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {

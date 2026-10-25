@@ -10,7 +10,7 @@ using ECommons.DalamudServices;
 
 using KirboToolbox.Helpers.UI;
 
-namespace KirboToolbox.UI;
+namespace KirboToolbox.UI.Windows;
 public class TestWindow : Window, IDisposable
 {
     private static string Name => "Test Window";
