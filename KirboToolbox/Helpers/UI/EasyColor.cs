@@ -1,4 +1,5 @@
 using System.Numerics;
+
 using Dalamud.Interface.Colors;
 
 namespace KirboToolbox.Helpers.UI;

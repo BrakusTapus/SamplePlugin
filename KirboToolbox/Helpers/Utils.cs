@@ -1,4 +1,5 @@
 using System.Numerics;
+
 using Dalamud.Game.ClientState.Objects.Types;
 
 namespace KirboToolbox.Helpers;

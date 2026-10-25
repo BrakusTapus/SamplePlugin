@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
 using System.Numerics;
 
 using Dalamud.Bindings.ImGui;
-using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
@@ -11,17 +9,11 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 
 using ECommons.DalamudServices;
-using ECommons.GameFunctions;
-using ECommons.ImGuiMethods;
 
 using KirboToolbox.Configs;
-using KirboToolbox.Core.Extensions;
-using KirboToolbox.Core.Services;
 using KirboToolbox.Features.Highlight;
 using KirboToolbox.Features.PlayerInfo;
-using KirboToolbox.Helpers.UI;
-
-using Lumina.Excel.Sheets;
+using KirboToolbox.Features.TargetInfo;
 
 namespace KirboToolbox.UI;
 
@@ -32,6 +24,7 @@ public class MainWindow : Window, IDisposable
     private readonly Configuration configuration;
     private readonly HighlightTab highlightTab;
     private readonly PlayerInfoTab playerInfoTab;
+    private readonly TargetInfoTab targetInfoTab;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -66,6 +59,7 @@ public class MainWindow : Window, IDisposable
         configuration = plugin.Configuration;
         highlightTab = new HighlightTab(plugin);
         playerInfoTab = new PlayerInfoTab(plugin);
+        targetInfoTab = new TargetInfoTab();
     }
 
     public void Dispose() { }
@@ -101,11 +95,11 @@ public class MainWindow : Window, IDisposable
 
             if (configuration.DisplayTargetInfoTab)
             {
-                using (var targetInfoTab = ImRaii.TabItem("Target Info"))
+                using (var targetInfoTabItem = ImRaii.TabItem("Target Info"))
                 {
-                    if (targetInfoTab.Success)
+                    if (targetInfoTabItem.Success)
                     {
-                        DrawTargetInfo();
+                        targetInfoTab.Draw();
                     }
                 }
             }
@@ -204,131 +198,6 @@ public class MainWindow : Window, IDisposable
                 }
 
                 ImGui.Spacing();
-            }
-        }
-    }
-
-    public unsafe static void DrawTargetInfo()
-    {
-        if (ImGui.Button("Redraw Nameplate"))
-        {
-            Svc.NamePlates.RequestRedraw();
-        }
-        ImGuiEx.Tooltip("Send a redraw request for nameplates");
-        ImGui.SameLine();
-        if (ImGui.Button("Clear List"))
-        {
-            NamePlateUpdater.ClearList();
-        }
-        ImGuiEx.Tooltip("Clears the listed nameplates");
-        ImGui.SameLine();
-        ImGui.TextUnformatted("AllNamePlates: " + NamePlateUpdater.AllNamePlates.Count());
-        ImGui.Separator();
-
-        float availableHeight = ImGui.GetContentRegionAvail().Y;
-        float availableWidth = ImGui.GetContentRegionAvail().X;
-        using (var child1 = ImRaii.Child("targetinfochild1", new Vector2(availableWidth / 2, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
-        {
-            if (child1.Success)
-            {
-
-                var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
-                var nameplate2 = NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
-                if (nameplate2 != null)
-                {
-                    ImGui.TextUnformatted($"Direct: IconID = {nameplate2.NameIconId}");
-                    ImGui.TextUnformatted($"1 = {nameplate2.Name}");
-                    ImGui.TextUnformatted($"2 = {nameplate2.IsBoss}");
-                    ImGui.TextUnformatted($"3 = {nameplate2.GameObjectId}");
-                }
-                else
-                {
-                    ImGui.TextUnformatted("Direct: NOT FOUND");
-                }
-            }
-        }
-        ImGui.SameLine();
-        using (var child2 = ImRaii.Child("targetinfochild2", new Vector2((availableWidth / 2) - 10, availableHeight - 10), true, ImGuiWindowFlags.NoScrollbar))
-        {
-            if (child2.Success)
-            {
-                foreach (NamePlateEntry entry in NamePlateUpdater.AllNamePlates)
-                {
-                    if (!entry.IsTargetable)
-                    {
-                        continue;
-                    }
-                    if (ImGui.BeginTable($"NamePlateTable_{entry.GameObjectId}", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInner | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
-                    {
-                        // Define fixed width for both columns
-                        ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthFixed, 150f);
-                        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthFixed, 200f);
-
-                        IDalamudTextureWrap? icon2 = ImGuiExt.GetGameIconTexture((uint)entry.NameIconId)?.GetWrapOrDefault();
-
-                        ImGui.TableNextRow();
-                        ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("Name");
-                        ImGui.TableSetColumnIndex(1);
-                        ImGui.TextUnformatted(entry.Name);
-
-                        if (icon2 != null)
-                        {
-                            ImGui.SameLine();
-                            ImGui.Image(icon2.Handle, new Vector2(22, 22));
-
-                            if (ImGui.IsItemHovered())
-                            {
-                                ImGui.BeginTooltip();
-                                ImGui.TextUnformatted($"NameIconId: {entry.NameIconId}");
-                                ImGui.EndTooltip();
-                            }
-                        }
-
-                        ImGui.TableNextRow();
-                        ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("GameObjectId:");
-                        ImGui.TableSetColumnIndex(1);
-                        ImGui.TextUnformatted(entry.GameObjectId.ToString());
-
-                        ImGui.TableNextRow();
-                        ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("Boss from icon:");
-                        ImGui.TableSetColumnIndex(1);
-                        ImGui.TextUnformatted(entry.IsBoss.ToString());
-
-                        ImGui.TableNextRow();
-                        ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("Targetable:");
-                        ImGui.TableSetColumnIndex(1);
-                        ImGui.TextUnformatted(entry.IsTargetable.ToString());
-
-                        ImGui.TableNextRow();
-                        ImGui.TableSetColumnIndex(0);
-                        ImGui.TextUnformatted("Hitbox Radius:");
-                        ImGui.TableSetColumnIndex(1);
-
-                        if (entry.BattleChara != null && entry.BattleChara.Address != IntPtr.Zero)
-                        {
-                            ImGui.SetNextItemWidth(100);
-                            var gameObject = (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)entry.BattleChara.Address;
-                            ImGui.SliderFloat(
-                                $"##HitboxRadiusSlider{entry.BattleChara.Name}{entry.BattleChara.EntityId}",
-                                ref gameObject->HitboxRadius,
-                                0f, 100f
-                            );
-                        }
-                        else
-                        {
-                            ImGui.TextUnformatted("N/A (No BattleChara)");
-                        }
-
-                        ImGui.EndTable();
-                    }
-
-                    // Add vertical spacing between entries
-                    ImGui.Dummy(new Vector2(0, 10));
-                }
             }
         }
     }

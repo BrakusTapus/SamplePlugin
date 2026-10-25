@@ -1,10 +1,13 @@
 using System;
 using System.Numerics;
+
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+
 using ECommons.DalamudServices;
+
 using KirboToolbox.Helpers.UI;
 
 namespace KirboToolbox.UI;
