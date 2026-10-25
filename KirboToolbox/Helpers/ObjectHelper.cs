@@ -12,6 +12,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 
+using KirboToolbox.Core.Extensions;
 using KirboToolbox.Core.Game;
 using KirboToolbox.Core.Trackers;
 using KirboToolbox.Features.Highlight;
@@ -20,71 +21,6 @@ namespace KirboToolbox.Helpers;
 
 internal static class ObjectHelper
 {
-    /// <summary>
-    /// The distance from <paramref name="obj"/> to the player
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public static float DistanceToPlayer(this IGameObject? obj)
-    {
-        var localPlayer = Svc.Objects.LocalPlayer;
-        if (obj == null || obj.Address == nint.Zero)
-        {
-            return float.MaxValue;
-        }
-
-        if (localPlayer == null)
-        {
-            return float.MaxValue;
-        }
-
-        var distance = Vector3.Distance(localPlayer.Position, obj.Position) - (localPlayer.HitboxRadius + obj.HitboxRadius);
-        return distance;
-    }
-
-    /// <summary>
-    /// Determines if the player can see the specified game object.
-    /// </summary>
-    /// <param name="obj">The game object to check visibility for.</param>
-    /// <returns>
-    /// <c>true</c> if the player can see the specified game object; otherwise, <c>false</c>.
-    /// </returns>
-    internal static unsafe bool CanSee(this IGameObject obj)
-    {
-        if (obj == null)
-        {
-            return false;
-        }
-
-        if (Player.Object == null)
-        {
-            return false;
-        }
-
-        if (obj.Struct() == null)
-        {
-            return false;
-        }
-
-        const uint specificEnemyId = 3830; // Bioculture Node in Aetherial Chemical Research Facility
-        if (obj.GameObjectId == specificEnemyId)
-        {
-            return true;
-        }
-
-        var point = Player.Object.Position + Vector3.UnitY * Player.GameObject->Height;
-        var tarPt = obj.Position + Vector3.UnitY * obj.Struct()->Height;
-        var direction = tarPt - point;
-
-        int* unknown = stackalloc int[] { 0x4000, 0, 0x4000, 0 };
-
-        RaycastHit hit;
-        var ray = new Ray(point, direction);
-
-        return !FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance()->BGCollisionModule
-            ->RaycastMaterialFilter(&hit, &point, &direction, direction.Length(), 1, unknown);
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -102,21 +38,6 @@ internal static class ObjectHelper
             }
             return count;
         }
-    }
-
-    internal static unsafe bool IsEnemy(this IGameObject obj)
-    {
-        if (obj == null)
-        {
-            return false;
-        }
-
-        if (ActionManager.CanUseActionOnTarget(142, obj.Struct()) || ActionManager.CanUseActionOnTarget(29653, obj.Struct())) // (uint)ActionID.BlizzardPvE is 142 | 29653 = pvp variant
-        {
-            return true;
-        }
-
-        return false;
     }
 
     /// <summary>Role of a character's job, built on the ECommons job helpers. Base classes count as their upgraded job (GLA = PLD).</summary>

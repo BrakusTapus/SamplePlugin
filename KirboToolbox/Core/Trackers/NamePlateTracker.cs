@@ -7,7 +7,6 @@ using Dalamud.Game.Gui.NamePlate;
 using ECommons.DalamudServices;
 
 using KirboToolbox.Core.Extensions;
-using KirboToolbox.Helpers;
 
 namespace KirboToolbox.Core.Trackers;
 
@@ -87,7 +86,7 @@ internal static class NamePlateTracker
         }
 
         // Remove entries that are no longer valid
-        Entries.RemoveAll(entry => !entry.IsTargetable || ObjectHelper.DistanceToPlayer(entry.BattleChara) >= 49);
+        Entries.RemoveAll(entry => !entry.IsTargetable || entry.BattleChara.DistanceToPlayer() >= 49);
 
     }
 

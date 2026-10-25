@@ -9,7 +9,6 @@ using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 
 using KirboToolbox.Core.Extensions;
-using KirboToolbox.Helpers;
 
 namespace KirboToolbox.Core.Trackers;
 
