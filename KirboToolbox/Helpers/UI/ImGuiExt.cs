@@ -17,7 +17,7 @@ using ECommons.ImGuiMethods;
 
 using Lumina.Excel.Sheets;
 
-using KirboToolbox.Data;
+using KirboToolbox.Core.Game;
 
 namespace KirboToolbox.Helpers.UI;
 

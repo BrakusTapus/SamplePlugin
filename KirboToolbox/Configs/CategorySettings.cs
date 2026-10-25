@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
-using KirboToolbox.Data;
+
+using KirboToolbox.Features.Highlight;
 
 namespace KirboToolbox.Configs;
 

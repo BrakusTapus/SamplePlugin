@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using System.Numerics;
+
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using KirboToolbox.Configs;
-using KirboToolbox.Data;
 
-namespace KirboToolbox.UI;
+using KirboToolbox.Configs;
+
+namespace KirboToolbox.Features.Highlight;
 
 /// <summary>
 /// The "Highlight Info" tab: a list of the active highlight rules plus an Add menu.

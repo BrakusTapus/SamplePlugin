@@ -1,15 +1,20 @@
 using System.Numerics;
+
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
+
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.GameFunctions;
 using ECommons.GameHelpers;
+
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
-using KirboToolbox.Data;
-using KirboToolbox.Updaters;
+
+using KirboToolbox.Core.Game;
+using KirboToolbox.Core.Services;
+using KirboToolbox.Features.Highlight;
 
 namespace KirboToolbox.Helpers;
 

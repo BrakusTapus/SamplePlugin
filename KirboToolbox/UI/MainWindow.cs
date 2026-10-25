@@ -15,9 +15,10 @@ using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
 
 using KirboToolbox.Configs;
-using KirboToolbox.Helpers.Extensions;
+using KirboToolbox.Core.Extensions;
+using KirboToolbox.Core.Services;
+using KirboToolbox.Features.Highlight;
 using KirboToolbox.Helpers.UI;
-using KirboToolbox.Updaters;
 
 using Lumina.Excel.Sheets;
 

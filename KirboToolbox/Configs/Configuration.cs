@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+
 using Dalamud.Configuration;
+
 using ECommons.DalamudServices;
-using KirboToolbox.Data;
+
+using KirboToolbox.Features.Highlight;
 
 namespace KirboToolbox.Configs;
 

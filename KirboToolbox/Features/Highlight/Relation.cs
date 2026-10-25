@@ -1,6 +1,6 @@
 using System;
 
-namespace KirboToolbox.Data;
+namespace KirboToolbox.Features.Highlight;
 
 /// <summary>
 /// How an object relates to the local player. Flags, so one rule can select several at once.

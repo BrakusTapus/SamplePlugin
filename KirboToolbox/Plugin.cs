@@ -10,9 +10,10 @@ using ECommons;
 using ECommons.DalamudServices;
 
 using KirboToolbox.Configs;
-using KirboToolbox.Helpers.Extensions;
 using KirboToolbox.UI;
-using KirboToolbox.Updaters;
+using KirboToolbox.Core.Services;
+using KirboToolbox.Features.Highlight;
+using KirboToolbox.Core.Extensions;
 
 namespace KirboToolbox;
 

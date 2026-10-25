@@ -1,8 +1,10 @@
 using System;
+
 using Dalamud.Plugin.Services;
+
 using ECommons.DalamudServices;
 
-namespace KirboToolbox.Helpers.Extensions;
+namespace KirboToolbox.Core.Extensions;
 
 public static class IDalamudServiceExtensions
 {

@@ -1,8 +1,9 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+
 using InteropGenerator.Runtime.Attributes;
 
-namespace KirboToolbox.Helpers.Structs;
+namespace KirboToolbox.Core.Structs;
 
 [GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = FFXIVClientStructs.FFXIV.Client.Game.Control.Control.StructSize)]

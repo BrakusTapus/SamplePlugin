@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
+
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
+
 using ECommons.DalamudServices;
+
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+
 using KirboToolbox.Helpers;
 
-namespace KirboToolbox.Updaters;
+namespace KirboToolbox.Core.Services;
 
 internal static class MainUpdater
 {

@@ -1,20 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
+
 using ECommons.DalamudServices;
+
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+
 using KirboToolbox.Configs;
-using KirboToolbox.Data;
+using KirboToolbox.Core.Game;
+using KirboToolbox.Core.Services;
 using KirboToolbox.Helpers;
 using KirboToolbox.Helpers.UI;
-using KirboToolbox.Updaters;
 
-namespace KirboToolbox.UI;
+namespace KirboToolbox.Features.Highlight;
 
 internal sealed class TargetHighlight : Window
 {

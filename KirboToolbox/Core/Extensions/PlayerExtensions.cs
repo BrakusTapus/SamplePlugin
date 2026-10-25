@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
+
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using KirboToolbox.Helpers.Structs;
 
-namespace KirboToolbox.Helpers.Extensions;
+using KirboToolbox.Core.Structs;
+
+namespace KirboToolbox.Core.Extensions;
 
 public static unsafe class PlayerExtensions
 {

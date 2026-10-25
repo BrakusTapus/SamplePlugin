@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Gui.NamePlate;
+
 using ECommons.DalamudServices;
+
 using KirboToolbox.Helpers;
 
-namespace KirboToolbox.Updaters;
+namespace KirboToolbox.Core.Services;
 
 /// <summary>
 /// Updates and stores a list of active NamePlate entries.

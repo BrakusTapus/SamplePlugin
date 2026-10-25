@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Interface.Colors;
 
-namespace KirboToolbox.Data;
+using KirboToolbox.Core.Game;
+
+namespace KirboToolbox.Features.Highlight;
 
 /// <summary>
 /// One selectable thing in the highlight tab. The Add menu and the rules table are both generated from

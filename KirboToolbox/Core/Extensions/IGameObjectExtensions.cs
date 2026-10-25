@@ -1,11 +1,13 @@
 using System.Numerics;
+
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
+
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
-namespace KirboToolbox.Helpers.Extensions;
+namespace KirboToolbox.Core.Extensions;
 
 public static class IGameObjectExtensions
 {
