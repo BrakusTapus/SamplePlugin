@@ -1,3 +1,7 @@
+using Dalamud.Game.ClientState.Objects.Types;
+
+using ECommons.ExcelServices;
+
 using Lumina.Excel.Sheets;
 
 namespace KirboToolbox.Core.Game;
@@ -7,62 +11,23 @@ namespace KirboToolbox.Core.Game;
 /// </summary>
 public enum JobRole : byte
 {
-    /// <summary>
-    /// 
-    /// </summary>
     None = 0,
-
-    /// <summary>
-    /// 
-    /// </summary>
     Tank = 1,
-
-    /// <summary>
-    /// 
-    /// </summary>
     Melee = 2,
-
-    /// <summary>
-    /// 
-    /// </summary>
     Ranged = 3,
-
-    /// <summary>
-    /// 
-    /// </summary>
     Healer = 4,
-
-    /// <summary>
-    /// 
-    /// </summary>
     RangedPhysical = 5,
-
-    /// <summary>
-    /// 
-    /// </summary>
     RangedMagical = 6,
-
-    /// <summary>
-    /// 
-    /// </summary>
     DiscipleOfTheLand = 7,
-
-    /// <summary>
-    /// 
-    /// </summary>
     DiscipleOfTheHand = 8,
 }
 
 /// <summary>
-/// The extension of the job.
+/// Ways to get the <see cref="JobRole"/> of a job or character.
 /// </summary>
 public static class JobRoleExtension
 {
-    /// <summary>
-    /// Get job role from class.
-    /// </summary>
-    /// <param name="job"></param>
-    /// <returns></returns>
+    /// <summary>Get the role from a ClassJob sheet row.</summary>
     public static JobRole GetJobRole(this ClassJob job)
     {
         var role = (JobRole)job.Role;
@@ -78,7 +43,50 @@ public static class JobRoleExtension
                 _ => JobRole.None,
             };
         }
+
         return role;
     }
 
+    /// <summary>Role of a character's job. Base classes count as their upgraded job (GLA = PLD).</summary>
+    public static JobRole GetJobRole(this IBattleChara chara)
+    {
+        var job = ((Job)chara.ClassJob.RowId).GetUpgradedJob();
+
+        if (job.IsTank())
+        {
+            return JobRole.Tank;
+        }
+
+        if (job.IsHealer())
+        {
+            return JobRole.Healer;
+        }
+
+        if (job.IsMeleeDps())
+        {
+            return JobRole.Melee;
+        }
+
+        if (job.IsPhysicalRangedDps())
+        {
+            return JobRole.RangedPhysical;
+        }
+
+        if (job.IsMagicalRangedDps())
+        {
+            return JobRole.RangedMagical;
+        }
+
+        if (job.IsDoh())
+        {
+            return JobRole.DiscipleOfTheHand;
+        }
+
+        if (job.IsDol())
+        {
+            return JobRole.DiscipleOfTheLand;
+        }
+
+        return JobRole.None;
+    }
 }
