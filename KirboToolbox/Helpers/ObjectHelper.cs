@@ -21,22 +21,6 @@ namespace KirboToolbox.Helpers;
 internal static class ObjectHelper
 {
     /// <summary>
-    /// Checks if the nameplate associated with this handler has a NameIconId of 61710, 61711, or 61712.
-    /// Only returns true if the associated object is a BattleChara.
-    /// </summary>
-    /// <param name="handler">The nameplate update handler.</param>
-    /// <returns>True if the NameIconId is one of the specified IDs, otherwise false.</returns>
-    public static bool IsBossFromNamePlateIconId(this INamePlateUpdateHandler handler)
-    {
-        if (handler.BattleChara == null)
-        {
-            return false;
-        }
-
-        return handler.NameIconId is 61710 or 61711 or 61712;
-    }
-
-    /// <summary>
     /// The distance from <paramref name="obj"/> to the player
     /// </summary>
     /// <param name="obj"></param>

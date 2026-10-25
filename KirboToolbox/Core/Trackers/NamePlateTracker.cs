@@ -33,11 +33,9 @@ internal static class NamePlateTracker
     }
 
     /// <summary>
-    /// Checks if the nameplate associated with this handler has a NameIconId of 61710, 61711, or 61712.
+    /// Checks if the nameplate has a NameIconId of 61710, 61711 or 61712 (the boss icons).
     /// Only returns true if the associated object is a BattleChara.
     /// </summary>
-    /// <param name="handler">The nameplate update handler.</param>
-    /// <returns>True if the NameIconId is one of the specified IDs, otherwise false.</returns>
     public static bool IsBossFromNamePlateIconId(this INamePlateUpdateHandler handler)
     {
         if (handler.BattleChara == null)
@@ -47,6 +45,22 @@ internal static class NamePlateTracker
 
         return handler.NameIconId is 61710 or 61711 or 61712;
     }
+
+    ///// <summary>
+    ///// Checks if the nameplate associated with this handler has a NameIconId of 61710, 61711, or 61712.
+    ///// Only returns true if the associated object is a BattleChara.
+    ///// </summary>
+    ///// <param name="handler">The nameplate update handler.</param>
+    ///// <returns>True if the NameIconId is one of the specified IDs, otherwise false.</returns>
+    //public static bool IsBossFromNamePlateIconId(this INamePlateUpdateHandler handler)
+    //{
+    //    if (handler.BattleChara == null)
+    //    {
+    //        return false;
+    //    }
+
+    //    return handler.NameIconId is 61710 or 61711 or 61712;
+    //}
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
