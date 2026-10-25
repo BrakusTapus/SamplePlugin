@@ -18,6 +18,7 @@ using KirboToolbox.Configs;
 using KirboToolbox.Core.Extensions;
 using KirboToolbox.Core.Services;
 using KirboToolbox.Features.Highlight;
+using KirboToolbox.Features.PlayerInfo;
 using KirboToolbox.Helpers.UI;
 
 using Lumina.Excel.Sheets;
@@ -30,6 +31,7 @@ public class MainWindow : Window, IDisposable
     private readonly Plugin plugin;
     private readonly Configuration configuration;
     private readonly HighlightTab highlightTab;
+    private readonly PlayerInfoTab playerInfoTab;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -63,6 +65,7 @@ public class MainWindow : Window, IDisposable
         this.plugin = plugin;
         configuration = plugin.Configuration;
         highlightTab = new HighlightTab(plugin);
+        playerInfoTab = new PlayerInfoTab(plugin);
     }
 
     public void Dispose() { }
@@ -87,11 +90,11 @@ public class MainWindow : Window, IDisposable
 
             if (configuration.DisplayPlayerInfoTab)
             {
-                using (var playerInfoTab = ImRaii.TabItem("Player Info"))
+                using (var playerInfoTabItem = ImRaii.TabItem("Player Info"))
                 {
-                    if (playerInfoTab.Success)
+                    if (playerInfoTabItem.Success)
                     {
-                        DrawPlayerInfo();
+                        playerInfoTab.Draw();
                     }
                 }
             }
@@ -201,132 +204,6 @@ public class MainWindow : Window, IDisposable
                 }
 
                 ImGui.Spacing();
-            }
-        }
-    }
-
-    public unsafe void DrawPlayerInfo()
-    {
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar3", Vector2.Zero, true))
-        {
-            // Check if this child is drawing
-            if (child.Success)
-            {
-                // Example for other services that Dalamud provides.
-                // ClientState provides a wrapper filled with information about the local player object and client.
-
-                var playerState = Svc.PlayerState;
-                if (playerState == null || !playerState.IsLoaded)
-                {
-                    ImGui.Text("IPlayerState is either null or not loaded!");
-                    return;
-                }
-
-                if (!playerState.ClassJob.IsValid)
-                {
-                    ImGui.Text("Our current job is currently not valid.");
-                    return;
-                }
-
-                var localPlayer = Svc.Objects.LocalPlayer;
-                if (localPlayer == null)
-                {
-                    ImGui.Text("Local player is unavailable.");
-                    return;
-                }
-
-                ImGui.AlignTextToFramePadding();
-                ImGui.Text($"Current job:");
-                ImGui.SameLine(120 * ImGuiHelpers.GlobalScale);
-                // ExtractText() should be the preferred method to read Lumina SeStrings,
-                // as ToString does not provide the actual text values, instead gives an encoded macro string.
-                ImGuiExt.DrawJobIcon(playerState);
-                ImGui.SameLine();
-                ImGui.Text(playerState.ClassJob.Value.Abbreviation.ToString());
-                ImGui.NewLine();
-
-                var speed = configuration.SpeedMultiplier;
-                var step = configuration.SpeedStep;
-
-                ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
-                ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
-                ImGui.NewLine();
-
-                ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
-                if (ImGui.SliderFloat("##SpeedSlider", ref speed, 0.5f, 5f, "%.2f"))
-                {
-                    speed = MathF.Round(speed, 2);
-                    configuration.SpeedMultiplier = speed;
-                    localPlayer.Speed = speed;
-                    configuration.Save();
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("-##SpeedDown"))
-                {
-                    speed = MathF.Max(0.1f, MathF.Round(speed - step, 2));
-                    configuration.SpeedMultiplier = speed;
-                    localPlayer.Speed = speed;
-                    configuration.Save();
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("+##SpeedUp"))
-                {
-                    speed = MathF.Round(speed + step, 2);
-                    configuration.SpeedMultiplier = speed;
-                    localPlayer.Speed = speed;
-                    configuration.Save();
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button("Reset##SpeedReset"))
-                {
-                    configuration.SpeedMultiplier = 1f;
-                    localPlayer.Speed = 1f;
-                    configuration.Save();
-                }
-
-                ImGui.SetNextItemWidth(80 * ImGuiHelpers.GlobalScale);
-                if (ImGui.InputFloat("Step size", ref step, 0f, 0f, "%.2f"))
-                {
-                    configuration.SpeedStep = Math.Clamp(step, 0.01f, 1f);
-                    configuration.Save();
-                }
-                ImGui.NewLine();
-
-                ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
-                ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius, 0f, 100f);
-                ImGui.SameLine();
-                if (ImGui.Button("Reset##HitboxRadius"))
-                {
-                    ((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)localPlayer.Address)->HitboxRadius = 0.5f;
-                }
-                ImGui.NewLine();
-
-                // Example for quarrying Lumina directly, getting the name of our current area.
-                var territoryId = Svc.ClientState.TerritoryType;
-                if (Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-                {
-                    ImGui.TextUnformatted($"We are currently in ({territoryId}) \"{territoryRow.PlaceName.Value.Name.ExtractText()}\"");
-                }
-                else
-                {
-                    ImGui.TextUnformatted("Invalid territory.");
-                }
-
-
-                var target = Svc.Targets.Target as IBattleChara;
-                var actionmanagerCheck = target != null && FFXIVClientStructs.FFXIV.Client.Game.ActionManager.CanUseActionOnTarget(142, (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Struct());
-                if (target != null)
-                {
-                    ImGui.Text("can use on target " + actionmanagerCheck);
-                }
-                else
-                {
-                    ImGui.Text("target is NULL");
-                }
-
             }
         }
     }
