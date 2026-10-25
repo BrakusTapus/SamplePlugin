@@ -74,4 +74,21 @@ internal static class ObjectTracker
             }
         }
     }
+
+    // Needs to check for isenemy
+    public static int NumberOfHostilesInRange
+    {
+        get
+        {
+            int count = 0;
+            foreach (IBattleChara o in AllBattleCharas)
+            {
+                if (o.DistanceToPlayer() < 30)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+    }
 }

@@ -1,5 +1,10 @@
 using System;
 
+using Dalamud.Game.ClientState.Objects.Types;
+
+using KirboToolbox.Core.Extensions;
+using KirboToolbox.Core.Trackers;
+
 namespace KirboToolbox.Features.Highlight;
 
 /// <summary>
@@ -40,4 +45,28 @@ public static class RelationInfo
         Relation.Enemy => "Anything hostile to you.",
         _ => string.Empty,
     };
+
+    /// <summary>Exactly one relation per object, checked most-specific first.</summary>
+    internal static Relation GetRelation(this IGameObject obj)
+    {
+        if (obj is IBattleChara)
+        {
+            if (ObjectTracker.IsInParty(obj.EntityId))
+            {
+                return Relation.Party;
+            }
+
+            if (ObjectTracker.IsInAlliance(obj.EntityId))
+            {
+                return Relation.Alliance;
+            }
+
+            if (obj.IsEnemy())
+            {
+                return Relation.Enemy;
+            }
+        }
+
+        return Relation.Others;
+    }
 }

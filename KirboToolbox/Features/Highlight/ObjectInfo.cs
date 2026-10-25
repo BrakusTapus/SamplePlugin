@@ -2,7 +2,6 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 
 using KirboToolbox.Core.Game;
-using KirboToolbox.Helpers;
 
 namespace KirboToolbox.Features.Highlight;
 
