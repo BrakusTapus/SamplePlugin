@@ -12,7 +12,7 @@ using KirboToolbox.Helpers;
 
 namespace KirboToolbox.Core.Services;
 
-internal static class MainUpdater
+internal static class ObjectTracker
 {
     private const float MaxDistance = 90f;
 

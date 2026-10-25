@@ -109,7 +109,7 @@ internal static class ObjectHelper
         get
         {
             int count = 0;
-            foreach (IBattleChara o in MainUpdater.AllBattleCharas)
+            foreach (IBattleChara o in ObjectTracker.AllBattleCharas)
             {
                 if (o.DistanceToPlayer() < 30)
                 {
@@ -183,12 +183,12 @@ internal static class ObjectHelper
     {
         if (obj is IBattleChara)
         {
-            if (MainUpdater.IsInParty(obj.EntityId))
+            if (ObjectTracker.IsInParty(obj.EntityId))
             {
                 return Relation.Party;
             }
 
-            if (MainUpdater.IsInAlliance(obj.EntityId))
+            if (ObjectTracker.IsInAlliance(obj.EntityId))
             {
                 return Relation.Alliance;
             }

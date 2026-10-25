@@ -83,8 +83,8 @@ public sealed class Plugin : IDalamudPlugin
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
-        NamePlateUpdater.Enable();
-        MainUpdater.Enable();
+        NamePlateTracker.Enable();
+        ObjectTracker.Enable();
     }
 
     public void Dispose()
@@ -92,8 +92,8 @@ public sealed class Plugin : IDalamudPlugin
         Svc.Log.Debug($"Plugin: Dispose started.");
 
         ResetPlayerSpeed();
-        NamePlateUpdater.Disable();
-        MainUpdater.Disable();
+        NamePlateTracker.Disable();
+        ObjectTracker.Disable();
 
         Svc.PluginInterface.UiBuilder.Draw -= windowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;
@@ -177,31 +177,31 @@ public sealed class Plugin : IDalamudPlugin
 
     private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
     {
-        NamePlateUpdater.ClearList();
+        NamePlateTracker.ClearList();
         Svc.Log.Debug("Duty completed.");
     }
 
     private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
     {
-        NamePlateUpdater.ClearList();
+        NamePlateTracker.ClearList();
         Svc.Log.Debug("Duty recommenced.");
     }
 
     private static void DutyState_DutyWiped(IDutyStateEventArgs e)
     {
-        NamePlateUpdater.ClearList();
+        NamePlateTracker.ClearList();
         Svc.Log.Debug("Duty wiped.");
     }
 
     private static void DutyState_DutyStarted(IDutyStateEventArgs e)
     {
-        NamePlateUpdater.ClearList();
+        NamePlateTracker.ClearList();
         Svc.Log.Debug("Duty started.");
     }
 
     private static void ClientState_TerritoryChanged(uint id)
     {
-        NamePlateUpdater.ClearList();
+        NamePlateTracker.ClearList();
         Svc.Log.Debug($"Territory changed to {id}.");
     }
 }

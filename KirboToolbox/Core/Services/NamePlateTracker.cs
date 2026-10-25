@@ -13,7 +13,7 @@ namespace KirboToolbox.Core.Services;
 /// <summary>
 /// Updates and stores a list of active NamePlate entries.
 /// </summary>
-internal static class NamePlateUpdater
+internal static class NamePlateTracker
 {
     public static IReadOnlyList<NamePlateEntry> AllNamePlates => Entries;
     private static readonly List<NamePlateEntry> Entries = new();
@@ -21,19 +21,19 @@ internal static class NamePlateUpdater
     public static void Enable()
     {
         Svc.NamePlates.OnNamePlateUpdate += OnNamePlateUpdate;
-        Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now enabled!");
+        Svc.Log.Debug($"NamePlateTracker: OnNamePlateUpdate is now enabled!");
     }
 
     public static void Disable()
     {
         ClearList();
         Svc.NamePlates.OnNamePlateUpdate -= OnNamePlateUpdate;
-        Svc.Log.Debug($"NamePlateUpdater: OnNamePlateUpdate is now disabled!");
+        Svc.Log.Debug($"NamePlateTracker: OnNamePlateUpdate is now disabled!");
     }
 
     internal static void OnNamePlateUpdate(INamePlateUpdateContext context, IReadOnlyList<INamePlateUpdateHandler> handlers)
     {
-        NamePlateUpdater.Update(handlers);
+        NamePlateTracker.Update(handlers);
         // Build a set of valid GameObjectIds from current handlers
         HashSet<ulong> currentGameObjectIds = new();
         foreach (INamePlateUpdateHandler handler in handlers)
@@ -94,7 +94,7 @@ internal static class NamePlateUpdater
             return null;
         }
 
-        return NamePlateUpdater.CurrentNameplates
+        return NamePlateTracker.CurrentNameplates
             .FirstOrDefault(n => n.GameObjectId == battleChara.GameObjectId);
     }
 
@@ -140,7 +140,7 @@ internal class NamePlateEntry
         get
         {
             var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
-            return NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+            return NamePlateTracker.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
         }
     }
 }

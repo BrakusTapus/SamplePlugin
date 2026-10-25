@@ -60,18 +60,18 @@ internal sealed unsafe class TargetInfoTab
 
         if (ImGui.Button("Clear List"))
         {
-            NamePlateUpdater.ClearList();
+            NamePlateTracker.ClearList();
         }
 
         ImGuiEx.Tooltip("Clears the listed nameplates");
         ImGui.SameLine();
-        ImGui.TextUnformatted("AllNamePlates: " + NamePlateUpdater.AllNamePlates.Count);
+        ImGui.TextUnformatted("AllNamePlates: " + NamePlateTracker.AllNamePlates.Count);
     }
 
     private static void DrawCurrentTarget()
     {
         var targetId = Svc.Targets.Target?.GameObjectId ?? 0;
-        var entry = NamePlateUpdater.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
+        var entry = NamePlateTracker.AllNamePlates.FirstOrDefault(n => n.GameObjectId == targetId);
         if (entry == null)
         {
             ImGui.TextUnformatted("Direct: NOT FOUND");
@@ -86,7 +86,7 @@ internal sealed unsafe class TargetInfoTab
 
     private static void DrawAllNamePlates()
     {
-        foreach (var entry in NamePlateUpdater.AllNamePlates)
+        foreach (var entry in NamePlateTracker.AllNamePlates)
         {
             if (!entry.IsTargetable)
             {

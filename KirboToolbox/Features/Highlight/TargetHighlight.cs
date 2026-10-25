@@ -77,7 +77,7 @@ internal sealed class TargetHighlight : Window
             return;
         }
 
-        foreach (var obj in MainUpdater.AllGameObjects)
+        foreach (var obj in ObjectTracker.AllGameObjects)
         {
             if (obj.Address == IntPtr.Zero || obj.GameObjectId == player.GameObjectId)
             {
