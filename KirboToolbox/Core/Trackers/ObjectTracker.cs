@@ -30,8 +30,17 @@ internal static class ObjectTracker
     public static unsafe bool IsInAlliance(uint entityId) =>
         inAlliance && GroupManager.Instance()->MainGroup.IsEntityIdInAlliance(entityId);
 
-    public static void Enable() => Svc.Framework.Update += OnUpdate;
-    public static void Disable() => Svc.Framework.Update -= OnUpdate;
+    public static void Enable()
+    {
+        Svc.Framework.Update += OnUpdate;
+        Svc.Log.Debug($"ObjectTracker: OnUpdate is now enabled!");
+    }
+
+    public static void Disable()
+    {
+        Svc.Framework.Update -= OnUpdate;
+        Svc.Log.Debug($"ObjectTracker: OnUpdate is now disabled!");
+    }
 
     private static unsafe void OnUpdate(IFramework framework)
     {
