@@ -71,17 +71,15 @@ public sealed class Plugin : IDalamudPlugin
         });
 
         Svc.PluginInterface.UiBuilder.Draw += windowSystem.Draw;
-        // Adds another button that is doing the same but for the main ui of the plugin
-        Svc.PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
-        // This adds a button to the plugin installer entry of this plugin which allows
-        // to toggle the display status of the configuration ui
-        Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
+        Svc.PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI; // Adds another button that is doing the same but for the main ui of the plugin
+        Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI; // This adds a button to the plugin installer entry of this plugin which allows to toggle the display status of the configuration ui
+
+        Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
         Svc.DutyState.DutyStarted += DutyState_DutyStarted;
+        Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
         Svc.DutyState.DutyWiped += DutyState_DutyWiped;
         Svc.DutyState.DutyRecommenced += DutyState_DutyRecommenced;
-        Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
-        Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
 
         NamePlateTracker.Enable();
         ObjectTracker.Enable();
@@ -107,10 +105,11 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Dispose();
 
         Svc.ClientState.TerritoryChanged -= ClientState_TerritoryChanged;
+
         Svc.DutyState.DutyStarted -= DutyState_DutyStarted;
+        Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
         Svc.DutyState.DutyWiped -= DutyState_DutyWiped;
         Svc.DutyState.DutyRecommenced -= DutyState_DutyRecommenced;
-        Svc.DutyState.DutyCompleted -= DutyState_DutyCompleted;
 
         Svc.Commands.RemoveHandler(CommandName);
         Svc.Commands.RemoveHandler(CommandTest);
@@ -136,6 +135,7 @@ public sealed class Plugin : IDalamudPlugin
 
             // Keep the saved slider value in sync with the real game speed.
             Configuration.SpeedMultiplier = 1f;
+            Svc.Log.Debug($"Player speed was reset back to 1.");
             Configuration.Save();
         }
         catch (Exception ex)
@@ -162,6 +162,9 @@ public sealed class Plugin : IDalamudPlugin
         ToggleHighlightUI();
     }
 
+    public void ToggleMainUI() => MainWindow.Toggle();
+    public void ToggleConfigUI() => ConfigWindow.Toggle();
+    public void ToggleTestUI() => TestWindow.Toggle();
     public void ToggleHighlightUI()
     {
         // Flip the setting, keep the window in sync with it, and save.
@@ -171,37 +174,35 @@ public sealed class Plugin : IDalamudPlugin
 
         Svc.Log.Debug($"Highlight overlay is now {(Configuration.EnableHighLightOverlay ? "enabled" : "disabled")}.");
     }
-    public void ToggleTestUI() => TestWindow.Toggle();
-    public void ToggleConfigUI() => ConfigWindow.Toggle();
-    public void ToggleMainUI() => MainWindow.Toggle();
 
-    private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
+    private void ClientState_TerritoryChanged(uint id)
     {
+        Svc.Log.Debug($"Territory changed to {id}.");
         NamePlateTracker.ClearList();
-        Svc.Log.Debug("Duty completed.");
-    }
-
-    private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
-    {
-        NamePlateTracker.ClearList();
-        Svc.Log.Debug("Duty recommenced.");
-    }
-
-    private static void DutyState_DutyWiped(IDutyStateEventArgs e)
-    {
-        NamePlateTracker.ClearList();
-        Svc.Log.Debug("Duty wiped.");
     }
 
     private static void DutyState_DutyStarted(IDutyStateEventArgs e)
     {
-        NamePlateTracker.ClearList();
         Svc.Log.Debug("Duty started.");
+        NamePlateTracker.ClearList();
     }
 
-    private static void ClientState_TerritoryChanged(uint id)
+    private static void DutyState_DutyCompleted(IDutyStateEventArgs e)
     {
+        Svc.Log.Debug("Duty completed.");
         NamePlateTracker.ClearList();
-        Svc.Log.Debug($"Territory changed to {id}.");
     }
+
+    private static void DutyState_DutyWiped(IDutyStateEventArgs e)
+    {
+        Svc.Log.Debug("Duty wiped.");
+        NamePlateTracker.ClearList();
+    }
+
+    private static void DutyState_DutyRecommenced(IDutyStateEventArgs e)
+    {
+        Svc.Log.Debug("Duty recommenced.");
+        NamePlateTracker.ClearList();
+    }
+
 }

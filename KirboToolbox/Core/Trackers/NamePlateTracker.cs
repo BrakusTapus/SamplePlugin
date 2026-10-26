@@ -93,6 +93,7 @@ internal static class NamePlateTracker
     public static void ClearList()
     {
         Entries.Clear();
+        Svc.Log.Debug($"Cleared list: 'NamePlate entries'");
     }
 
     public static IReadOnlyList<INamePlateUpdateHandler> CurrentNameplates { get; private set; } = new List<INamePlateUpdateHandler>();

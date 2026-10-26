@@ -97,6 +97,6 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         Svc.PluginInterface.SavePluginConfig(this);
-        Svc.Log.Debug($"Saved plugin config.");
+        Svc.Log.Verbose($"Saved plugin config.");
     }
 }
