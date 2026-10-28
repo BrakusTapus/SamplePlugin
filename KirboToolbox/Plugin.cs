@@ -1,3 +1,5 @@
+// TODO optimiize performance somehow
+
 using System;
 using System.IO;
 
