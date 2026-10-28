@@ -1,4 +1,5 @@
 // TODO optimiize performance somehow
+// TODO Add kirbotoolbox ass a entry on the iTitleMenuScreen
 
 using System;
 using System.IO;
@@ -77,7 +78,6 @@ public sealed class Plugin : IDalamudPlugin
         Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI; // This adds a button to the plugin installer entry of this plugin which allows to toggle the display status of the configuration ui
 
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
-        Svc.ClientState.LeavePvP += ClientState_LeavingPvP;
 
         Svc.DutyState.DutyStarted += DutyState_DutyStarted;
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
@@ -181,12 +181,6 @@ public sealed class Plugin : IDalamudPlugin
     private void ClientState_TerritoryChanged(uint id)
     {
         Svc.Log.Debug($"Territory changed to {id}.");
-        NamePlateTracker.ClearList();
-    }
-
-    private void ClientState_LeavingPvP()
-    {
-        Svc.Log.Debug($"leaving PvP.");
         NamePlateTracker.ClearList();
     }
 
