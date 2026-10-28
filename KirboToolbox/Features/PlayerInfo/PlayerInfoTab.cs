@@ -83,7 +83,8 @@ internal sealed unsafe class PlayerInfoTab
         var step = configuration.SpeedStep;
 
         ImGui.Text("Current movement speed: " + localPlayer.CurrentSpeed.ToString("F3"));
-        ImGui.Text("Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
+        ImGui.Text("Current Movement speed multiplier: " + localPlayer.Speed.ToString("F3"));
+        ImGui.Text("Movement speed multiplier: " + speed.ToString("F3"));
         ImGui.NewLine();
 
         ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
@@ -128,7 +129,7 @@ internal sealed unsafe class PlayerInfoTab
         configuration.Save();
     }
 
-    private static void DrawHitbox(IPlayerCharacter localPlayer, IPlayerState playerState)
+    private static void DrawHitbox(IPlayerCharacter localPlayer, IPlayerState playerState) // issue: hitbox radius value gets dynamicly changed for example when on mount
     {
         if (localPlayer.Address == nint.Zero)
         {
@@ -138,7 +139,8 @@ internal sealed unsafe class PlayerInfoTab
         var gameObject = (GameObject*)localPlayer.Address;
 
         ImGui.TextUnformatted($"Hitbox Radius: ({localPlayer.HitboxRadius})");
-        ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref gameObject->HitboxRadius, 0f, 100f);
+        ImGui.SetNextItemWidth(150 * ImGuiHelpers.GlobalScale);
+        ImGui.SliderFloat($"Hitbox Radius###{playerState.CharacterName}{playerState.EntityId}", ref gameObject->HitboxRadius, 0f, 3f);
         ImGui.SameLine();
         if (ImGui.Button("Reset##HitboxRadius"))
         {

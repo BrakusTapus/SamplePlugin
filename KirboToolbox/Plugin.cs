@@ -75,6 +75,7 @@ public sealed class Plugin : IDalamudPlugin
         Svc.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI; // This adds a button to the plugin installer entry of this plugin which allows to toggle the display status of the configuration ui
 
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
+        Svc.ClientState.LeavePvP += ClientState_LeavingPvP;
 
         Svc.DutyState.DutyStarted += DutyState_DutyStarted;
         Svc.DutyState.DutyCompleted += DutyState_DutyCompleted;
@@ -121,7 +122,7 @@ public sealed class Plugin : IDalamudPlugin
     /// <summary>
     /// Puts the player's movement speed back to normal so we don't leave modified game memory behind.
     /// </summary>
-    private void ResetPlayerSpeed()
+    private void ResetPlayerSpeed() // player Speed should be reset automatically under certain conditions like when logging out or changing territory (player is null during territory transitions)
     {
         try
         {
@@ -178,6 +179,12 @@ public sealed class Plugin : IDalamudPlugin
     private void ClientState_TerritoryChanged(uint id)
     {
         Svc.Log.Debug($"Territory changed to {id}.");
+        NamePlateTracker.ClearList();
+    }
+
+    private void ClientState_LeavingPvP()
+    {
+        Svc.Log.Debug($"leaving PvP.");
         NamePlateTracker.ClearList();
     }
 
