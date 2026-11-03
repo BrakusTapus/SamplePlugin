@@ -14,6 +14,7 @@ using ECommons.DalamudServices;
 
 using KirboToolbox.Configs;
 using KirboToolbox.Core.Trackers;
+using KirboToolbox.Features.AutoGuard;
 using KirboToolbox.Features.Highlight;
 using KirboToolbox.Core.Extensions;
 using KirboToolbox.UI.Windows;
@@ -35,12 +36,14 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
     internal TestWindow TestWindow { get; init; }
     internal TargetHighlight TargetHighlightWindow { get; init; }
+    internal AutoGuardService AutoGuard { get; init; }
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
         ECommonsMain.Init(pluginInterface, this, Module.DalamudReflector, Module.ObjectFunctions);
         Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.MigrateIfNeeded();
+        AutoGuard = new AutoGuardService(Configuration);
 
         // you might normally want to embed resources and load them from the manifest stream
         var assetsPath = Path.Combine(pluginInterface.AssemblyLocation.Directory?.FullName!, "Assets");
@@ -95,6 +98,7 @@ public sealed class Plugin : IDalamudPlugin
         ResetPlayerSpeed();
         NamePlateTracker.Disable();
         ObjectTracker.Disable();
+        AutoGuard.Dispose();
 
         Svc.PluginInterface.UiBuilder.Draw -= windowSystem.Draw;
         Svc.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUI;

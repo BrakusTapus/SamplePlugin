@@ -11,6 +11,7 @@ using Dalamud.Interface.Windowing;
 using ECommons.DalamudServices;
 
 using KirboToolbox.Configs;
+using KirboToolbox.Features.AutoGuard;
 using KirboToolbox.Features.Highlight;
 using KirboToolbox.Features.PlayerInfo;
 using KirboToolbox.Features.TargetInfo;
@@ -25,6 +26,7 @@ public class MainWindow : Window, IDisposable
     private readonly HighlightTab highlightTab;
     private readonly PlayerInfoTab playerInfoTab;
     private readonly TargetInfoTab targetInfoTab;
+    private readonly AutoGuardTab autoGuardTab;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -60,6 +62,7 @@ public class MainWindow : Window, IDisposable
         highlightTab = new HighlightTab(plugin);
         playerInfoTab = new PlayerInfoTab(plugin);
         targetInfoTab = new TargetInfoTab();
+        autoGuardTab = new AutoGuardTab(plugin);
     }
 
     public void Dispose() { }
@@ -112,6 +115,13 @@ public class MainWindow : Window, IDisposable
                     {
                         DrawHighlightTab();
                     }
+                }
+            }
+            using (var autoGuardTabItem = ImRaii.TabItem("Auto Guard"))
+            {
+                if (autoGuardTabItem.Success)
+                {
+                    autoGuardTab.Draw();
                 }
             }
         }

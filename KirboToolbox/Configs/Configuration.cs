@@ -34,6 +34,12 @@ public class Configuration : IPluginConfiguration
     public bool HighlightPlayer { get; set; } = false;
     public bool UseGradientColor { get; set; } = false;
 
+    // Auto guard
+    public bool AutoGuardEnabled { get; set; } = false;
+    public bool AutoGuardAlertOnCooldown { get; set; } = true;
+    public int AutoGuardTimesDetected { get; set; } = 0;
+    public int AutoGuardTimesGuarded { get; set; } = 0;
+
     /// <summary>
     /// What to highlight. Key = HighlightCategory.Id. A category is active if it has an entry here.
     /// </summary>
