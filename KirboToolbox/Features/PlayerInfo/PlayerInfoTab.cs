@@ -165,13 +165,41 @@ internal sealed unsafe class PlayerInfoTab
 
     private static void DrawTargetCheck()
     {
-        if (Svc.Targets.Target is not IBattleChara target)
+        if (Svc.Targets.Target is not IBattleChara target || target.Address == IntPtr.Zero)
         {
-            ImGui.Text("target is NULL");
+            ImGui.Text("target is NULL or invalid");
             return;
         }
 
-        var canUse = ActionManager.CanUseActionOnTarget(142, (GameObject*)target.Struct());
-        ImGui.Text("can use on target " + canUse);
+        // Safely check ActionManager if applicable, or wrap in a try-catch for safety
+        try
+        {
+            ImGui.TextUnformatted($"Target: {target.Name.TextValue}");
+
+            var targetOfTarget = target.TargetObject;
+            var targetOfTargetName = targetOfTarget != null ? targetOfTarget.Name.TextValue : "none";
+            ImGui.TextUnformatted($"Target's target: {targetOfTargetName}");
+
+            var canUse = ActionManager.CanUseActionOnTarget(142, (GameObject*)target.Struct());
+            ImGui.Text($"Can use action on target: {canUse}");
+
+            var canUseMarksMansSpite = ActionManager.CanUseActionOnTarget(29415, (GameObject*)target.Struct());
+            ImGui.Text($"Can use MarksMan Spite on target: {canUseMarksMansSpite}");
+
+            var isTargetingPlayer = target.IsTargetingPlayer();
+
+            if (isTargetingPlayer)
+            {
+                ImGui.TextColored(new System.Numerics.Vector4(0, 1, 0, 1), "Is Targeting Player: True");
+            }
+            else
+            {
+                ImGui.Text("Is Targeting Player: False");
+            }
+        }
+        catch (Exception ex)
+        {
+            ImGui.TextColored(new System.Numerics.Vector4(1, 0, 0, 1), $"Error in DrawTargetCheck: {ex.Message}");
+        }
     }
 }

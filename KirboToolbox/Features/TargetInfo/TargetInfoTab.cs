@@ -3,14 +3,18 @@ using System.Linq;
 using System.Numerics;
 
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility.Raii;
 
 using ECommons.DalamudServices;
+using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
 
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
+using KirboToolbox.Core.Extensions;
 using KirboToolbox.Core.Trackers;
 using KirboToolbox.Helpers.UI;
 
@@ -34,6 +38,8 @@ internal sealed unsafe class TargetInfoTab
             if (left.Success)
             {
                 DrawCurrentTarget();
+                ImGui.Separator();
+                DrawTargetCheck();
             }
         }
 
@@ -82,6 +88,46 @@ internal sealed unsafe class TargetInfoTab
         ImGui.TextUnformatted($"1 = {entry.Name}");
         ImGui.TextUnformatted($"2 = {entry.IsBoss}");
         ImGui.TextUnformatted($"3 = {entry.GameObjectId}");
+    }
+
+    private static void DrawTargetCheck()
+    {
+        if (Svc.Targets.Target is not IBattleChara target || target.Address == IntPtr.Zero)
+        {
+            ImGui.Text("target is NULL or invalid");
+            return;
+        }
+
+        // Safely check ActionManager if applicable, or wrap in a try-catch for safety
+        try
+        {
+            ImGui.TextUnformatted($"Target: {target.Name.TextValue}");
+
+            var targetOfTarget = target.TargetObject;
+            var targetOfTargetName = targetOfTarget != null ? targetOfTarget.Name.TextValue : "none";
+            ImGui.TextUnformatted($"Target's target: {targetOfTargetName}");
+
+            var canUse = ActionManager.CanUseActionOnTarget(142, (GameObject*)targetOfTarget.Struct());
+            ImGui.Text($"Can use action on target: {canUse}");
+
+            var canUseMarksMansSpite = ActionManager.CanUseActionOnTarget(29415, (GameObject*)targetOfTarget.Struct());
+            ImGui.Text($"Can use MarksMan Spite on target: {canUseMarksMansSpite}");
+
+            var isTargetingPlayer = target.IsTargetingPlayer();
+
+            if (isTargetingPlayer)
+            {
+                ImGui.TextColored(new System.Numerics.Vector4(0, 1, 0, 1), "Is Targeting Player: True");
+            }
+            else
+            {
+                ImGui.Text("Is Targeting Player: False");
+            }
+        }
+        catch (Exception ex)
+        {
+            ImGui.TextColored(new System.Numerics.Vector4(1, 0, 0, 1), $"Error in DrawTargetCheck: {ex.Message}");
+        }
     }
 
     private static void DrawAllNamePlates()
